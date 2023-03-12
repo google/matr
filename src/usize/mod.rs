@@ -20,6 +20,7 @@ mod is_even;
 mod to_usize;
 mod long_recursion;
 
+use std::marker::PhantomData;
 pub use zero::*;
 pub use increment::*;
 pub use sum::*;
@@ -50,6 +51,18 @@ impl<U: USizeValue> Value<USize> for U {
     type UnconstrainedImpl = <U as USizeValue>::Impl;
 }
 
+pub struct AsUSize<N: Expr<USize>> {
+    n: PhantomData<N>,
+}
+
+impl<N: Expr<USize>> USizeTrait for AsUSize<N> {
+    default type Visit<ResultK: Kind, V: USizeVisitor<ResultK>> = V::VisitZero;
+}
+
+impl<N: Expr<USize>> USizeTrait for AsUSize<N> where <<N as Expr<USize>>::Eval as Value<USize>>::UnconstrainedImpl: USizeTrait {
+    type Visit<ResultK: Kind, V: USizeVisitor<ResultK>> = <<<N as Expr<USize>>::Eval as Value<USize>>::UnconstrainedImpl as USizeTrait>::Visit<ResultK, V>;
+}
+
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
@@ -61,18 +74,6 @@ mod internal {
     pub trait USizeVisitor<ResultK: Kind> {
         type VisitZero: Expr<ResultK>;
         type VisitIncrement<N: Expr<USize>>: Expr<ResultK>;
-    }
-
-    pub struct AsUSize<N: Expr<USize>> {
-        n: PhantomData<N>,
-    }
-
-    impl<N: Expr<USize>> USizeTrait for AsUSize<N> {
-        default type Visit<ResultK: Kind, V: USizeVisitor<ResultK>> = V::VisitZero;
-    }
-
-    impl<N: Expr<USize>> USizeTrait for AsUSize<N> where <<N as Expr<USize>>::Eval as Value<USize>>::UnconstrainedImpl: USizeTrait {
-        type Visit<ResultK: Kind, V: USizeVisitor<ResultK>> = <<<N as Expr<USize>>::Eval as Value<USize>>::UnconstrainedImpl as USizeTrait>::Visit<ResultK, V>;
     }
 
     pub struct USizeEquals<X: Expr<USize>, Y: Expr<USize>> {

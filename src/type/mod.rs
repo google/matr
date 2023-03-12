@@ -24,8 +24,12 @@ pub struct Type {}
 
 impl Kind for Type {}
 
+impl KindWithDefault for Type {
+    type Default = WrapType<()>;
+}
+
 pub trait TypeValue {
-    type Impl;
+    type UnconstrainedImpl;
 }
 
 impl EqualityComparableKind for Type {
@@ -41,11 +45,11 @@ impl<T> Expr<Type> for WrapType<T> {
 }
 
 impl<T> TypeValue for WrapType<T> {
-    type Impl = T;
+    type UnconstrainedImpl = T;
 }
 
 impl<T: TypeValue> Value<Type> for T {
-    type UnconstrainedImpl = <T as TypeValue>::Impl;
+    type UnconstrainedImpl = <T as TypeValue>::UnconstrainedImpl;
 }
 
 // These have to be public because otherwise Rust would complain that "can't leak private type".

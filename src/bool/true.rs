@@ -20,15 +20,15 @@ impl Expr<Bool> for True {
     type Eval = TrueValue;
 }
 
-pub struct TrueValue {}
-impl BoolValue for TrueValue {
-    type Impl = TrueImpl;
-}
-
 // These have to be public because otherwise Rust would complain that "can't leak private type".
 // But they should never be explicitly referenced elsewhere.
 mod internal {
     pub use super::super::internal::*;
+
+    pub struct TrueValue {}
+    impl BoolValue for TrueValue {
+        type Impl = TrueImpl;
+    }
 
     pub struct TrueImpl {}
 
