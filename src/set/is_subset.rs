@@ -22,31 +22,21 @@ pub struct IsSubset<K: EqualityComparableKind, CandidateSubset: Expr<Set<K>>, Ca
 }
 
 impl<K: EqualityComparableKind, CandidateSubset: Expr<Set<K>>, CandidateSuperset: Expr<Set<K>>> Expr<Bool> for IsSubset<K, CandidateSubset, CandidateSuperset> {
-    type Eval = IsSubsetValue<K, CandidateSubset, CandidateSuperset>;
+    type Eval = <VisitSet<K, Bool, CandidateSubset, IsSubsetVisitor<K, CandidateSuperset>> as Expr<Bool>>::Eval;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
 
-    pub struct IsSubsetValue<K: EqualityComparableKind, CandidateSubset: Expr<Set<K>>, CandidateSuperset: Expr<Set<K>>> {
-        k: PhantomData<K>,
-        candidate_subset: PhantomData<CandidateSubset>,
-        candidate_superset: PhantomData<CandidateSuperset>,
-    }
-
-    impl<K: EqualityComparableKind, CandidateSubset: Expr<Set<K>>, CandidateSuperset: Expr<Set<K>>> BoolValue for IsSubsetValue<K, CandidateSubset, CandidateSuperset> {
-        type Impl = AsBool<<AsList<K, <AsSet<K, CandidateSubset> as SetTrait<K>>::GetList> as ListTrait<K>>::Visit<Bool, IsSubsetVisitor<K, CandidateSuperset>>>;
-    }
-
     pub struct IsSubsetVisitor<K: EqualityComparableKind, CandidateSuperset: Expr<Set<K>>> {
         k: PhantomData<K>,
         candidate_superset: PhantomData<CandidateSuperset>,
     }
 
-    impl<K: EqualityComparableKind, CandidateSuperset: Expr<Set<K>>> ListVisitor<K, Bool> for IsSubsetVisitor<K, CandidateSuperset> {
-        type VisitEmptyList = True;
-        type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> = And<IsInSet<K, Elem, CandidateSuperset>, <AsList<K, Tail> as ListTrait<K>>::Visit<Bool, IsSubsetVisitor<K, CandidateSuperset>>>;
+    impl<K: EqualityComparableKind, CandidateSuperset: Expr<Set<K>>> SetVisitor<K, Bool> for IsSubsetVisitor<K, CandidateSuperset> {
+        type VisitEmptySet = True;
+        type VisitCons<Elem: Expr<K>, Tail: Expr<Set<K>>> = And<IsInSet<K, Elem, CandidateSuperset>, VisitSet<K, Bool, Tail, IsSubsetVisitor<K, CandidateSuperset>>>;
     }
 }
 

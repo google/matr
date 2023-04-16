@@ -22,21 +22,12 @@ pub struct ListSize<K: Kind, L: Expr<List<K>>> {
 }
 
 impl<K: Kind, L: Expr<List<K>>> Expr<USize> for ListSize<K, L> {
-    type Eval = ListSizeValue<K, L>;
+    type Eval = <VisitList<K, USize, L, ListSizeVisitor<K>> as Expr<USize>>::Eval;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct ListSizeValue<K: Kind, L: Expr<List<K>>> {
-        k: PhantomData<K>,
-        l: PhantomData<L>,
-    }
-
-    impl<K: Kind, L: Expr<List<K>>> USizeValue for ListSizeValue<K, L> {
-        type Impl = AsUSize<<AsList<K, L> as ListTrait<K>>::Visit<USize, ListSizeVisitor<K>>>;
-    }
 
     pub struct ListSizeVisitor<K: Kind> {
         k: PhantomData<K>,

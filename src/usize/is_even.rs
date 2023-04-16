@@ -20,15 +20,7 @@ pub struct IsEven<N: Expr<USize>> {
 }
 
 impl<N: Expr<USize>> Expr<Bool> for IsEven<N> {
-    type Eval = IsEvenValue<N>;
-}
-
-pub struct IsEvenValue<N: Expr<USize>> {
-    n: PhantomData<N>,
-}
-
-impl<N: Expr<USize>> BoolValue for IsEvenValue<N> {
-    type Impl = AsBool<<AsUSize<N> as USizeTrait>::Visit<Bool, IsEvenVisitor>>;
+    type Eval = <VisitUSize<Bool, N, IsEvenVisitor> as Expr<Bool>>::Eval;
 }
 
 pub struct IsOdd<N: Expr<USize>> {
@@ -36,31 +28,11 @@ pub struct IsOdd<N: Expr<USize>> {
 }
 
 impl<N: Expr<USize>> Expr<Bool> for IsOdd<N> {
-    type Eval = IsOddValue<N>;
-}
-
-pub struct IsOddValue<N: Expr<USize>> {
-    n: PhantomData<N>,
-}
-
-impl<N: Expr<USize>> BoolValue for IsOddValue<N> {
-    type Impl = AsBool<<AsUSize<N> as USizeTrait>::Visit<Bool, IsOddVisitor>>;
+    type Eval = <VisitUSize<Bool, N, IsOddVisitor> as Expr<Bool>>::Eval;
 }
 
 mod internal {
     pub use super::super::internal::*;
-
-    pub struct IsEvenFunctor {}
-
-    impl Functor1<USize, Result<Bool>> for IsEvenFunctor {
-        type Apply<V1: Expr<USize>> = Ok<Bool, <AsUSize<V1> as USizeTrait>::Visit<Bool, IsEvenVisitor>>;
-    }
-
-    pub struct IsOddFunctor {}
-
-    impl Functor1<USize, Result<Bool>> for IsOddFunctor {
-        type Apply<V1: Expr<USize>> = Ok<Bool, <AsUSize<V1> as USizeTrait>::Visit<Bool, IsOddVisitor>>;
-    }
 
     pub struct IsEvenVisitor {}
 

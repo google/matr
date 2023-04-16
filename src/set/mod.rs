@@ -56,34 +56,88 @@ impl<K: EqualityComparableKind> KindWithDefault for Set<K> {
     type Default = EmptySet<K>;
 }
 
-pub trait SetValue<K: EqualityComparableKind> {
-    type Impl: SetTrait<K>;
+pub trait SetVisitor<ElemK: EqualityComparableKind, OutK: Kind> {
+    type VisitEmptySet: Expr<OutK>;
+    type VisitCons<Elem: Expr<ElemK>, Tail: Expr<Set<ElemK>>>: Expr<OutK>;
 }
 
-impl<K: EqualityComparableKind, U: SetValue<K>> Value<Set<K>> for U {
-    type UnconstrainedImpl = <U as SetValue<K>>::Impl;
-}
-
-pub trait SetTrait<K: EqualityComparableKind> {
-    type GetList: Expr<List<K>>;
-}
-
-pub struct AsSet<K: EqualityComparableKind, S: Expr<Set<K>>> {
-    k: PhantomData<K>,
+pub struct VisitSet<ElemK: EqualityComparableKind, OutK: Kind, S: Expr<Set<ElemK>>, V: SetVisitor<ElemK, OutK>> {
+    elem_k: PhantomData<ElemK>,
+    out_k: PhantomData<OutK>,
     s: PhantomData<S>,
+    v: PhantomData<V>,
 }
 
-impl<K: EqualityComparableKind, S: Expr<Set<K>>> SetTrait<K> for AsSet<K, S> {
-    default type GetList = EmptyList<K>;
-}
-
-impl<K:EqualityComparableKind, S: Expr<Set<K>>> SetTrait<K> for AsSet<K, S> where <<S as Expr<Set<K>>>::Eval as Value<Set<K>>>::UnconstrainedImpl: SetTrait<K> {
-    type GetList = <<<S as Expr<Set<K>>>::Eval as Value<Set<K>>>::UnconstrainedImpl as SetTrait<K>>::GetList;
+impl<ElemK: EqualityComparableKind, OutK: Kind, S: Expr<Set<ElemK>>, V: SetVisitor<ElemK, OutK>> Expr<OutK> for VisitSet<ElemK, OutK, S, V> {
+    type Eval = <VisitList<ElemK, OutK, <AsSet<ElemK, S> as SetTrait<ElemK>>::GetList, SetVisitorToListVisitorAdapter<ElemK, OutK, V>> as Expr<OutK>>::Eval;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
+
+    pub struct SetVisitorToListVisitorAdapter<ElemK: EqualityComparableKind, OutK: Kind, V: SetVisitor<ElemK, OutK>> {
+        elem_k: PhantomData<ElemK>,
+        out_k: PhantomData<OutK>,
+        v: PhantomData<V>,
+    }
+
+    impl<ElemK: EqualityComparableKind, OutK: Kind, V: SetVisitor<ElemK, OutK>> ListVisitor<ElemK, OutK> for SetVisitorToListVisitorAdapter<ElemK, OutK, V> {
+        type VisitEmptyList = V::VisitEmptySet;
+        type VisitCons<Elem: Expr<ElemK>, Tail: Expr<List<ElemK>>> = V::VisitCons<Elem, ListToSetUnchecked<ElemK, Tail>>;
+    }
+
+    pub struct ListToSetUnchecked<ElemK: EqualityComparableKind, L: Expr<List<ElemK>>> {
+        elem_k: PhantomData<ElemK>,
+        l: PhantomData<L>,
+    }
+
+    impl<ElemK: EqualityComparableKind, L: Expr<List<ElemK>>> Expr<Set<ElemK>> for ListToSetUnchecked<ElemK, L> {
+        type Eval = ListToSetUncheckedValue<ElemK, L>;
+    }
+
+    pub struct ListToSetUncheckedValue<ElemK: EqualityComparableKind, L: Expr<List<ElemK>>> {
+        elem_k: PhantomData<ElemK>,
+        l: PhantomData<L>,
+    }
+
+    impl<ElemK: EqualityComparableKind, L: Expr<List<ElemK>>> SetValue<ElemK> for ListToSetUncheckedValue<ElemK, L> {
+        type Impl = ListToSetUncheckedImpl<ElemK, L>;
+    }
+
+    pub struct ListToSetUncheckedImpl<ElemK: EqualityComparableKind, S: Expr<List<ElemK>>> {
+        elem_k: PhantomData<ElemK>,
+        s: PhantomData<S>,
+    }
+
+    impl<ElemK: EqualityComparableKind, L: Expr<List<ElemK>>> SetTrait<ElemK> for ListToSetUncheckedImpl<ElemK, L> {
+        type GetList = L;
+    }
+
+    pub trait SetValue<K: EqualityComparableKind> {
+        type Impl: SetTrait<K>;
+    }
+
+    impl<K: EqualityComparableKind, U: SetValue<K>> Value<Set<K>> for U {
+        type UnconstrainedImpl = <U as SetValue<K>>::Impl;
+    }
+
+    pub trait SetTrait<K: EqualityComparableKind> {
+        type GetList: Expr<List<K>>;
+    }
+
+    pub struct AsSet<K: EqualityComparableKind, S: Expr<Set<K>>> {
+        k: PhantomData<K>,
+        s: PhantomData<S>,
+    }
+
+    impl<K: EqualityComparableKind, S: Expr<Set<K>>> SetTrait<K> for AsSet<K, S> {
+        default type GetList = EmptyList<K>;
+    }
+
+    impl<K:EqualityComparableKind, S: Expr<Set<K>>> SetTrait<K> for AsSet<K, S> where <<S as Expr<Set<K>>>::Eval as Value<Set<K>>>::UnconstrainedImpl: SetTrait<K> {
+        type GetList = <<<S as Expr<Set<K>>>::Eval as Value<Set<K>>>::UnconstrainedImpl as SetTrait<K>>::GetList;
+    }
 
     pub struct SetEquals<K: EqualityComparableKind, X: Expr<Set<K>>, Y: Expr<Set<K>>> {
         k: PhantomData<K>,
@@ -92,16 +146,6 @@ mod internal {
     }
 
     impl<K: EqualityComparableKind, X: Expr<Set<K>>, Y: Expr<Set<K>>> Expr<Bool> for SetEquals<K, X, Y> {
-        type Eval = SetEqualsImpl<K, X, Y>;
-    }
-
-    pub struct SetEqualsImpl<K: EqualityComparableKind, X: Expr<Set<K>>, Y: Expr<Set<K>>> {
-        k: PhantomData<K>,
-        x: PhantomData<X>,
-        y: PhantomData<Y>,
-    }
-
-    impl<K: EqualityComparableKind, X: Expr<Set<K>>, Y: Expr<Set<K>>> BoolValue for SetEqualsImpl<K, X, Y> {
-        type Impl = AsBool<And<IsSubset<K, X, Y>, IsSubset<K, Y, X>>>;
+        type Eval = <And<IsSubset<K, X, Y>, IsSubset<K, Y, X>> as Expr<Bool>>::Eval;
     }
 }

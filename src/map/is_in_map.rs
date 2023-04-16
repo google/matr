@@ -15,31 +15,20 @@
 use std::marker::PhantomData;
 use internal::*;
 
-pub struct IsInMap<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, S: Expr<Map<K, V>>> {
+pub struct IsInMap<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, M: Expr<Map<K, V>>> {
     k: PhantomData<K>,
     v: PhantomData<V>,
     x: PhantomData<X>,
-    s: PhantomData<S>,
+    m: PhantomData<M>,
 }
 
-impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, S: Expr<Map<K, V>>> Expr<Bool> for IsInMap<K, V, X, S> {
-    type Eval = IsInMapValue<K, V, X, S>;
+impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, M: Expr<Map<K, V>>> Expr<Bool> for IsInMap<K, V, X, M> {
+    type Eval = <VisitMap<K, V, Bool, M, IsInMapVisitor<K, V, X>> as Expr<Bool>>::Eval;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct IsInMapValue<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, S: Expr<Map<K, V>>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        x: PhantomData<X>,
-        s: PhantomData<S>,
-    }
-
-    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, M: Expr<Map<K, V>>> BoolValue for IsInMapValue<K, V, X, M> {
-        type Impl = AsBool<<AsList<Pair<K, V>, <AsMap<K, V, M> as MapTrait<K, V>>::GetList> as ListTrait<Pair<K, V>>>::Visit<Bool, IsInMapVisitor<K, V, X>>>;
-    }
 
     pub struct IsInMapVisitor<K: EqualityComparableKind + KindWithDefault, V: Kind, X: Expr<K>> {
         k: PhantomData<K>,
@@ -47,9 +36,9 @@ mod internal {
         x: PhantomData<X>,
     }
 
-    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>> ListVisitor<Pair<K, V>, Bool> for IsInMapVisitor<K, V, X> {
-        type VisitEmptyList = False;
-        type VisitCons<Elem: Expr<Pair<K, V>>, Tail: Expr<List<Pair<K, V>>>> = Or<Equals<K, GetFirst<K, V, Elem>, X>, <AsList<Pair<K, V>, Tail> as ListTrait<Pair<K, V>>>::Visit<Bool, IsInMapVisitor<K, V, X>>>;
+    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>> MapVisitor<K, V, Bool> for IsInMapVisitor<K, V, X> {
+        type VisitEmptyMap = False;
+        type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> = Or<Equals<K, Key, X>, IsInMap<K, V, X, Tail>>;
     }
 
 }

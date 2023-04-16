@@ -27,7 +27,6 @@ pub use r#if::*;
 pub use not::*;
 pub use or::*;
 
-use std::marker::PhantomData;
 use internal::*;
 
 pub struct Bool {}
@@ -42,34 +41,35 @@ impl KindWithDefault for Bool {
     type Default = False;
 }
 
-pub trait BoolTrait {
-    type Cond<ResultK: Kind, IfTrue: Expr<ResultK>, IfFalse: Expr<ResultK>>: Expr<ResultK>;
-}
-
-pub trait BoolValue {
-    type Impl: BoolTrait;
-}
-
-impl<B: BoolValue> Value<Bool> for B {
-    type UnconstrainedImpl = <B as BoolValue>::Impl;
-}
-
-pub struct AsBool<B: Expr<Bool>> {
-    b: PhantomData<B>,
-}
-
-impl<B: Expr<Bool>> BoolTrait for AsBool<B> {
-    default type Cond<ResultK: Kind, IfTrue: Expr<ResultK>, IfFalse: Expr<ResultK>> = IfTrue;
-}
-
-impl<B: Expr<Bool>> BoolTrait for AsBool<B> where <<B as Expr<Bool>>::Eval as Value<Bool>>::UnconstrainedImpl: BoolTrait {
-    type Cond<ResultK: Kind, IfTrue: Expr<ResultK>, IfFalse: Expr<ResultK>> = <<<B as Expr<Bool>>::Eval as Value<Bool>>::UnconstrainedImpl as BoolTrait>::Cond<ResultK, IfTrue, IfFalse>;
-}
-
 // These have to be public because otherwise Rust would complain that "can't leak private type".
 // But they should never be explicitly referenced elsewhere.
-mod internal {
+pub(crate) mod internal {
+    use std::marker::PhantomData;
     pub use crate::*;
+
+    pub trait BoolTrait {
+        type Cond<ResultK: Kind, IfTrue: Expr<ResultK>, IfFalse: Expr<ResultK>>: Expr<ResultK>;
+    }
+
+    pub trait BoolValue {
+        type Impl: BoolTrait;
+    }
+
+    impl<B: BoolValue> Value<Bool> for B {
+        type UnconstrainedImpl = <B as BoolValue>::Impl;
+    }
+
+    pub struct AsBool<B: Expr<Bool>> {
+        b: PhantomData<B>,
+    }
+
+    impl<B: Expr<Bool>> BoolTrait for AsBool<B> {
+        default type Cond<ResultK: Kind, IfTrue: Expr<ResultK>, IfFalse: Expr<ResultK>> = IfTrue;
+    }
+
+    impl<B: Expr<Bool>> BoolTrait for AsBool<B> where <<B as Expr<Bool>>::Eval as Value<Bool>>::UnconstrainedImpl: BoolTrait {
+        type Cond<ResultK: Kind, IfTrue: Expr<ResultK>, IfFalse: Expr<ResultK>> = <<<B as Expr<Bool>>::Eval as Value<Bool>>::UnconstrainedImpl as BoolTrait>::Cond<ResultK, IfTrue, IfFalse>;
+    }
 }
 
 #[cfg(test)]

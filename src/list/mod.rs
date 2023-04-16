@@ -90,6 +90,17 @@ pub trait ListVisitor<ElemK: Kind, OutK: Kind> {
     type VisitCons<Elem: Expr<ElemK>, Tail: Expr<List<ElemK>>>: Expr<OutK>;
 }
 
+pub struct VisitList<ElemK: Kind, OutK: Kind, L: Expr<List<ElemK>>, V: ListVisitor<ElemK, OutK>> {
+    elem_k: PhantomData<ElemK>,
+    out_k: PhantomData<OutK>,
+    l: PhantomData<L>,
+    v: PhantomData<V>,
+}
+
+impl<ElemK: Kind, OutK: Kind, L: Expr<List<ElemK>>, V: ListVisitor<ElemK, OutK>> Expr<OutK> for VisitList<ElemK, OutK, L, V> {
+    type Eval = <<AsList<ElemK, L> as ListTrait<ElemK>>::Visit<OutK, V> as Expr<OutK>>::Eval;
+}
+
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
@@ -101,17 +112,7 @@ mod internal {
     }
 
     impl<K: EqualityComparableKind, X: Expr<List<K>>, Y: Expr<List<K>>> Expr<Bool> for ListEquals<K, X, Y> {
-        type Eval = ListEqualsImpl<K, X, Y>;
-    }
-
-    pub struct ListEqualsImpl<K: EqualityComparableKind, X: Expr<List<K>>, Y: Expr<List<K>>> {
-        k: PhantomData<K>,
-        x: PhantomData<X>,
-        y: PhantomData<Y>,
-    }
-
-    impl<K: EqualityComparableKind, X: Expr<List<K>>, Y: Expr<List<K>>> BoolValue for ListEqualsImpl<K, X, Y> {
-        type Impl = AsBool<<AsList<K, X> as ListTrait<K>>::Visit<Bool, ListEqualsVisitor<K, Y>>>;
+        type Eval = <VisitList<K, Bool, X, ListEqualsVisitor<K, Y>> as Expr<Bool>>::Eval;
     }
 
     pub struct ListEqualsVisitor<K: EqualityComparableKind, Other: Expr<List<K>>> {

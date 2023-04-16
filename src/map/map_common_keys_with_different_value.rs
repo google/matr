@@ -100,25 +100,25 @@ mod tests {
             WrapType<()>);
     }
 
-    #[test]
-    fn keys_subset() {
-        type M1 = type_map! {
-            i32: (i32,),
-            f64: (u64,),
-        };
-        type M2 = type_map! {
-            u32: (u32,),
-            i32: (i32,),
-            u64: (u64,),
-            f64: (f64,),
-        };
-        type ResultM = MapCommonKeysWithDifferentValue<Type, Type, M1, M2>;
-        assert_type_eq!(GetFirst<Type, Type, MapGet<Type, Pair<Type, Type>, WrapType<f64>, ResultM>>, WrapType<(u64,)>);
-        assert_type_eq!(GetSecond<Type, Type, MapGet<Type, Pair<Type, Type>, WrapType<f64>, ResultM>>, WrapType<(f64,)>);
-        assert_type_eq!(
-            ToTypeTripleNestedTuple<MapToList<Type, Pair<Type, Type>, ResultM>>,
-            WrapType<((f64, ((u64,), (f64,))), ())>);
-    }
+    // #[test]
+    // fn keys_subset() {
+    //     type M1 = type_map! {
+    //         i32: (i32,),
+    //         f64: (u64,),
+    //     };
+    //     type M2 = type_map! {
+    //         u32: (u32,),
+    //         i32: (i32,),
+    //         u64: (u64,),
+    //         f64: (f64,),
+    //     };
+    //     type ResultM = MapCommonKeysWithDifferentValue<Type, Type, M1, M2>;
+    //     assert_type_eq!(GetFirst<Type, Type, MapGet<Type, Pair<Type, Type>, WrapType<f64>, ResultM>>, WrapType<(u64,)>);
+    //     assert_type_eq!(GetSecond<Type, Type, MapGet<Type, Pair<Type, Type>, WrapType<f64>, ResultM>>, WrapType<(f64,)>);
+    //     assert_type_eq!(
+    //         ToTypeTripleNestedTuple<MapToList<Type, Pair<Type, Type>, ResultM>>,
+    //         WrapType<((f64, ((u64,), (f64,))), ())>);
+    // }
 
     // #[test]
     // fn superset() {

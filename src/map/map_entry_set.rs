@@ -22,32 +22,20 @@ pub struct MapEntrySet<K: EqualityComparableKind, V: Kind, M: Expr<Map<K, V>>> {
 }
 
 impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault + EqualityComparableKind, M: Expr<Map<K, V>>> Expr<Set<Pair<K, V>>> for MapEntrySet<K, V, M> {
-    type Eval = MapEntrySetValue<K, V, M>;
+    type Eval = <VisitMap<K, V, Set<Pair<K, V>>, M, MapEntrySetVisitor<K, V>> as Expr<Set<Pair<K, V>>>>::Eval;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
 
-    pub struct MapEntrySetValue<K: EqualityComparableKind, V: Kind, M: Expr<Map<K, V>>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        m: PhantomData<M>,
-    }
-
-    impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault + EqualityComparableKind, M: Expr<Map<K, V>>> SetValue<Pair<K, V>> for MapEntrySetValue<K, V, M> {
-        type Impl = AsSet<Pair<K, V>,
-            <AsList<Pair<K, V>, <AsMap<K, V, M> as MapTrait<K, V>>::GetList> as ListTrait<Pair<K, V>>>::Visit<Set<Pair<K, V>>, MapEntrySetVisitor<K, V>>
-        >;
-    }
-
     pub struct MapEntrySetVisitor<K: EqualityComparableKind, V: Kind> {
         k: PhantomData<K>,
         v: PhantomData<V>,
     }
 
-    impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault + EqualityComparableKind> ListVisitor<Pair<K, V>, Set<Pair<K, V>>> for MapEntrySetVisitor<K, V> {
-        type VisitEmptyList = EmptySet<Pair<K, V>>;
-        type VisitCons<Elem: Expr<Pair<K, V>>, Tail: Expr<List<Pair<K, V>>>> = AddToSet<Pair<K, V>, Elem, <AsList<Pair<K, V>, Tail> as ListTrait<Pair<K, V>>>::Visit<Set<Pair<K, V>>, MapEntrySetVisitor<K, V>>>;
+    impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault + EqualityComparableKind> MapVisitor<K, V, Set<Pair<K, V>>> for MapEntrySetVisitor<K, V> {
+        type VisitEmptyMap = EmptySet<Pair<K, V>>;
+        type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> = AddToSet<Pair<K, V>, ConsPair<K, V, Key, Value>, VisitMap<K, V, Set<Pair<K, V>>, Tail, MapEntrySetVisitor<K, V>>>;
     }
 }

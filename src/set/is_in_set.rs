@@ -22,21 +22,21 @@ pub struct IsInSet<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> {
 }
 
 impl<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> Expr<Bool> for IsInSet<K, X, S> {
-    type Eval = IsInSetValue<K, X, S>;
+    type Eval = <VisitSet<K, Bool, S, IsInSetVisitor<K, X>> as Expr<Bool>>::Eval;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
 
-    pub struct IsInSetValue<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> {
+    pub struct IsInSetVisitor<K: EqualityComparableKind, X: Expr<K>> {
         k: PhantomData<K>,
         x: PhantomData<X>,
-        s: PhantomData<S>,
     }
 
-    impl<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> BoolValue for IsInSetValue<K, X, S> {
-        type Impl = AsBool<IsInList<K, X, <AsSet<K, S> as SetTrait<K>>::GetList>>;
+    impl<K: EqualityComparableKind, X: Expr<K>> SetVisitor<K, Bool> for IsInSetVisitor<K, X> {
+        type VisitEmptySet = False;
+        type VisitCons<Elem: Expr<K>, Tail: Expr<Set<K>>> = Or<Equals<K, Elem, X>, IsInSet<K, X, Tail>>;
     }
 }
 

@@ -22,22 +22,12 @@ pub struct IsInList<K: EqualityComparableKind, X: Expr<K>, L: Expr<List<K>>> {
 }
 
 impl<K: EqualityComparableKind, X: Expr<K>, L: Expr<List<K>>> Expr<Bool> for IsInList<K, X, L> {
-    type Eval = IsInListValue<K, X, L>;
+    type Eval = <VisitList<K, Bool, L, IsInListVisitor<K, X>> as Expr<Bool>>::Eval;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct IsInListValue<K: EqualityComparableKind, X: Expr<K>, L: Expr<List<K>>> {
-        k: PhantomData<K>,
-        x: PhantomData<X>,
-        l: PhantomData<L>,
-    }
-
-    impl<K: EqualityComparableKind, X: Expr<K>, L: Expr<List<K>>> BoolValue for IsInListValue<K, X, L> {
-        type Impl = AsBool<<AsList<K, L> as ListTrait<K>>::Visit<Bool, IsInListVisitor<K, X>>>;
-    }
 
     pub struct IsInListVisitor<K: EqualityComparableKind, X: Expr<K>> {
         k: PhantomData<K>,

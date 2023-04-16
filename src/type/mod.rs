@@ -64,11 +64,11 @@ mod internal {
     }
 
     // This must implement BoolTrait instead of Value<Bool> due to the use of specialization.
-    impl<X, Y> BoolTrait for IsEqualToTypeImplHelper<X, Y> {
+    impl<X, Y> crate::bool::internal::BoolTrait for IsEqualToTypeImplHelper<X, Y> {
         default type Cond<ResultK: Kind, IfTrue: Expr<ResultK>, IfFalse: Expr<ResultK>> = IfFalse;
     }
 
-    impl<X> BoolTrait for IsEqualToTypeImplHelper<X, X> {
+    impl<X> crate::bool::internal::BoolTrait for IsEqualToTypeImplHelper<X, X> {
         type Cond<ResultK: Kind, IfTrue: Expr<ResultK>, IfFalse: Expr<ResultK>> = IfTrue;
     }
 
@@ -78,7 +78,7 @@ mod internal {
     }
 
     // This must implement BoolTrait instead of Value<Bool> due to the use of specialization.
-    impl<X: Value<Type>, Y: Value<Type>> BoolValue for IsEqualToTypeImpl<X, Y> {
+    impl<X: Value<Type>, Y: Value<Type>> crate::bool::internal::BoolValue for IsEqualToTypeImpl<X, Y> {
         type Impl = IsEqualToTypeImplHelper<X::UnconstrainedImpl, Y::UnconstrainedImpl>;
     }
 

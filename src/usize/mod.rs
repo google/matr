@@ -43,37 +43,47 @@ impl KindWithDefault for USize {
     type Default = Zero;
 }
 
-pub trait USizeValue {
-    type Impl: USizeTrait;
+pub trait USizeVisitor<ResultK: Kind> {
+    type VisitZero: Expr<ResultK>;
+    type VisitIncrement<N: Expr<USize>>: Expr<ResultK>;
 }
 
-impl<U: USizeValue> Value<USize> for U {
-    type UnconstrainedImpl = <U as USizeValue>::Impl;
-}
-
-pub struct AsUSize<N: Expr<USize>> {
+pub struct VisitUSize<K: Kind, N: Expr<USize>, V: USizeVisitor<K>> {
+    k: PhantomData<K>,
     n: PhantomData<N>,
+    v: PhantomData<V>,
 }
 
-impl<N: Expr<USize>> USizeTrait for AsUSize<N> {
-    default type Visit<ResultK: Kind, V: USizeVisitor<ResultK>> = V::VisitZero;
-}
-
-impl<N: Expr<USize>> USizeTrait for AsUSize<N> where <<N as Expr<USize>>::Eval as Value<USize>>::UnconstrainedImpl: USizeTrait {
-    type Visit<ResultK: Kind, V: USizeVisitor<ResultK>> = <<<N as Expr<USize>>::Eval as Value<USize>>::UnconstrainedImpl as USizeTrait>::Visit<ResultK, V>;
+impl<K: Kind, N: Expr<USize>, V: USizeVisitor<K>> Expr<K> for VisitUSize<K, N, V> {
+    type Eval = <<AsUSize<N> as USizeTrait>::Visit<K, V> as Expr<K>>::Eval;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
 
-    pub trait USizeTrait {
-        type Visit<ResultK: Kind, V: USizeVisitor<ResultK>>: Expr<ResultK>;
+    pub trait USizeValue {
+        type Impl: USizeTrait;
     }
 
-    pub trait USizeVisitor<ResultK: Kind> {
-        type VisitZero: Expr<ResultK>;
-        type VisitIncrement<N: Expr<USize>>: Expr<ResultK>;
+    impl<U: USizeValue> Value<USize> for U {
+        type UnconstrainedImpl = <U as USizeValue>::Impl;
+    }
+
+    pub struct AsUSize<N: Expr<USize>> {
+        n: PhantomData<N>,
+    }
+
+    impl<N: Expr<USize>> USizeTrait for AsUSize<N> {
+        default type Visit<ResultK: Kind, V: USizeVisitor<ResultK>> = V::VisitZero;
+    }
+
+    impl<N: Expr<USize>> USizeTrait for AsUSize<N> where <<N as Expr<USize>>::Eval as Value<USize>>::UnconstrainedImpl: USizeTrait {
+        type Visit<ResultK: Kind, V: USizeVisitor<ResultK>> = <<<N as Expr<USize>>::Eval as Value<USize>>::UnconstrainedImpl as USizeTrait>::Visit<ResultK, V>;
+    }
+
+    pub trait USizeTrait {
+        type Visit<ResultK: Kind, V: USizeVisitor<ResultK>>: Expr<ResultK>;
     }
 
     pub struct USizeEquals<X: Expr<USize>, Y: Expr<USize>> {
@@ -82,16 +92,7 @@ mod internal {
     }
 
     impl<X: Expr<USize>, Y: Expr<USize>> Expr<Bool> for USizeEquals<X, Y> {
-        type Eval = USizeEqualsImpl<X, Y>;
-    }
-
-    pub struct USizeEqualsImpl<X: Expr<USize>, Y: Expr<USize>> {
-        x: PhantomData<X>,
-        y: PhantomData<Y>,
-    }
-
-    impl<X: Expr<USize>, Y: Expr<USize>> BoolValue for USizeEqualsImpl<X, Y> {
-        type Impl = AsBool<<AsUSize<X> as USizeTrait>::Visit<Bool, USizeEqualsVisitor<Y>>>;
+        type Eval = <VisitUSize<Bool, X, USizeEqualsVisitor<Y>> as Expr<Bool>>::Eval;
     }
 
     pub struct USizeEqualsVisitor<Other: Expr<USize>> {

@@ -6,8 +6,9 @@ This is meant to be a sort of standard library for metaprogramming in Rust, prov
 but with the expectation that users of this crate will want to define their own types and meta-functions; the
 meta-"type system" is designed to be extensible.
 
-The meta-types defined here (i.e., the directories under `src/`) don't access anything beyond what a user of this
-library could, so they also serve as examples for users of this library on how to write their own meta-types.
+Apart from `bool` and `type`, all other meta-types defined here (i.e., the directories under `src/`) don't access
+anything beyond what a user of this library could, so they also serve as examples for users of this library on how to
+write their own meta-types.
 
 It's also possible to define custom sub-traits of `Kind` with additional restrictions/capabilities, see
 `EqualityComparableKind` and `Equals` for an example.

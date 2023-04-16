@@ -24,7 +24,7 @@ pub struct LongRecursion<N: Expr<USize>> {
 }
 
 impl<N: Expr<USize>> Expr<Bool> for LongRecursion<N> {
-    type Eval = LongRecursionValue<N>;
+    type Eval = <IsEven<Sum<N, OneBillion>> as Expr<Bool>>::Eval;
 }
 
 mod internal {
@@ -33,14 +33,11 @@ mod internal {
 
     type Ten = Increment<Increment<Increment<Increment<Increment<Increment<Increment<Increment<Increment<Increment<Zero>>>>>>>>>>;
     type OneThousand = Multiply<Multiply<Ten, Ten>, Ten>;
-    type OneBillion = Multiply<Multiply<OneThousand, OneThousand>, OneThousand>;
+    pub type OneBillion = Multiply<Multiply<OneThousand, OneThousand>, OneThousand>;
 
+    #[allow(dead_code)]
     pub struct LongRecursionValue<N: Expr<USize>> {
         n: PhantomData<N>,
-    }
-
-    impl<N: Expr<USize>> BoolValue for LongRecursionValue<N> {
-        type Impl = AsBool<IsEven<Sum<N, OneBillion>>>;
     }
 }
 

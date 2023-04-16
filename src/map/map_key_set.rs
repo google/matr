@@ -22,32 +22,20 @@ pub struct MapKeySet<K: EqualityComparableKind, V: Kind, M: Expr<Map<K, V>>> {
 }
 
 impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault, M: Expr<Map<K, V>>> Expr<Set<K>> for MapKeySet<K, V, M> {
-    type Eval = MapKeySetValue<K, V, M>;
+    type Eval = <VisitMap<K, V, Set<K>, M, MapKeySetVisitor<K, V>> as Expr<Set<K>>>::Eval;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
 
-    pub struct MapKeySetValue<K: EqualityComparableKind, V: Kind, M: Expr<Map<K, V>>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        m: PhantomData<M>,
-    }
-
-    impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault, M: Expr<Map<K, V>>> SetValue<K> for MapKeySetValue<K, V, M> {
-        type Impl = AsSet<K,
-            <AsList<Pair<K, V>, <AsMap<K, V, M> as MapTrait<K, V>>::GetList> as ListTrait<Pair<K, V>>>::Visit<Set<K>, MapKeySetVisitor<K, V>>
-        >;
-    }
-
     pub struct MapKeySetVisitor<K: EqualityComparableKind, V: Kind> {
         k: PhantomData<K>,
         v: PhantomData<V>,
     }
 
-    impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault> ListVisitor<Pair<K, V>, Set<K>> for MapKeySetVisitor<K, V> {
-        type VisitEmptyList = EmptySet<K>;
-        type VisitCons<Elem: Expr<Pair<K, V>>, Tail: Expr<List<Pair<K, V>>>> = AddToSet<K, GetFirst<K, V, Elem>, <AsList<Pair<K, V>, Tail> as ListTrait<Pair<K, V>>>::Visit<Set<K>, MapKeySetVisitor<K, V>>>;
+    impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault> MapVisitor<K, V, Set<K>> for MapKeySetVisitor<K, V> {
+        type VisitEmptyMap = EmptySet<K>;
+        type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> = AddToSet<K, Key, VisitMap<K, V, Set<K>, Tail, MapKeySetVisitor<K, V>>>;
     }
 }

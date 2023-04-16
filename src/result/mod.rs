@@ -41,12 +41,20 @@ impl<K: KindWithDefault> KindWithDefault for Result<K> {
     type Default = Ok<K, K::Default>;
 }
 
-pub trait ResultValue<K: Kind> {
-    type Impl: ResultTrait<K>;
+pub trait ResultVisitor<K: Kind, ResultK: Kind> {
+    type VisitOk<V: Expr<K>>: Expr<ResultK>;
+    type VisitErr<E>: Expr<ResultK>;
 }
 
-impl<K: Kind, R: ResultValue<K>> Value<Result<K>> for R {
-    type UnconstrainedImpl = <R as ResultValue<K>>::Impl;
+pub struct VisitResult<K: Kind, OutK: Kind, R: Expr<Result<K>>, V: ResultVisitor<K, OutK>> {
+    k: PhantomData<K>,
+    out_k: PhantomData<OutK>,
+    r: PhantomData<R>,
+    v: PhantomData<V>,
+}
+
+impl<K: Kind, OutK: Kind, R: Expr<Result<K>>, V: ResultVisitor<K, OutK>> Expr<OutK> for VisitResult<K, OutK, R, V> {
+    type Eval = <<AsResult<K, R> as ResultTrait<K>>::Visit<OutK, V> as Expr<OutK>>::Eval;
 }
 
 // These have to be public because otherwise Rust would complain that "can't leak private type".
@@ -55,9 +63,12 @@ mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
 
-    pub trait ResultVisitor<K: Kind, ResultK: Kind> {
-        type VisitOk<V: Expr<K>>: Expr<ResultK>;
-        type VisitErr<E>: Expr<ResultK>;
+    pub trait ResultValue<K: Kind> {
+        type Impl: ResultTrait<K>;
+    }
+
+    impl<K: Kind, R: ResultValue<K>> Value<Result<K>> for R {
+        type UnconstrainedImpl = <R as ResultValue<K>>::Impl;
     }
 
     pub trait ResultTrait<K: Kind> {
