@@ -15,27 +15,16 @@
 use std::marker::PhantomData;
 use internal::*;
 
-pub struct MapToList<K: KindWithDefault + EqualityComparableKind, V: Kind, S: Expr<Map<K, V>>> {
+pub struct MapToList<K: KindWithDefault + EqualityComparableKind, V: Kind, M: Expr<Map<K, V>>> {
     k: PhantomData<K>,
     v: PhantomData<V>,
-    s: PhantomData<S>,
+    m: PhantomData<M>,
 }
 
-impl<K: KindWithDefault + EqualityComparableKind, V: Kind, S: Expr<Map<K, V>>> Expr<List<Pair<K, V>>> for MapToList<K, V, S> {
-    type Eval = MapToListValue<K, V, S>;
+impl<K: KindWithDefault + EqualityComparableKind, V: Kind, M: Expr<Map<K, V>>> Expr<List<Pair<K, V>>> for MapToList<K, V, M> {
+    type Eval = <<AsMap<K, V, M> as MapTrait<K, V>>::GetList as Expr<List<Pair<K, V>>>>::Eval;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct MapToListValue<K: KindWithDefault + EqualityComparableKind, V: Kind, S: Expr<Map<K, V>>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        s: PhantomData<S>,
-    }
-
-    impl<K: KindWithDefault + EqualityComparableKind, V: Kind, S: Expr<Map<K, V>>> ListValue<Pair<K, V>> for MapToListValue<K, V, S> {
-        type Impl = AsList<Pair<K, V>, <AsMap<K, V, S> as MapTrait<K, V>>::GetList>;
-    }
 }

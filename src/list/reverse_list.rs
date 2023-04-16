@@ -21,19 +21,9 @@ pub struct ReverseList<K: Kind, L: Expr<List<K>>> {
 }
 
 impl<K: Kind, L: Expr<List<K>>> Expr<List<K>> for ReverseList<K, L> {
-    type Eval = ReverseListValue<K, L>;
+    type Eval = <ReversedListConcat<K, L, EmptyList<K>> as Expr<List<K>>>::Eval;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct ReverseListValue<K: Kind, L: Expr<List<K>>> {
-        k: PhantomData<K>,
-        l: PhantomData<L>,
-    }
-
-    impl<K: Kind, L: Expr<List<K>>> ListValue<K> for ReverseListValue<K, L> {
-        type Impl = AsList<K, ReversedListConcat<K, L, EmptyList<K>>>;
-    }
 }

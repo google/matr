@@ -21,21 +21,12 @@ pub struct ListToSet<K: EqualityComparableKind, L: Expr<List<K>>> {
 }
 
 impl<K: EqualityComparableKind, L: Expr<List<K>>> Expr<Set<K>> for ListToSet<K, L> {
-    type Eval = ListToSetValue<K, L>;
+    type Eval = <VisitList<K, Set<K>, L, ListToSetVisitor<K>> as Expr<Set<K>>>::Eval;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct ListToSetValue<K: EqualityComparableKind, L: Expr<List<K>>> {
-        k: PhantomData<K>,
-        l: PhantomData<L>,
-    }
-
-    impl<K: EqualityComparableKind, L: Expr<List<K>>> SetValue<K> for ListToSetValue<K, L> {
-        type Impl = AsSet<K, <AsList<K, L> as ListTrait<K>>::Visit<Set<K>, ListToSetVisitor<K>>>;
-    }
 
     pub struct ListToSetVisitor<K: EqualityComparableKind> {
         k: PhantomData<K>,

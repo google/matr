@@ -21,21 +21,12 @@ pub struct Multiply<X: Expr<USize>, Y: Expr<USize>> {
 }
 
 impl<X: Expr<USize>, Y: Expr<USize>> Expr<USize> for Multiply<X, Y> {
-    type Eval = MultiplyValues<X, Y>;
+    type Eval = <VisitUSize<USize, X, MultiplyValueVisitor<Y>> as Expr<USize>>::Eval;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct MultiplyValues<X: Expr<USize>, Y: Expr<USize>> {
-        x: PhantomData<X>,
-        y: PhantomData<Y>,
-    }
-
-    impl<X: Expr<USize>, Y: Expr<USize>> USizeValue for MultiplyValues<X, Y> {
-        type Impl = AsUSize<<AsUSize<X> as USizeTrait>::Visit<USize, MultiplyValueVisitor<Y>>>;
-    }
 
     pub struct MultiplyValueVisitor<N: Expr<USize>> {
         n: PhantomData<N>,
@@ -43,26 +34,9 @@ mod internal {
 
     impl<X: Expr<USize>> USizeVisitor<USize> for MultiplyValueVisitor<X> {
         type VisitZero = X;
-        type VisitIncrement<Y: Expr<USize>> = Sum<X, MultiplyValueVisitorValue<X, Y>>;
+        type VisitIncrement<Y: Expr<USize>> = Sum<X, Multiply<X, Y>>;
     }
 
-    pub struct MultiplyValueVisitorValue<X: Expr<USize>, Y: Expr<USize>> {
-        x: PhantomData<X>,
-        y: PhantomData<Y>,
-    }
-
-    impl<X: Expr<USize>, Y: Expr<USize>> Expr<USize> for MultiplyValueVisitorValue<X, Y> {
-        type Eval = MultiplyValueVisitorImpl<X, Y>;
-    }
-
-    pub struct MultiplyValueVisitorImpl<X: Expr<USize>, Y: Expr<USize>> {
-        x: PhantomData<X>,
-        y: PhantomData<Y>,
-    }
-
-    impl<X: Expr<USize>, Y: Expr<USize>> USizeValue for MultiplyValueVisitorImpl<X, Y> {
-        type Impl = AsUSize<<AsUSize<X> as USizeTrait>::Visit<USize, MultiplyValueVisitor<Y>>>;
-    }
 }
 
 // TODO: add tests

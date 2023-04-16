@@ -23,23 +23,12 @@ pub struct MapRemoveKeySet<K: KindWithDefault + EqualityComparableKind, V: KindW
 }
 
 impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault, M: Expr<Map<K, V>>, S: Expr<Set<K>>> Expr<Map<K, V>> for MapRemoveKeySet<K, V, M, S> {
-    type Eval = MapRemoveKeySetValue<K, V, M, S>;
+    type Eval = <VisitMap<K, V, Map<K, V>, M, MapRemoveKeySetVisitor<K, V, S, EmptyMap<K, V>>> as Expr<Map<K, V>>>::Eval;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct MapRemoveKeySetValue<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault, M: Expr<Map<K, V>>, S: Expr<Set<K>>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        m: PhantomData<M>,
-        s: PhantomData<S>,
-    }
-
-    impl<K: KindWithDefault + EqualityComparableKind + KindWithDefault, V: KindWithDefault, M: Expr<Map<K, V>>, S: Expr<Set<K>>> MapValue<K, V> for MapRemoveKeySetValue<K, V, M, S> {
-        type Impl = AsMap<K, V, <AsList<Pair<K, V>, <AsMap<K, V, M> as MapTrait<K, V>>::GetList> as ListTrait<Pair<K, V>>>::Visit<Map<K, V>, MapRemoveKeySetVisitor<K, V, S, EmptyMap<K, V>>>>;
-    }
 
     pub struct MapRemoveKeySetVisitor<K: EqualityComparableKind, V: Kind, S: Expr<Set<K>>, ResultM: Expr<Map<K, V>>> {
         k: PhantomData<K>,
@@ -48,14 +37,14 @@ mod internal {
         result_m: PhantomData<ResultM>,
     }
 
-    impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault, S: Expr<Set<K>>, ResultM: Expr<Map<K, V>>> ListVisitor<Pair<K, V>, Map<K, V>> for MapRemoveKeySetVisitor<K, V, S, ResultM> {
-        type VisitEmptyList = EmptyMap<K, V>;
-        type VisitCons<Elem: Expr<Pair<K, V>>, Tail: Expr<List<Pair<K, V>>>> =
-            <AsList<Pair<K, V>, Tail> as ListTrait<Pair<K, V>>>::Visit<Map<K, V>, MapRemoveKeySetVisitor<K, V, S,
+    impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault, S: Expr<Set<K>>, ResultM: Expr<Map<K, V>>> MapVisitor<K, V, Map<K, V>> for MapRemoveKeySetVisitor<K, V, S, ResultM> {
+        type VisitEmptyMap = EmptyMap<K, V>;
+        type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> =
+            VisitMap<K, V, Map<K, V>, Tail, MapRemoveKeySetVisitor<K, V, S,
                 If<Map<K, V>,
-                    IsInSet<K, GetFirst<K, V, Elem>, S>,
+                    IsInSet<K, Key, S>,
                     ResultM,
-                    Put<K, V, GetFirst<K, V, Elem>, GetSecond<K, V, Elem>, ResultM>
+                    Put<K, V, Key, Value, ResultM>
                 >>>;
     }
 }

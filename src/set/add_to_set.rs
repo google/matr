@@ -22,37 +22,16 @@ pub struct AddToSet<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> {
 }
 
 impl<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> Expr<Set<K>> for AddToSet<K, X, S> {
-    type Eval = AddToSetValue<K, X, S>;
+    type Eval = <If<
+        Set<K>,
+        IsInSet<K, X, S>,
+        S,
+        ListToSetUnchecked<K, Cons<K, X, SetToList<K, S>>>
+    > as Expr<Set<K>>>::Eval;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct AddToSetValue<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> {
-        k: PhantomData<K>,
-        x: PhantomData<X>,
-        s: PhantomData<S>,
-    }
-
-    impl<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> SetValue<K> for AddToSetValue<K, X, S> {
-        type Impl = AddToSetImpl<K, X, S>;
-    }
-
-    pub struct AddToSetImpl<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> {
-        k: PhantomData<K>,
-        x: PhantomData<X>,
-        s: PhantomData<S>,
-    }
-
-    impl<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> SetTrait<K> for AddToSetImpl<K, X, S> {
-        type GetList = If<
-            List<K>,
-            IsInList<K, X, <AsSet<K, S> as SetTrait<K>>::GetList>,
-            <AsSet<K, S> as SetTrait<K>>::GetList,
-            Cons<K, X, <AsSet<K, S> as SetTrait<K>>::GetList>
-        >;
-    }
 }
 
 #[cfg(test)]

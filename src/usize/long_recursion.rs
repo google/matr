@@ -28,17 +28,11 @@ impl<N: Expr<USize>> Expr<Bool> for LongRecursion<N> {
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use crate::*;
 
     type Ten = Increment<Increment<Increment<Increment<Increment<Increment<Increment<Increment<Increment<Increment<Zero>>>>>>>>>>;
     type OneThousand = Multiply<Multiply<Ten, Ten>, Ten>;
     pub type OneBillion = Multiply<Multiply<OneThousand, OneThousand>, OneThousand>;
-
-    #[allow(dead_code)]
-    pub struct LongRecursionValue<N: Expr<USize>> {
-        n: PhantomData<N>,
-    }
 }
 
 #[cfg(test)]

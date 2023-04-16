@@ -21,21 +21,12 @@ pub struct Sum<X: Expr<USize>, Y: Expr<USize>> {
 }
 
 impl<X: Expr<USize>, Y: Expr<USize>> Expr<USize> for Sum<X, Y> {
-    type Eval = SumValues<X, Y>;
+    type Eval = <VisitUSize<USize, X, SumValueVisitor<Y>> as Expr<USize>>::Eval;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct SumValues<X: Expr<USize>, Y: Expr<USize>> {
-        x: PhantomData<X>,
-        y: PhantomData<Y>,
-    }
-
-    impl<X: Expr<USize>, Y: Expr<USize>> USizeValue for SumValues<X, Y> {
-        type Impl = AsUSize<<AsUSize<X> as USizeTrait>::Visit<USize, SumValueVisitor<Y>>>;
-    }
 
     pub struct SumValueVisitor<N: Expr<USize>> {
         n: PhantomData<N>,
@@ -43,7 +34,7 @@ mod internal {
 
     impl<X: Expr<USize>> USizeVisitor<USize> for SumValueVisitor<X> {
         type VisitZero = X;
-        type VisitIncrement<N: Expr<USize>> = Increment<<AsUSize<N> as USizeTrait>::Visit<USize, SumValueVisitor<X>>>;
+        type VisitIncrement<N: Expr<USize>> = Increment<VisitUSize<USize, N, SumValueVisitor<X>>>;
     }
 }
 

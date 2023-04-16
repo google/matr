@@ -22,35 +22,13 @@ pub struct RemoveFromMap<K: EqualityComparableKind, V: Kind, X: Expr<K>, S: Expr
     s: PhantomData<S>,
 }
 
-impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, S: Expr<Map<K, V>>> Expr<Map<K, V>> for RemoveFromMap<K, V, X, S> {
-    type Eval = RemoveFromMapValue<K, V, X, S>;
+impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, M: Expr<Map<K, V>>> Expr<Map<K, V>> for RemoveFromMap<K, V, X, M> {
+    type Eval = <ListToMapUnchecked<K, V, VisitList<Pair<K, V>, List<Pair<K, V>>, MapToList<K, V, M>, RemoveFromMapVisitor<K, V, X>>> as Expr<Map<K, V>>>::Eval;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct RemoveFromMapValue<K: EqualityComparableKind, V: Kind, X: Expr<K>, S: Expr<Map<K, V>>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        x: PhantomData<X>,
-        s: PhantomData<S>,
-    }
-
-    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, S: Expr<Map<K, V>>> MapValue<K, V> for RemoveFromMapValue<K, V, X, S> {
-        type Impl = RemoveFromMapImpl<K, V, X, S>;
-    }
-
-    pub struct RemoveFromMapImpl<K: EqualityComparableKind, V: Kind, X: Expr<K>, S: Expr<Map<K, V>>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        x: PhantomData<X>,
-        s: PhantomData<S>,
-    }
-
-    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, S: Expr<Map<K, V>>> MapTrait<K, V> for RemoveFromMapImpl<K, V, X, S> {
-        type GetList = <AsList<Pair<K, V>, <AsMap<K, V, S> as MapTrait<K, V>>::GetList> as ListTrait<Pair<K, V>>>::Visit<List<Pair<K, V>>, RemoveFromMapVisitor<K, V, X>>;
-    }
 
     pub struct RemoveFromMapVisitor<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>> {
         k: PhantomData<K>,
@@ -63,8 +41,8 @@ mod internal {
         type VisitCons<Elem: Expr<Pair<K, V>>, Tail: Expr<List<Pair<K, V>>>> = If<
             List<Pair<K, V>>,
             Equals<K, GetFirst<K, V, Elem>, X>,
-            <AsList<Pair<K, V>, Tail> as ListTrait<Pair<K, V>>>::Visit<List<Pair<K, V>>, RemoveFromMapVisitor<K, V, X>>,
-            Cons<Pair<K, V>, Elem, <AsList<Pair<K, V>, Tail> as ListTrait<Pair<K, V>>>::Visit<List<Pair<K, V>>, RemoveFromMapVisitor<K, V, X>>>
+            VisitList<Pair<K, V>, List<Pair<K, V>>, Tail, RemoveFromMapVisitor<K, V, X>>,
+            Cons<Pair<K, V>, Elem, VisitList<Pair<K, V>, List<Pair<K, V>>, Tail, RemoveFromMapVisitor<K, V, X>>>
         >;
     }
 }

@@ -17,7 +17,7 @@ use std::hash::Hash;
 use internal::*;
 
 pub fn to_hash_set<K: EqualityComparableKind, S: Expr<Set<K>>, OutT: Eq + Hash, F: Functor1<K, RuntimeFn<OutT, ()>>>() -> HashSet<OutT> {
-    return call_runtime_fn::<HashSet<OutT>, (), ToHashSet<K, <AsSet<K, S> as SetTrait<K>>::GetList, OutT, F>>(());
+    return call_runtime_fn::<HashSet<OutT>, (), VisitSet<K, RuntimeFn<HashSet<OutT>, ()>, S, ToHashSetVisitor<K, OutT, F>>>(());
 }
 
 mod internal {
@@ -26,37 +26,15 @@ mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
 
-    pub struct ToHashSet<K: EqualityComparableKind, L: Expr<List<K>>, OutT: Eq + Hash, F: Functor1<K, RuntimeFn<OutT, ()>>> {
-        k: PhantomData<K>,
-        l: PhantomData<L>,
-        out_t: PhantomData<OutT>,
-        f: PhantomData<F>,
-    }
-
-    impl<K: EqualityComparableKind, S: Expr<List<K>>, OutT: Eq + Hash, F: Functor1<K, RuntimeFn<OutT, ()>>> Expr<RuntimeFn<HashSet<OutT>, ()>> for ToHashSet<K, S, OutT, F> {
-        type Eval = ToHashSetValue<K, S, OutT, F>;
-    }
-
-    pub struct ToHashSetValue<K: EqualityComparableKind, L: Expr<List<K>>, OutT, F: Functor1<K, RuntimeFn<OutT, ()>>> {
-        k: PhantomData<K>,
-        l: PhantomData<L>,
-        out_t: PhantomData<OutT>,
-        f: PhantomData<F>,
-    }
-
-    impl<K: EqualityComparableKind, L: Expr<List<K>>, OutT: Eq + Hash, F: Functor1<K, RuntimeFn<OutT, ()>>> RuntimeFnValue<HashSet<OutT>, ()> for ToHashSetValue<K, L, OutT, F> {
-        type Impl = AsRuntimeFn<HashSet<OutT>, (), <AsList<K, L> as ListTrait<K>>::Visit<RuntimeFn<HashSet<OutT>, ()>, ToHashSetVisitor<K, OutT, F>>>;
-    }
-
     pub struct ToHashSetVisitor<K: EqualityComparableKind, OutT: Eq + Hash, F: Functor1<K, RuntimeFn<OutT, ()>>> {
         k: PhantomData<K>,
         out_t: PhantomData<OutT>,
         f: PhantomData<F>,
     }
 
-    impl<K: EqualityComparableKind, OutT: Eq + Hash, F: Functor1<K, RuntimeFn<OutT, ()>>> ListVisitor<K, RuntimeFn<HashSet<OutT>, ()>> for ToHashSetVisitor<K, OutT, F> {
-        type VisitEmptyList = EmptyHashSet<OutT>;
-        type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> = AddToHashSet<K, Elem, OutT, F, ToHashSet<K, Tail, OutT, F>>;
+    impl<K: EqualityComparableKind, OutT: Eq + Hash, F: Functor1<K, RuntimeFn<OutT, ()>>> SetVisitor<K, RuntimeFn<HashSet<OutT>, ()>> for ToHashSetVisitor<K, OutT, F> {
+        type VisitEmptySet = EmptyHashSet<OutT>;
+        type VisitCons<Elem: Expr<K>, Tail: Expr<Set<K>>> = AddToHashSet<K, Elem, OutT, F, VisitSet<K, RuntimeFn<HashSet<OutT>, ()>, Tail, ToHashSetVisitor<K, OutT, F>>>;
     }
 
     pub struct EmptyHashSet<OutT: Eq + Hash> {

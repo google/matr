@@ -23,22 +23,11 @@ pub struct ListConcat<K: Kind, L: Expr<List<K>>, Tail: Expr<List<K>>> {
 }
 
 impl<K: Kind, L: Expr<List<K>>, Tail: Expr<List<K>>> Expr<List<K>> for ListConcat<K, L, Tail> {
-    type Eval = ListConcatValue<K, L, Tail>;
+    type Eval = <ReversedListConcat<K, ReverseList<K, L>, Tail> as Expr<List<K>>>::Eval;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct ListConcatValue<K: Kind, L: Expr<List<K>>, Tail: Expr<List<K>>> {
-        k: PhantomData<K>,
-        l: PhantomData<L>,
-        tail: PhantomData<Tail>,
-    }
-
-    impl<K: Kind, L: Expr<List<K>>, Tail: Expr<List<K>>> ListValue<K> for ListConcatValue<K, L, Tail> {
-        type Impl = AsList<K, ReversedListConcat<K, ReverseList<K, L>, Tail>>;
-    }
 }
 
 #[cfg(test)]

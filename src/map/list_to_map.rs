@@ -22,22 +22,12 @@ pub struct ListToMap<K: EqualityComparableKind, V: Kind, L: Expr<List<Pair<K, V>
 }
 
 impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, L: Expr<List<Pair<K, V>>>> Expr<Map<K, V>> for ListToMap<K, V, L> {
-    type Eval = ListToMapValue<K, V, L>;
+    type Eval = <VisitList<Pair<K, V>, Map<K, V>, L, ListToMapVisitor<K, V>> as Expr<Map<K, V>>>::Eval;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct ListToMapValue<K: EqualityComparableKind, V: Kind, L: Expr<List<Pair<K, V>>>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        l: PhantomData<L>,
-    }
-
-    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, L: Expr<List<Pair<K, V>>>> MapValue<K, V> for ListToMapValue<K, V, L> {
-        type Impl = AsMap<K, V, <AsList<Pair<K, V>, L> as ListTrait<Pair<K, V>>>::Visit<Map<K, V>, ListToMapVisitor<K, V>>>;
-    }
 
     pub struct ListToMapVisitor<K: EqualityComparableKind, V: Kind> {
         k: PhantomData<K>,

@@ -23,23 +23,12 @@ pub struct MapCommonKeysWithDifferentValue<K: EqualityComparableKind, V: Equalit
 }
 
 impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault + EqualityComparableKind, M1: Expr<Map<K, V>>, M2: Expr<Map<K, V>>> Expr<Map<K, Pair<V, V>>> for MapCommonKeysWithDifferentValue<K, V, M1, M2> {
-    type Eval = MapCommonKeysWithDifferentValueValue<K, V, M1, M2>;
+    type Eval = <VisitMap<K, V, Map<K, Pair<V, V>>, M1, MapCommonKeysWithDifferentValueVisitor<K, V, M2, EmptyMap<K, Pair<V, V>>>> as Expr<Map<K, Pair<V, V>>>>::Eval;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct MapCommonKeysWithDifferentValueValue<K: EqualityComparableKind, V: EqualityComparableKind, M1: Expr<Map<K, V>>, M2: Expr<Map<K, V>>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        m1: PhantomData<M1>,
-        m2: PhantomData<M2>,
-    }
-
-    impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault + EqualityComparableKind, M1: Expr<Map<K, V>>, M2: Expr<Map<K, V>>> MapValue<K, Pair<V, V>> for MapCommonKeysWithDifferentValueValue<K, V, M1, M2> {
-        type Impl = AsMap<K, Pair<V, V>, <AsList<Pair<K, V>, <AsMap<K, V, M1> as MapTrait<K, V>>::GetList> as ListTrait<Pair<K, V>>>::Visit<Map<K, Pair<V, V>>, MapCommonKeysWithDifferentValueVisitor<K, V, M2, EmptyMap<K, Pair<V, V>>>>>;
-    }
 
     pub struct MapCommonKeysWithDifferentValueVisitor<K: EqualityComparableKind, V: EqualityComparableKind, M: Expr<Map<K, V>>, ResultM: Expr<Map<K, Pair<V, V>>>> {
         k: PhantomData<K>,
@@ -48,19 +37,19 @@ mod internal {
         result_m: PhantomData<ResultM>,
     }
 
-    impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault + EqualityComparableKind, M: Expr<Map<K, V>>, ResultM: Expr<Map<K, Pair<V, V>>>> ListVisitor<Pair<K, V>, Map<K, Pair<V, V>>> for MapCommonKeysWithDifferentValueVisitor<K, V, M, ResultM> {
-        type VisitEmptyList = EmptyMap<K, Pair<V, V>>;
-        type VisitCons<Elem: Expr<Pair<K, V>>, Tail: Expr<List<Pair<K, V>>>> =
-            <AsList<Pair<K, V>, Tail> as ListTrait<Pair<K, V>>>::Visit<Map<K, Pair<V, V>>, MapCommonKeysWithDifferentValueVisitor<K, V, M,
-                // If<Map<K, Pair<V, V>>,
-                //     And<
-                //         IsInMap<K, V, GetFirst<K, V, Elem>, M>,
-                //         Not<Equals<V,
-                //             MapGet<K, V, GetFirst<K, V, Elem>, M>,
-                //             GetSecond<K, V, Elem>>>>,
-                    Put<K, Pair<V, V>, GetFirst<K, V, Elem>, ConsPair<V, V, MapGet<K, V, GetFirst<K, V, Elem>, M>, GetSecond<K, V, Elem>>, ResultM>,
-                //     ResultM
-                // >
+    impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault + EqualityComparableKind, M: Expr<Map<K, V>>, ResultM: Expr<Map<K, Pair<V, V>>>> MapVisitor<K, V, Map<K, Pair<V, V>>> for MapCommonKeysWithDifferentValueVisitor<K, V, M, ResultM> {
+        type VisitEmptyMap = EmptyMap<K, Pair<V, V>>;
+        type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> =
+            VisitMap<K, V, Map<K, Pair<V, V>>, Tail, MapCommonKeysWithDifferentValueVisitor<K, V, M,
+                If<Map<K, Pair<V, V>>,
+                    And<
+                        IsInMap<K, V, Key, M>,
+                        Not<Equals<V,
+                            MapGet<K, V, Key, M>,
+                            Value>>>,
+                    Put<K, Pair<V, V>, Key, ConsPair<V, V, MapGet<K, V, Key, M>, Value>, ResultM>,
+                    ResultM
+                >
         >>;
     }
 }

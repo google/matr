@@ -21,20 +21,11 @@ pub struct ToTypeTripleNestedTuple<L: Expr<List<Pair<Type, Pair<Type, Type>>>>> 
 }
 
 impl<L: Expr<List<Pair<Type, Pair<Type, Type>>>>> Expr<Type> for ToTypeTripleNestedTuple<L> {
-    type Eval = ToTypeTripleNestedTupleValue<L>;
+    type Eval = <VisitList<Pair<Type, Pair<Type, Type>>, Type, L, ToTypeTripleNestedTupleVisitor> as Expr<Type>>::Eval;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct ToTypeTripleNestedTupleValue<L: Expr<List<Pair<Type, Pair<Type, Type>>>>> {
-        l: PhantomData<L>,
-    }
-
-    impl<L: Expr<List<Pair<Type, Pair<Type, Type>>>>> TypeValue for ToTypeTripleNestedTupleValue<L> {
-        type UnconstrainedImpl = <GetType<<AsList<Pair<Type, Pair<Type, Type>>, L> as ListTrait<Pair<Type, Pair<Type, Type>>>>::Visit<Type, ToTypeTripleNestedTupleVisitor>> as GetTypeTrait>::Get;
-    }
 
     pub struct ToTypeTripleNestedTupleVisitor {}
 

@@ -22,22 +22,12 @@ pub struct RemoveFromList<K: EqualityComparableKind, X: Expr<K>, L: Expr<List<K>
 }
 
 impl<K: EqualityComparableKind, X: Expr<K>, L: Expr<List<K>>> Expr<List<K>> for RemoveFromList<K, X, L> {
-    type Eval = RemoveFromListValue<K, X, L>;
+    type Eval = <VisitList<K, List<K>, L, RemoveFromListVisitor<K, X>> as Expr<List<K>>>::Eval;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct RemoveFromListValue<K: EqualityComparableKind, X: Expr<K>, L: Expr<List<K>>> {
-        k: PhantomData<K>,
-        x: PhantomData<X>,
-        l: PhantomData<L>,
-    }
-
-    impl<K: EqualityComparableKind, X: Expr<K>, L: Expr<List<K>>> ListValue<K> for RemoveFromListValue<K, X, L> {
-        type Impl = AsList<K, <AsList<K, L> as ListTrait<K>>::Visit<List<K>, RemoveFromListVisitor<K, X>>>;
-    }
 
     pub struct RemoveFromListVisitor<K: EqualityComparableKind, X: Expr<K>> {
         k: PhantomData<K>,

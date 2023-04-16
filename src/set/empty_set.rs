@@ -20,26 +20,9 @@ pub struct EmptySet<K: EqualityComparableKind> {
 }
 
 impl<K: EqualityComparableKind> Expr<Set<K>> for EmptySet<K> {
-    type Eval = EmptySetValue<K>;
+    type Eval = <ListToSetUnchecked<K, EmptyList<K>> as Expr<Set<K>>>::Eval;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct EmptySetValue<K: EqualityComparableKind> {
-        k: PhantomData<K>,
-    }
-
-    impl<K: EqualityComparableKind> SetValue<K> for EmptySetValue<K> {
-        type Impl = EmptySetImpl<K>;
-    }
-
-    pub struct EmptySetImpl<K: EqualityComparableKind> {
-        k: PhantomData<K>,
-    }
-
-    impl<K: EqualityComparableKind> SetTrait<K> for EmptySetImpl<K> {
-        type GetList = EmptyList<K>;
-    }
 }

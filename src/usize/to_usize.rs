@@ -29,7 +29,7 @@ pub const fn result_to_usize<N: Expr<Result<USize>>>() -> std::result::Result<us
 }
 
 pub const fn to_usize<N: Expr<USize>>() -> usize {
-    return call_const_fn::<usize, (), ToUSize<N>>(());
+    return call_const_fn::<usize, (), VisitUSize<ConstFn<usize, ()>, N, ToUSizeVisitor>>(());
 }
 
 mod internal {
@@ -59,30 +59,14 @@ mod internal {
     pub struct ToUSizeFunctor {}
 
     impl Functor1<USize, Result<ConstFn<std::result::Result<usize, &'static str>, ()>>> for ToUSizeFunctor {
-        type Apply<N: Expr<USize>> = Ok<ConstFn<std::result::Result<usize, &'static str>, ()>, ToResultConstFn<usize, (), Ok<ConstFn<usize, ()>, ToUSize<N>>>>;
+        type Apply<N: Expr<USize>> = Ok<ConstFn<std::result::Result<usize, &'static str>, ()>, ToResultConstFn<usize, (), Ok<ConstFn<usize, ()>, VisitUSize<ConstFn<usize, ()>, N, ToUSizeVisitor>>>>;
     }
 
-    pub struct ToUSize<N: Expr<USize>> {
-        n: PhantomData<N>,
-    }
+    pub struct ToUSizeVisitor {}
 
-    impl<N: Expr<USize>> Expr<ConstFn<usize, ()>> for ToUSize<N> {
-        type Eval = ValueToUSize<N>;
-    }
-
-    pub struct ValueToUSize<N: Expr<USize>> {
-        n: PhantomData<N>,
-    }
-
-    impl<N: Expr<USize>> ConstFnValue<usize, ()> for ValueToUSize<N> {
-        type Impl = AsConstFn<usize, (), <AsUSize<N> as USizeTrait>::Visit<ConstFn<usize, ()>, ValueToUSizeVisitor>>;
-    }
-
-    pub struct ValueToUSizeVisitor {}
-
-    impl USizeVisitor<ConstFn<usize, ()>> for ValueToUSizeVisitor {
+    impl USizeVisitor<ConstFn<usize, ()>> for ToUSizeVisitor {
         type VisitZero = ZeroValueConstFn;
-        type VisitIncrement<N: Expr<USize>> = IncValueConstFn<<AsUSize<N> as USizeTrait>::Visit<ConstFn<usize, ()>, ValueToUSizeVisitor>>;
+        type VisitIncrement<N: Expr<USize>> = IncValueConstFn<<AsUSize<N> as USizeTrait>::Visit<ConstFn<usize, ()>, ToUSizeVisitor>>;
     }
 
     pub struct ZeroValueConstFn {}

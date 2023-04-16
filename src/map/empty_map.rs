@@ -21,28 +21,9 @@ pub struct EmptyMap<K: EqualityComparableKind, V: Kind> {
 }
 
 impl<K: EqualityComparableKind, V: Kind> Expr<Map<K, V>> for EmptyMap<K, V> {
-    type Eval = EmptyMapValue<K, V>;
+    type Eval = <ListToMapUnchecked<K, V, EmptyList<Pair<K, V>>> as Expr<Map<K, V>>>::Eval;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct EmptyMapValue<K: EqualityComparableKind, V: Kind> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-    }
-
-    impl<K: EqualityComparableKind, V: Kind> MapValue<K, V> for EmptyMapValue<K, V> {
-        type Impl = EmptyMapImpl<K, V>;
-    }
-
-    pub struct EmptyMapImpl<K: EqualityComparableKind, V: Kind> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-    }
-
-    impl<K: EqualityComparableKind, V: Kind> MapTrait<K, V> for EmptyMapImpl<K, V> {
-        type GetList = EmptyList<Pair<K, V>>;
-    }
 }

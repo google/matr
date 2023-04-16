@@ -38,14 +38,14 @@ mod internal {
 
     impl USizeVisitor<Bool> for IsEvenVisitor {
         type VisitZero = True;
-        type VisitIncrement<N: Expr<USize>> = <AsUSize<N> as USizeTrait>::Visit<Bool, IsOddVisitor>;
+        type VisitIncrement<N: Expr<USize>> = VisitUSize<Bool, N, IsOddVisitor>;
     }
 
     pub struct IsOddVisitor {}
 
     impl USizeVisitor<Bool> for IsOddVisitor {
         type VisitZero = False;
-        type VisitIncrement<N: Expr<USize>> = <AsUSize<N> as USizeTrait>::Visit<Bool, IsEvenVisitor>;
+        type VisitIncrement<N: Expr<USize>> = VisitUSize<Bool, N, IsEvenVisitor>;
     }
 }
 

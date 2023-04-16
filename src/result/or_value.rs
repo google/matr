@@ -23,7 +23,7 @@ pub struct OrValue<K: Kind, V: Expr<Result<K>>, Fallback: Expr<K>> {
 }
 
 impl<K: Kind, V: Expr<Result<K>>, Fallback: Expr<K>> Expr<K> for OrValue<K, V, Fallback> {
-    type Eval = <<AsResult<K, V> as ResultTrait<K>>::Visit<K, OrValueVisitor<K, V, Fallback>> as Expr<K>>::Eval;
+    type Eval = <VisitResult<K, K, V, OrValueVisitor<K, V, Fallback>> as Expr<K>>::Eval;
 }
 
 // These have to be public because otherwise Rust would complain that "can't leak private type".

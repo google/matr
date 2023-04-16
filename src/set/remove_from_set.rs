@@ -22,32 +22,11 @@ pub struct RemoveFromSet<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>>
 }
 
 impl<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> Expr<Set<K>> for RemoveFromSet<K, X, S> {
-    type Eval = RemoveFromSetValue<K, X, S>;
+    type Eval = <ListToSetUnchecked<K, RemoveFromList<K, X, SetToList<K, S>>> as Expr<Set<K>>>::Eval;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct RemoveFromSetValue<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> {
-        k: PhantomData<K>,
-        x: PhantomData<X>,
-        s: PhantomData<S>,
-    }
-
-    impl<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> SetValue<K> for RemoveFromSetValue<K, X, S> {
-        type Impl = RemoveFromSetImpl<K, X, S>;
-    }
-
-    pub struct RemoveFromSetImpl<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> {
-        k: PhantomData<K>,
-        x: PhantomData<X>,
-        s: PhantomData<S>,
-    }
-
-    impl<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> SetTrait<K> for RemoveFromSetImpl<K, X, S> {
-        type GetList = RemoveFromList<K, X, <AsSet<K, S> as SetTrait<K>>::GetList>;
-    }
 }
 
 #[cfg(test)]

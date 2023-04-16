@@ -68,23 +68,6 @@ impl<K: Kind, U: ListValue<K>> Value<List<K>> for U {
     type UnconstrainedImpl = <U as ListValue<K>>::Impl;
 }
 
-pub struct AsList<K: Kind, L: Expr<List<K>>> {
-    k: PhantomData<K>,
-    l: PhantomData<L>,
-}
-
-impl<K: Kind, L: Expr<List<K>>> ListTrait<K> for AsList<K, L> {
-    default type Visit<OutK: Kind, V: ListVisitor<K, OutK>> = V::VisitEmptyList;
-}
-
-impl<K:Kind, L: Expr<List<K>>> ListTrait<K> for AsList<K, L> where <<L as Expr<List<K>>>::Eval as Value<List<K>>>::UnconstrainedImpl: ListTrait<K> {
-    type Visit<OutK: Kind, V: ListVisitor<K, OutK>> = <<<L as Expr<List<K>>>::Eval as Value<List<K>>>::UnconstrainedImpl as ListTrait<K>>::Visit<OutK, V>;
-}
-
-pub trait ListTrait<K: Kind> {
-    type Visit<OutK: Kind, V: ListVisitor<K, OutK>>: Expr<OutK>;
-}
-
 pub trait ListVisitor<ElemK: Kind, OutK: Kind> {
     type VisitEmptyList: Expr<OutK>;
     type VisitCons<Elem: Expr<ElemK>, Tail: Expr<List<ElemK>>>: Expr<OutK>;
@@ -105,6 +88,22 @@ mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
 
+    pub struct AsList<K: Kind, L: Expr<List<K>>> {
+        k: PhantomData<K>,
+        l: PhantomData<L>,
+    }
+
+    impl<K: Kind, L: Expr<List<K>>> ListTrait<K> for AsList<K, L> {
+        default type Visit<OutK: Kind, V: ListVisitor<K, OutK>> = V::VisitEmptyList;
+    }
+
+    impl<K:Kind, L: Expr<List<K>>> ListTrait<K> for AsList<K, L> where <<L as Expr<List<K>>>::Eval as Value<List<K>>>::UnconstrainedImpl: ListTrait<K> {
+        type Visit<OutK: Kind, V: ListVisitor<K, OutK>> = <<<L as Expr<List<K>>>::Eval as Value<List<K>>>::UnconstrainedImpl as ListTrait<K>>::Visit<OutK, V>;
+    }
+
+    pub trait ListTrait<K: Kind> {
+        type Visit<OutK: Kind, V: ListVisitor<K, OutK>>: Expr<OutK>;
+    }
     pub struct ListEquals<K: EqualityComparableKind, X: Expr<List<K>>, Y: Expr<List<K>>> {
         k: PhantomData<K>,
         x: PhantomData<X>,

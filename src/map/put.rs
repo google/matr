@@ -24,39 +24,16 @@ pub struct Put<KeyK: EqualityComparableKind + KindWithDefault, ValueK: KindWithD
 }
 
 impl<KeyK: EqualityComparableKind + KindWithDefault, ValueK: KindWithDefault, Key: Expr<KeyK>, Value: Expr<ValueK>, M: Expr<Map<KeyK, ValueK>>> Expr<Map<KeyK, ValueK>> for Put<KeyK, ValueK, Key, Value, M> {
-    type Eval = PutValue<KeyK, ValueK, ConsPair<KeyK, ValueK, Key, Value>, M>;
+    type Eval = <If<
+        Map<KeyK, ValueK>,
+        IsInMap<KeyK, ValueK, Key, M>,
+        M,
+        ListToMapUnchecked<KeyK, ValueK, Cons<Pair<KeyK, ValueK>, ConsPair<KeyK, ValueK, Key, Value>, MapToList<KeyK, ValueK, M>>>
+    > as Expr<Map<KeyK, ValueK>>>::Eval;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct PutValue<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<Pair<K, V>>, M: Expr<Map<K, V>>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        x: PhantomData<X>,
-        m: PhantomData<M>,
-    }
-
-    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<Pair<K, V>>, M: Expr<Map<K, V>>> MapValue<K, V> for PutValue<K, V, X, M> {
-        type Impl = PutImpl<K, V, X, M>;
-    }
-
-    pub struct PutImpl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<Pair<K, V>>, M: Expr<Map<K, V>>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        x: PhantomData<X>,
-        m: PhantomData<M>,
-    }
-
-    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<Pair<K, V>>, M: Expr<Map<K, V>>> MapTrait<K, V> for PutImpl<K, V, X, M> {
-        type GetList = If<
-            List<Pair<K, V>>,
-            IsInMap<K, V, GetFirst<K, V, X>, M>,
-            <AsMap<K, V, M> as MapTrait<K, V>>::GetList,
-            Cons<Pair<K, V>, X, <AsMap<K, V, M> as MapTrait<K, V>>::GetList>
-        >;
-    }
 }
 
 #[cfg(test)]

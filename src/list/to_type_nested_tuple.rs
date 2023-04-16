@@ -21,21 +21,12 @@ pub struct ToTypeNestedTuple<L: Expr<List<Type>>> {
 }
 
 impl<L: Expr<List<Type>>> Expr<Type> for ToTypeNestedTuple<L> {
-    type Eval = ToTypeNestedTupleValue<L>;
+    type Eval = <VisitList<Type, Type, L, ToTypeNestedTupleVisitor> as Expr<Type>>::Eval;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct ToTypeNestedTupleValue<L: Expr<List<Type>>> {
-        l: PhantomData<L>,
-    }
-
-    impl<L: Expr<List<Type>>> TypeValue for ToTypeNestedTupleValue<L> {
-        type UnconstrainedImpl = <GetType<<AsList<Type, L> as ListTrait<Type>>::Visit<Type, ToTypeNestedTupleVisitor>> as GetTypeTrait>::Get;
-    }
-
+    
     pub struct ToTypeNestedTupleVisitor {}
 
     impl ListVisitor<Type, Type> for ToTypeNestedTupleVisitor {

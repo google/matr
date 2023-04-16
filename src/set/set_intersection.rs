@@ -22,22 +22,12 @@ pub struct SetIntersection<K: EqualityComparableKind, S1: Expr<Set<K>>, S2: Expr
 }
 
 impl<K: EqualityComparableKind, S1: Expr<Set<K>>, S2: Expr<Set<K>>> Expr<Set<K>> for SetIntersection<K, S1, S2> {
-    type Eval = SetIntersectionValue<K, S1, S2>;
+    type Eval = <VisitSet<K, Set<K>, S1, SetIntersectionVisitor<K, S2, EmptySet<K>>> as Expr<Set<K>>>::Eval;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct SetIntersectionValue<K: EqualityComparableKind, S1: Expr<Set<K>>, S2: Expr<Set<K>>> {
-        k: PhantomData<K>,
-        s1: PhantomData<S1>,
-        s2: PhantomData<S2>,
-    }
-
-    impl<K: EqualityComparableKind, S1: Expr<Set<K>>, S2: Expr<Set<K>>> SetValue<K> for SetIntersectionValue<K, S1, S2> {
-        type Impl = AsSet<K, <AsList<K, <AsSet<K, S1> as SetTrait<K>>::GetList> as ListTrait<K>>::Visit<Set<K>, SetIntersectionVisitor<K, S2, EmptySet<K>>>>;
-    }
 
     pub struct SetIntersectionVisitor<K: EqualityComparableKind, S: Expr<Set<K>>, ResultS: Expr<Set<K>>> {
         k: PhantomData<K>,
@@ -45,10 +35,10 @@ mod internal {
         result_s: PhantomData<ResultS>,
     }
 
-    impl<K: EqualityComparableKind, S: Expr<Set<K>>, ResultS: Expr<Set<K>>> ListVisitor<K, Set<K>> for SetIntersectionVisitor<K, S, ResultS> {
-        type VisitEmptyList = EmptySet<K>;
-        type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> =
-            <AsList<K, Tail> as ListTrait<K>>::Visit<Set<K>, SetIntersectionVisitor<K, S,
+    impl<K: EqualityComparableKind, S: Expr<Set<K>>, ResultS: Expr<Set<K>>> SetVisitor<K, Set<K>> for SetIntersectionVisitor<K, S, ResultS> {
+        type VisitEmptySet = EmptySet<K>;
+        type VisitCons<Elem: Expr<K>, Tail: Expr<Set<K>>> =
+            VisitSet<K, Set<K>, Tail, SetIntersectionVisitor<K, S,
                 If<Set<K>,
                     IsInSet<K, Elem, S>,
                     AddToSet<K, Elem, ResultS>,

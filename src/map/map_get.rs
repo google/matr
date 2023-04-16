@@ -24,25 +24,25 @@ pub struct MapGet<K: EqualityComparableKind + KindWithDefault, V: KindWithDefaul
     s: PhantomData<S>,
 }
 
-impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, S: Expr<Map<K, V>>> Expr<V> for MapGet<K, V, X, S> {
-    type Eval = <<AsList<Pair<K, V>, <AsMap<K, V, S> as MapTrait<K, V>>::GetList> as ListTrait<Pair<K, V>>>::Visit<V, MapGetValueVisitor<K, V, X>> as Expr<V>>::Eval;
+impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, M: Expr<Map<K, V>>> Expr<V> for MapGet<K, V, X, M> {
+    type Eval = <VisitMap<K, V, V, M, MapGetVisitor<K, V, X>> as Expr<V>>::Eval;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
 
-    pub struct MapGetValueVisitor<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>> {
+    pub struct MapGetVisitor<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>> {
         k: PhantomData<K>,
         v: PhantomData<V>,
         x: PhantomData<X>,
     }
 
-    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>> ListVisitor<Pair<K, V>, V> for MapGetValueVisitor<K, V, X> {
-        type VisitEmptyList = V::Default;
-        type VisitCons<Elem: Expr<Pair<K, V>>, Tail: Expr<List<Pair<K, V>>>> = If<V, Equals<K, GetFirst<K, V, Elem>, X>,
-            GetSecond<K, V, Elem>,
-            <AsList<Pair<K, V>, Tail> as ListTrait<Pair<K, V>>>::Visit<V, MapGetValueVisitor<K, V, X>>
+    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>> MapVisitor<K, V, V> for MapGetVisitor<K, V, X> {
+        type VisitEmptyMap = V::Default;
+        type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> = If<V, Equals<K, Key, X>,
+            Value,
+            VisitMap<K, V, V, Tail, MapGetVisitor<K, V, X>>
         >;
     }
 }
