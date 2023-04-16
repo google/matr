@@ -41,7 +41,6 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
-    use crate::bool::assertions::*;
 
     #[test]
     fn false_literal() {

@@ -58,7 +58,6 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
-    use crate::bool::assertions::{assert_false, assert_true};
 
     type N0 = Zero;
     type N1 = Increment<N0>;
@@ -70,7 +69,7 @@ mod tests {
 
     #[test]
     fn is_in_empty_map() {
-        assert_false!(IsInMap<Type, WrapType<i32>, EmptyMap<Type>>);
+        assert_false!(IsInMap<Type, Type, WrapType<i32>, EmptyMap<Type, Type>>);
     }
 
     #[test]

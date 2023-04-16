@@ -33,7 +33,6 @@ impl<K: EqualityComparableKind, X: Expr<K>, Y: Expr<K>> Expr<Bool> for Equals<K,
 #[allow(dead_code)]
 mod tests {
     use crate::*;
-    use crate::bool::assertions::*;
 
     #[test]
     fn equals_types() {

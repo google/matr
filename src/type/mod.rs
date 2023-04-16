@@ -96,7 +96,6 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use super::internal::*;
-    use crate::bool::assertions::*;
 
     #[test]
     fn is_equal_to_type() {

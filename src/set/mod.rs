@@ -64,26 +64,26 @@ impl<K: EqualityComparableKind, U: SetValue<K>> Value<Set<K>> for U {
     type UnconstrainedImpl = <U as SetValue<K>>::Impl;
 }
 
+pub trait SetTrait<K: EqualityComparableKind> {
+    type GetList: Expr<List<K>>;
+}
+
+pub struct AsSet<K: EqualityComparableKind, S: Expr<Set<K>>> {
+    k: PhantomData<K>,
+    s: PhantomData<S>,
+}
+
+impl<K: EqualityComparableKind, S: Expr<Set<K>>> SetTrait<K> for AsSet<K, S> {
+    default type GetList = EmptyList<K>;
+}
+
+impl<K:EqualityComparableKind, S: Expr<Set<K>>> SetTrait<K> for AsSet<K, S> where <<S as Expr<Set<K>>>::Eval as Value<Set<K>>>::UnconstrainedImpl: SetTrait<K> {
+    type GetList = <<<S as Expr<Set<K>>>::Eval as Value<Set<K>>>::UnconstrainedImpl as SetTrait<K>>::GetList;
+}
+
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
-
-    pub trait SetTrait<K: EqualityComparableKind> {
-        type GetList: Expr<List<K>>;
-    }
-
-    pub struct AsSet<K: EqualityComparableKind, S: Expr<Set<K>>> {
-        k: PhantomData<K>,
-        s: PhantomData<S>,
-    }
-
-    impl<K: EqualityComparableKind, S: Expr<Set<K>>> SetTrait<K> for AsSet<K, S> {
-        default type GetList = EmptyList<K>;
-    }
-
-    impl<K:EqualityComparableKind, S: Expr<Set<K>>> SetTrait<K> for AsSet<K, S> where <<S as Expr<Set<K>>>::Eval as Value<Set<K>>>::UnconstrainedImpl: SetTrait<K> {
-        type GetList = <<<S as Expr<Set<K>>>::Eval as Value<Set<K>>>::UnconstrainedImpl as SetTrait<K>>::GetList;
-    }
 
     pub struct SetEquals<K: EqualityComparableKind, X: Expr<Set<K>>, Y: Expr<Set<K>>> {
         k: PhantomData<K>,

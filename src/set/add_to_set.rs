@@ -59,7 +59,6 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
-    use crate::set::assertions::assert_type_set_eq;
 
     #[test]
     fn add_commutative() {

@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// E.g. type_list![u32, i64, usize] expands to:
-// Cons<Type, WrapType<u32>, Cons<Type, WrapType<i64>, Cons<Type, WrapType<usize>, EmptyList<Type>>>>
+// E.g. map!(<USize, USize>{Zero: Inc<Zero>, Inc<Inc<Zero>>, Inc<Inc<Inc<Zero>>>}) expands to:
+// Put<USize, USize, Zero, Inc<Zero>, Put<USize, USize, Inc<Inc<Zero>>, Inc<Inc<Inc<Zero>>>, EmptyMap<USize, USize>>>
+// When using this for Type, prefer using type_map! which is simpler to use (but this is more general)
 #[macro_export]
-macro_rules! type_list {
-    () => {
-        $crate::EmptyList<$crate::Type>
+macro_rules! map {
+    (<$K: ty, $V: ty>{}) => {
+        $crate::EmptyMap<$K, $V>
     };
-    ($X:ty $( ,$Y:ty )*) => {
-        $crate::Cons<$crate::Type, $crate::WrapType<$X>, type_list![$($Y),*]>
+    (<$K: ty, $V: ty>{}[$K1:ty : $V1:ty $( ,$Ks:ty : $Vs: ty )*]) => {
+        $crate::Put<$K, $V, $K1, $V1, $crate::map!(<$K, $V>{$($Ks: $Vs),*})>
     };
 }
-pub use type_list;
+pub use map;

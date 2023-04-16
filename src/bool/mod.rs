@@ -76,7 +76,6 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
-    use super::assertions::*;
 
     #[test]
     fn as_bool() {

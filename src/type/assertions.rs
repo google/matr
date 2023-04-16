@@ -12,59 +12,65 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#[macro_export]
 macro_rules! assert_type_eq {
-($X:ty, $Y:ty) => {{
-        crate::r#type::assertions::assert_raw_type_eq!(
-            <GetType<$X> as GetTypeTrait>::Get,
-            <GetType<$Y> as GetTypeTrait>::Get);
-    }};
+    ($X:ty, $Y:ty) => {
+        $crate::assert_raw_type_eq!(
+            <$crate::GetType<$X> as $crate::GetTypeTrait>::Get,
+            <$crate::GetType<$Y> as $crate::GetTypeTrait>::Get);
+    };
 }
-pub(crate) use assert_type_eq;
+pub use assert_type_eq;
 
+#[macro_export]
 macro_rules! assert_type_result_eq {
 ($X:ty, $Y:ty) => {{
-        const _: () = crate::check_no_error::<Type, $X>();
-        const _: () = crate::check_no_error::<Type, $Y>();
-        crate::r#type::assertions::assert_raw_type_eq!(
-            <GetType<OrValue<Type, $X, WrapType<()>>> as GetTypeTrait>::Get,
-            <GetType<OrValue<Type, $Y, WrapType<()>>> as GetTypeTrait>::Get);
+        const _: () = $crate::check_no_error::<Type, $X>();
+        const _: () = $crate::check_no_error::<Type, $Y>();
+        $crate::assert_raw_type_eq!(
+            <$crate::GetType<$crate::OrValue<$crate::Type, $X, $crate::WrapType<()>>> as $crate::GetTypeTrait>::Get,
+            <$crate::GetType<$crate::OrValue<$crate::Type, $Y, $crate::WrapType<()>>> as $crate::GetTypeTrait>::Get);
     }};
 }
-pub(crate) use assert_type_result_eq;
+pub use assert_type_result_eq;
 
+#[macro_export]
 macro_rules! assert_type_not_eq {
 ($X:ty, $Y:ty) => {{
-        crate::r#type::assertions::assert_raw_type_not_eq!(
-            <GetType<$X> as GetTypeTrait>::Get,
-            <GetType<$Y> as GetTypeTrait>::Get);
+        $crate::assert_raw_type_not_eq!(
+            <$crate::GetType<$X> as $crate::GetTypeTrait>::Get,
+            <$crate::GetType<$Y> as $crate::GetTypeTrait>::Get);
     }};
 }
-pub(crate) use assert_type_not_eq;
+pub use assert_type_not_eq;
 
+#[macro_export]
 macro_rules! assert_type_result_not_eq {
 ($X:ty, $Y:ty) => {{
         const _: () = crate::check_no_error::<Type, $X>();
         const _: () = crate::check_no_error::<Type, $Y>();
-        crate::r#type::assertions::assert_raw_type_not_eq!(
-            <GetType<OrValue<Type, $X, WrapType<()>>> as GetTypeTrait>::Get,
-            <GetType<OrValue<Type, $Y, WrapType<()>>> as GetTypeTrait>::Get);
+        $crate::assert_raw_type_not_eq!(
+            <$crate::GetType<$crate::OrValue<$crate::Type, $X, $crate::WrapType<()>>> as $crate::GetTypeTrait>::Get,
+            <$crate::GetType<$crate::OrValue<$crate::Type, $Y, $crate::WrapType<()>>> as $crate::GetTypeTrait>::Get);
     }};
 }
-pub(crate) use assert_type_result_not_eq;
+pub use assert_type_result_not_eq;
 
+#[macro_export]
 macro_rules! assert_raw_type_eq {
         ($X:ty, $Y:ty) => {{
-            const _: () = <crate::r#type::assertions::internal::AssertRawTypeEq<$X, $Y> as crate::r#type::assertions::internal::AssertRawTypeEqTrait>::check_equal();
+            const _: () = <$crate::r#type::assertions::internal::AssertRawTypeEq<$X, $Y> as $crate::r#type::assertions::internal::AssertRawTypeEqTrait>::check_equal();
         }};
     }
-pub(crate) use assert_raw_type_eq;
+pub use assert_raw_type_eq;
 
+#[macro_export]
 macro_rules! assert_raw_type_not_eq {
         ($X:ty, $Y:ty) => {{
-            const _: () = <crate::r#type::assertions::internal::AssertRawTypeNotEq<$X, $Y> as crate::r#type::assertions::internal::AssertRawTypeNotEqTrait>::check_not_equal();
+            const _: () = <$crate::r#type::assertions::internal::AssertRawTypeNotEq<$X, $Y> as $crate::r#type::assertions::internal::AssertRawTypeNotEqTrait>::check_not_equal();
         }};
     }
-pub(crate) use assert_raw_type_not_eq;
+pub use assert_raw_type_not_eq;
 
 pub mod internal {
     use std::marker::PhantomData;
@@ -115,8 +121,6 @@ pub mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
-    use crate::bool::assertions::*;
-    use crate::r#type::assertions::*;
 
     #[test]
     fn assert_raw_type_eq() {

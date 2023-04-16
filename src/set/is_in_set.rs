@@ -44,7 +44,6 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
-    use crate::bool::assertions::{assert_false, assert_true};
 
     type N0 = Zero;
     type N1 = Increment<N0>;

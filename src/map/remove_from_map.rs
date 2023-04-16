@@ -60,12 +60,12 @@ mod internal {
 
     impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>> ListVisitor<Pair<K, V>, List<Pair<K, V>>> for RemoveFromMapVisitor<K, V, X> {
         type VisitEmptyList = EmptyList<Pair<K, V>>;
-        type VisitCons<Elem: Expr<Pair<K, V>>, Tail: Expr<List<Pair<K, V>>>> = AsList<Pair<K, V>, If<
+        type VisitCons<Elem: Expr<Pair<K, V>>, Tail: Expr<List<Pair<K, V>>>> = If<
             List<Pair<K, V>>,
             Equals<K, GetFirst<K, V, Elem>, X>,
             <AsList<Pair<K, V>, Tail> as ListTrait<Pair<K, V>>>::Visit<List<Pair<K, V>>, RemoveFromMapVisitor<K, V, X>>,
             Cons<Pair<K, V>, Elem, <AsList<Pair<K, V>, Tail> as ListTrait<Pair<K, V>>>::Visit<List<Pair<K, V>>, RemoveFromMapVisitor<K, V, X>>>
-        >>;
+        >;
     }
 }
 
@@ -73,9 +73,6 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
-    use crate::r#type::assertions::assert_type_eq;
-    use crate::map::assertions::assert_type_map_eq;
-    use crate::type_list::type_list;
 
     #[test]
     fn remove_from_empty_map() {
@@ -84,14 +81,23 @@ mod tests {
 
     #[test]
     fn remove_from_map_found() {
-        type S = ListToMap<Type, Type, type_list![usize, f32, u64]>;
-        type S2 = ListToMap<Type, Type, type_list![usize, u64]>;
-        assert_type_map_eq!(RemoveFromMap<Type, Type, WrapType<f32>, S>, S2);
+        type M = type_map!{
+            usize: (usize,),
+            f32: (f32,),
+            u64: (u64,)
+        };
+        type M2 = type_map!{
+            usize: (usize,),
+            u64: (u64,)};
+        assert_type_map_eq!(RemoveFromMap<Type, Type, WrapType<f32>, M>, M2);
     }
 
     #[test]
     fn remove_from_map_not_found() {
-        type S = ListToMap<Type, Type, type_list![usize, f32, u64]>;
-        assert_type_map_eq!(RemoveFromMap<Type, Type, WrapType<bool>, S>, S);
+        type M = type_map!{
+            usize: (usize,),
+            f32: (f32,),
+            u64: (u64,)};
+        assert_type_map_eq!(RemoveFromMap<Type, Type, WrapType<bool>, M>, M);
     }
 }

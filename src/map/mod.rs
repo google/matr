@@ -21,6 +21,12 @@ mod list_to_map;
 mod to_hash_map;
 mod remove_from_map;
 mod map_get;
+mod map_key_set;
+mod map_entry_set;
+mod map_remove_key_set;
+mod map_common_keys_with_different_value;
+pub mod map;
+pub mod type_map;
 
 pub use empty_map::*;
 pub use put::*;
@@ -30,6 +36,12 @@ pub use list_to_map::*;
 pub use to_hash_map::*;
 pub use remove_from_map::*;
 pub use map_get::*;
+pub use map_key_set::*;
+pub use map_entry_set::*;
+pub use map_remove_key_set::*;
+pub use map_common_keys_with_different_value::*;
+pub use map::*;
+pub use type_map::*;
 
 use std::marker::PhantomData;
 use internal::*;
@@ -41,7 +53,7 @@ pub struct Map<K: EqualityComparableKind, V: Kind> {
 
 impl<K: EqualityComparableKind, V: Kind> Kind for Map<K, V> {}
 
-impl<K: EqualityComparableKind, V: EqualityComparableKind> EqualityComparableKind for Map<K, V> {
+impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault + EqualityComparableKind> EqualityComparableKind for Map<K, V> {
     type Eq<X: Expr<Map<K, V>>, Y: Expr<Map<K, V>>> = MapEquals<K, V, X, Y>;
 }
 
@@ -65,17 +77,17 @@ mod internal {
         type GetList: Expr<List<Pair<K, V>>>;
     }
 
-    pub struct AsMap<K: EqualityComparableKind, V: Kind, S: Expr<Map<K, V>>> {
+    pub struct AsMap<K: EqualityComparableKind + KindWithDefault, V: Kind, S: Expr<Map<K, V>>> {
         k: PhantomData<K>,
         v: PhantomData<V>,
         s: PhantomData<S>,
     }
 
-    impl<K: EqualityComparableKind, V: Kind, M: Expr<Map<K, V>>> MapTrait<K, V> for AsMap<K, V, M> {
-        default type GetList = EmptyList<K>;
+    impl<K: KindWithDefault + EqualityComparableKind, V: Kind, M: Expr<Map<K, V>>> MapTrait<K, V> for AsMap<K, V, M> {
+        default type GetList = EmptyList<Pair<K, V>>;
     }
 
-    impl<K:EqualityComparableKind, V: Kind, M: Expr<Map<K, V>>> MapTrait<K, V> for AsMap<K, V, M> where <<M as Expr<Map<K, V>>>::Eval as Value<Map<K, V>>>::UnconstrainedImpl: MapTrait<K, V> {
+    impl<K: KindWithDefault + EqualityComparableKind, V: Kind, M: Expr<Map<K, V>>> MapTrait<K, V> for AsMap<K, V, M> where <<M as Expr<Map<K, V>>>::Eval as Value<Map<K, V>>>::UnconstrainedImpl: MapTrait<K, V> {
         type GetList = <<<M as Expr<Map<K, V>>>::Eval as Value<Map<K, V>>>::UnconstrainedImpl as MapTrait<K, V>>::GetList;
     }
 
@@ -86,7 +98,7 @@ mod internal {
         y: PhantomData<Y>,
     }
 
-    impl<K: EqualityComparableKind, V: EqualityComparableKind, X: Expr<Map<K, V>>, Y: Expr<Map<K, V>>> Expr<Bool> for MapEquals<K, V, X, Y> {
+    impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault + EqualityComparableKind, X: Expr<Map<K, V>>, Y: Expr<Map<K, V>>> Expr<Bool> for MapEquals<K, V, X, Y> {
         type Eval = MapEqualsImpl<K, V, X, Y>;
     }
 
@@ -97,7 +109,7 @@ mod internal {
         y: PhantomData<Y>,
     }
 
-    impl<K: EqualityComparableKind, V: EqualityComparableKind, X: Expr<Map<K, V>>, Y: Expr<Map<K, V>>> BoolValue for MapEqualsImpl<K, V, X, Y> {
+    impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault + EqualityComparableKind, X: Expr<Map<K, V>>, Y: Expr<Map<K, V>>> BoolValue for MapEqualsImpl<K, V, X, Y> {
         type Impl = AsBool<And<IsSubmap<K, V, X, Y>, IsSubmap<K, V, Y, X>>>;
     }
 
@@ -108,7 +120,7 @@ mod internal {
         candidate_supermap: PhantomData<CandidateSupermap>,
     }
 
-    impl<K: EqualityComparableKind, V: EqualityComparableKind, CandidateSubmap: Expr<Map<K, V>>, CandidateSupermap: Expr<Map<K, V>>> Expr<Bool> for IsSubmap<K, V, CandidateSubmap, CandidateSupermap> {
+    impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault + EqualityComparableKind, CandidateSubmap: Expr<Map<K, V>>, CandidateSupermap: Expr<Map<K, V>>> Expr<Bool> for IsSubmap<K, V, CandidateSubmap, CandidateSupermap> {
         type Eval = IsSubmapValue<K, V, CandidateSubmap, CandidateSupermap>;
     }
     

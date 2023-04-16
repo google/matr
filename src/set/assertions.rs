@@ -12,28 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#[macro_export]
 macro_rules! assert_type_set_eq {
 ($X:ty, $Y:ty) => {{
-        type Common = <GetType<ToTypeNestedTuple<SetToList<Type, SetIntersection<Type, $X, $Y>>>> as GetTypeTrait>::Get;
-        type XOnly = <GetType<ToTypeNestedTuple<SetToList<Type, SetDifference<Type, $X, $Y>>>> as GetTypeTrait>::Get;
-        type YOnly = <GetType<ToTypeNestedTuple<SetToList<Type, SetDifference<Type, $Y, $X>>>> as GetTypeTrait>::Get;
+        type Common = <$crate::GetType<$crate::ToTypeNestedTuple<$crate::SetToList<$crate::Type, $crate::SetIntersection<$crate::Type, $X, $Y>>>> as $crate::GetTypeTrait>::Get;
+        type XOnly = <$crate::GetType<$crate::ToTypeNestedTuple<$crate::SetToList<$crate::Type, $crate::SetDifference<$crate::Type, $X, $Y>>>> as $crate::GetTypeTrait>::Get;
+        type YOnly = <$crate::GetType<$crate::ToTypeNestedTuple<$crate::SetToList<$crate::Type, $crate::SetDifference<$crate::Type, $Y, $X>>>> as $crate::GetTypeTrait>::Get;
         // Including Common to give more context when the assertion fails.
-        crate::r#type::assertions::assert_raw_type_eq!(
+        $crate::assert_raw_type_eq!(
             (Common, XOnly, YOnly),
             (Common, (), ()));
     }};
 }
-pub(crate) use assert_type_set_eq;
+pub use assert_type_set_eq;
 
+#[macro_export]
 macro_rules! assert_type_set_not_eq {
 ($X:ty, $Y:ty) => {{
-        type Common = <GetType<ToTypeNestedTuple<SetToList<Type, SetIntersection<Type, $X, $Y>>>> as GetTypeTrait>::Get;
-        type XOnly = <GetType<ToTypeNestedTuple<SetToList<Type, SetDifference<Type, $X, $Y>>>> as GetTypeTrait>::Get;
-        type YOnly = <GetType<ToTypeNestedTuple<SetToList<Type, SetDifference<Type, $Y, $X>>>> as GetTypeTrait>::Get;
+        type Common = <$crate::GetType<$crate::ToTypeNestedTuple<$crate::SetToList<$crate::Type, $crate::SetIntersection<$crate::Type, $X, $Y>>>> as $crate::GetTypeTrait>::Get;
+        type XOnly = <$crate::GetType<$crate::ToTypeNestedTuple<$crate::SetToList<$crate::Type, $crate::SetDifference<$crate::Type, $X, $Y>>>> as $crate::GetTypeTrait>::Get;
+        type YOnly = <$crate::GetType<$crate::ToTypeNestedTuple<$crate::SetToList<$crate::Type, $crate::SetDifference<$crate::Type, $Y, $X>>>> as $crate::GetTypeTrait>::Get;
         // Including Common to give more context when the assertion fails.
-        crate::r#type::assertions::assert_raw_type_not_eq!(
+        $crate::assert_raw_type_not_eq!(
             (Common, XOnly, YOnly),
             (Common, (), ()));
     }};
 }
-pub(crate) use assert_type_set_not_eq;
+pub use assert_type_set_not_eq;

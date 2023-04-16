@@ -26,7 +26,6 @@ impl<X: Expr<Bool>> Expr<Bool> for Not<X> {
 #[cfg(test)]
 #[allow(dead_code)]
 mod tests {
-    use crate::bool::assertions::*;
     use crate::*;
 
     #[test]

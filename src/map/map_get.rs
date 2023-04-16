@@ -17,30 +17,33 @@ use internal::*;
 
 // Returns the value associated with the key in the map, or the default value for the value kind otherwise.
 // It's the caller's responsibility to check if the key in the map if getting the default value is not acceptable (e.g. if that could be a valid value in the map).
-pub struct MapGet<K: EqualityComparableKind, V: KindWithDefault, X: Expr<K>, S: Expr<Map<K, V>>> {
+pub struct MapGet<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, S: Expr<Map<K, V>>> {
     k: PhantomData<K>,
     v: PhantomData<V>,
     x: PhantomData<X>,
     s: PhantomData<S>,
 }
 
-impl<K: EqualityComparableKind, V: KindWithDefault, X: Expr<K>, S: Expr<Map<K, V>>> Expr<V> for MapGet<K, V, X, S> {
-    type Eval = MapGetValue<K, V, X, S>;
+impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, S: Expr<Map<K, V>>> Expr<V> for MapGet<K, V, X, S> {
+    type Eval = <<AsList<Pair<K, V>, <AsMap<K, V, S> as MapTrait<K, V>>::GetList> as ListTrait<Pair<K, V>>>::Visit<V, MapGetValueVisitor<K, V, X>> as Expr<V>>::Eval;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
 
-    pub struct MapGetValue<K: EqualityComparableKind, V: Kind, X: Expr<K>, S: Expr<Map<K, V>>> {
+    pub struct MapGetValueVisitor<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>> {
         k: PhantomData<K>,
         v: PhantomData<V>,
         x: PhantomData<X>,
-        s: PhantomData<S>,
     }
 
-    impl<K: EqualityComparableKind, V: Kind, X: Expr<K>, S: Expr<Map<K, V>>> BoolValue for MapGetValue<K, V, X, S> {
-        type Impl = AsBool<IsInList<K, X, <AsMap<K, V, S> as MapTrait<K, V>>::GetList>>;
+    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>> ListVisitor<Pair<K, V>, V> for MapGetValueVisitor<K, V, X> {
+        type VisitEmptyList = V::Default;
+        type VisitCons<Elem: Expr<Pair<K, V>>, Tail: Expr<List<Pair<K, V>>>> = If<V, Equals<K, GetFirst<K, V, Elem>, X>,
+            GetSecond<K, V, Elem>,
+            <AsList<Pair<K, V>, Tail> as ListTrait<Pair<K, V>>>::Visit<V, MapGetValueVisitor<K, V, X>>
+        >;
     }
 }
 
@@ -48,7 +51,6 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
-    use crate::bool::assertions::{assert_false, assert_true};
 
     type N0 = Zero;
     type N1 = Increment<N0>;
@@ -60,18 +62,18 @@ mod tests {
 
     #[test]
     fn is_in_empty_map() {
-        assert_false!(MapGet<Type, WrapType<i32>, EmptyMap<Type>>);
+        assert_type_eq!(MapGet<Type, Type, WrapType<i32>, EmptyMap<Type, Type>>, WrapType<()>);
     }
 
     #[test]
     fn is_in_map_found() {
-        type S = Put<Type, Type, WrapType<i32>, WrapType<u32>, Put<Type, Type, WrapType<f64>, WrapType<u64>, Put<Type, Type, WrapType<usize>, WrapType<usize>, EmptyMap<Type, Type>>>>;
-        assert_true!(MapGet<Type, WrapType<f64>, S>);
+        type M = Put<Type, Type, WrapType<i32>, WrapType<u32>, Put<Type, Type, WrapType<f64>, WrapType<u64>, Put<Type, Type, WrapType<usize>, WrapType<usize>, EmptyMap<Type, Type>>>>;
+        assert_type_eq!(MapGet<Type, Type, WrapType<f64>, M>, WrapType<u64>);
     }
 
     #[test]
     fn is_in_map_not_found() {
-        type S = Put<Type, Type, WrapType<i32>, WrapType<u32>, Put<Type, Type, WrapType<f64>, WrapType<u64>, Put<Type, Type, WrapType<usize>, WrapType<usize>, EmptyMap<Type, Type>>>>;
-        assert_false!(MapGet<Type, WrapType<u32>, S>);
+        type M = Put<Type, Type, WrapType<i32>, WrapType<u32>, Put<Type, Type, WrapType<f64>, WrapType<u64>, Put<Type, Type, WrapType<usize>, WrapType<usize>, EmptyMap<Type, Type>>>>;
+        assert_type_eq!(MapGet<Type, Type, WrapType<u32>, M>, WrapType<()>);
     }
 }

@@ -37,7 +37,6 @@ impl<X: Expr<Result<Bool>>, Y: Expr<Result<Bool>>> Expr<Result<Bool>> for OrResu
 #[allow(dead_code)]
 mod tests {
     use crate::*;
-    use crate::bool::assertions::*;
 
     #[test]
     fn or() {

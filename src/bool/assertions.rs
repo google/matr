@@ -12,39 +12,51 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+#[macro_export]
 macro_rules! assert_false {
-    ($value:ty) => {{
-        use crate::WrapType;
-        use crate::If;
-        crate::r#type::assertions::assert_type_eq!(If<Type, $value, WrapType<u32>, WrapType<f64>>, WrapType<f64>);
-    }};
+    ($value:ty) => {
+        $crate::assert_type_eq!(
+            $crate::If<$crate::Type, $value,
+                $crate::WrapType<u32>,
+                $crate::WrapType<f64>>,
+            $crate::WrapType<f64>);
+    };
 }
 
+#[macro_export]
 macro_rules! assert_false_result {
-    ($value:ty) => {{
-        use crate::WrapType;
-        use crate::IfResult;
-        crate::r#type::assertions::assert_type_result_eq!(IfResult<Type, $value, Ok<Type, WrapType<u32>>, Ok<Type, WrapType<f64>>>, Ok<Type, WrapType<f64>>);
-    }};
+    ($value:ty) => {
+        $crate::assert_type_result_eq!(
+            $crate::IfResult<$crate::Type, $value,
+                $crate::Ok<$crate::Type, $crate::WrapType<u32>>,
+                $crate::Ok<$crate::Type, $crate::WrapType<f64>>>,
+            $crate::Ok<$crate::Type, $crate::WrapType<f64>>);
+    };
 }
 
+#[macro_export]
 macro_rules! assert_true {
-    ($value:ty) => {{
-        use crate::WrapType;
-        use crate::If;
-        crate::r#type::assertions::assert_type_eq!(If<Type, $value, WrapType<u32>, WrapType<f64>>, WrapType<u32>);
-    }};
+    ($value:ty) => {
+        $crate::assert_type_eq!(
+            $crate::If<$crate::Type, $value,
+                $crate::WrapType<u32>,
+                $crate::WrapType<f64>>,
+            $crate::WrapType<u32>);
+    };
 }
 
+#[macro_export]
 macro_rules! assert_true_result {
-    ($value:ty) => {{
-        use crate::WrapType;
-        use crate::IfResult;
-        crate::r#type::assertions::assert_type_result_eq!(IfResult<Type, $value, Ok<Type, WrapType<u32>>, Ok<Type, WrapType<f64>>>, Ok<Type, WrapType<u32>>);
-    }};
+    ($value:ty) => {
+        crate::assert_type_result_eq!(
+            $crate::IfResult<$crate::Type, $value,
+                $crate::Ok<$crate::Type, $crate::WrapType<u32>>,
+                $crate::Ok<$crate::Type, $crate::WrapType<f64>>>,
+            $crate::Ok<$crate::Type, $crate::WrapType<u32>>);
+    };
 }
 
-pub(crate) use assert_false;
-pub(crate) use assert_false_result;
-pub(crate) use assert_true;
-pub(crate) use assert_true_result;
+pub use assert_false;
+pub use assert_false_result;
+pub use assert_true;
+pub use assert_true_result;

@@ -54,8 +54,6 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
-    use crate::bool::assertions::{assert_false, assert_true};
-    use crate::type_list::type_list;
 
     #[test]
     fn is_in_empty_list() {

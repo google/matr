@@ -31,7 +31,6 @@ mod internal {
 #[cfg(test)]
 #[allow(dead_code)]
 mod tests {
-    use crate::bool::assertions::*;
     use super::internal::*;
 
     #[test]

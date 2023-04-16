@@ -16,8 +16,8 @@ use std::collections::HashMap;
 use std::hash::Hash;
 use internal::*;
 
-pub fn to_hash_map<K: EqualityComparableKind, V: Kind, M: Expr<Map<K, V>>, OutK: Eq + Hash, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>>() -> HashMap<OutK, OutV> {
-    return call_runtime_fn::<HashMap<OutK, OutV>, (), ToHashMap<K, <AsMap<K, V, M> as MapTrait<K, V>>::GetList, OutK, OutV, KeyF, ValueF>>(());
+pub fn to_hash_map<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, M: Expr<Map<K, V>>, OutK: Eq + Hash, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>>() -> HashMap<OutK, OutV> {
+    return call_runtime_fn::<HashMap<OutK, OutV>, (), ToHashMap<K, V, <AsMap<K, V, M> as MapTrait<K, V>>::GetList, OutK, OutV, KeyF, ValueF>>(());
 }
 
 mod internal {
@@ -26,7 +26,7 @@ mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
 
-    pub struct ToHashMap<K: EqualityComparableKind, V: Kind, L: Expr<List<Pair<K, V>>>, OutK: Eq + Hash, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>> {
+    pub struct ToHashMap<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, L: Expr<List<Pair<K, V>>>, OutK: Eq + Hash, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>> {
         k: PhantomData<K>,
         v: PhantomData<V>,
         l: PhantomData<L>,
@@ -36,11 +36,11 @@ mod internal {
         value_f: PhantomData<ValueF>,
     }
 
-    impl<K: EqualityComparableKind, V: Kind, S: Expr<List<Pair<K, V>>>, OutK: Eq + Hash, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>> Expr<RuntimeFn<HashMap<OutK, OutV>, ()>> for ToHashMap<K, V, S, OutK, OutV, KeyF, ValueF> {
+    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, S: Expr<List<Pair<K, V>>>, OutK: Eq + Hash, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>> Expr<RuntimeFn<HashMap<OutK, OutV>, ()>> for ToHashMap<K, V, S, OutK, OutV, KeyF, ValueF> {
         type Eval = ToHashMapValue<K, V, S, OutK, OutV, KeyF, ValueF>;
     }
 
-    pub struct ToHashMapValue<K: EqualityComparableKind, V: Kind, L: Expr<List<Pair<K, V>>>, OutK, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>> {
+    pub struct ToHashMapValue<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, L: Expr<List<Pair<K, V>>>, OutK, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>> {
         k: PhantomData<K>,
         v: PhantomData<V>,
         l: PhantomData<L>,
@@ -50,7 +50,7 @@ mod internal {
         value_f: PhantomData<ValueF>,
     }
 
-    impl<K: EqualityComparableKind, V: Kind, L: Expr<List<Pair<K, V>>>, OutK: Eq + Hash, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>> RuntimeFnValue<HashMap<OutK, OutV>, ()> for ToHashMapValue<K, V, L, OutK, OutV, KeyF, ValueF> {
+    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, L: Expr<List<Pair<K, V>>>, OutK: Eq + Hash, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>> RuntimeFnValue<HashMap<OutK, OutV>, ()> for ToHashMapValue<K, V, L, OutK, OutV, KeyF, ValueF> {
         type Impl = AsRuntimeFn<HashMap<OutK, OutV>, (), <AsList<Pair<K, V>, L> as ListTrait<Pair<K, V>>>::Visit<RuntimeFn<HashMap<OutK, OutV>, ()>, ToHashMapVisitor<K, V, OutK, OutV, KeyF, ValueF>>>;
     }
 
@@ -63,7 +63,7 @@ mod internal {
         value_f: PhantomData<ValueF>,
     }
 
-    impl<K: EqualityComparableKind, V: Kind, OutK: Eq + Hash, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>> ListVisitor<Pair<K, V>, RuntimeFn<HashMap<OutK, OutV>, ()>> for ToHashMapVisitor<K, V, OutK, OutV, KeyF, ValueF> {
+    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, OutK: Eq + Hash, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>> ListVisitor<Pair<K, V>, RuntimeFn<HashMap<OutK, OutV>, ()>> for ToHashMapVisitor<K, V, OutK, OutV, KeyF, ValueF> {
         type VisitEmptyList = EmptyHashMap<OutK, OutV>;
         type VisitCons<Elem: Expr<Pair<K, V>>, Tail: Expr<List<Pair<K, V>>>> = AddToHashMap<K, V, Elem, OutK, OutV, KeyF, ValueF, ToHashMap<K, V, Tail, OutK, OutV, KeyF, ValueF>>;
     }
@@ -97,7 +97,7 @@ mod internal {
         }
     }
 
-    pub struct AddToHashMap<K: Kind, V: Kind, Elem: Expr<Pair<K, V>>, OutK: Eq + Hash, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>, TailHashMap: Expr<RuntimeFn<HashMap<OutK, OutV>, ()>>> {
+    pub struct AddToHashMap<K: KindWithDefault, V: KindWithDefault, Elem: Expr<Pair<K, V>>, OutK: Eq + Hash, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>, TailHashMap: Expr<RuntimeFn<HashMap<OutK, OutV>, ()>>> {
         k: PhantomData<K>,
         v: PhantomData<V>,
         elem: PhantomData<Elem>,
@@ -108,7 +108,7 @@ mod internal {
         tail_vec: PhantomData<TailHashMap>,
     }
 
-    impl<K: Kind, V: Kind, Elem: Expr<Pair<K, V>>, OutK: Eq + Hash, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>, TailHashMap: Expr<RuntimeFn<HashMap<OutK, OutV>, ()>>> Expr<RuntimeFn<HashMap<OutK, OutV>, ()>> for AddToHashMap<K, V, Elem, OutK, OutV, KeyF, ValueF, TailHashMap> {
+    impl<K: KindWithDefault, V: KindWithDefault, Elem: Expr<Pair<K, V>>, OutK: Eq + Hash, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>, TailHashMap: Expr<RuntimeFn<HashMap<OutK, OutV>, ()>>> Expr<RuntimeFn<HashMap<OutK, OutV>, ()>> for AddToHashMap<K, V, Elem, OutK, OutV, KeyF, ValueF, TailHashMap> {
         type Eval = AddToHashMapValue<K, V, Elem, OutK, OutV, KeyF, ValueF, TailHashMap>;
     }
 
@@ -123,11 +123,11 @@ mod internal {
         tail_vec: PhantomData<TailHashMap>,
     }
 
-    impl<K: Kind, V: Kind, Elem: Expr<Pair<K, V>>, OutK: Eq + Hash, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>, TailHashMap: Expr<RuntimeFn<HashMap<OutK, OutV>, ()>>> RuntimeFnValue<HashMap<OutK, OutV>, ()> for AddToHashMapValue<K, V, Elem, OutK, OutV, KeyF, ValueF, TailHashMap> {
+    impl<K: KindWithDefault, V: KindWithDefault, Elem: Expr<Pair<K, V>>, OutK: Eq + Hash, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>, TailHashMap: Expr<RuntimeFn<HashMap<OutK, OutV>, ()>>> RuntimeFnValue<HashMap<OutK, OutV>, ()> for AddToHashMapValue<K, V, Elem, OutK, OutV, KeyF, ValueF, TailHashMap> {
         type Impl = AddToHashMapImpl<K, V, Elem, OutK, OutV, KeyF, ValueF, TailHashMap>;
     }
 
-    pub struct AddToHashMapImpl<K: Kind, V: Kind, Elem: Expr<Pair<K, V>>, OutK: Eq + Hash, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>, TailHashMap: Expr<RuntimeFn<HashMap<OutK, OutV>, ()>>> {
+    pub struct AddToHashMapImpl<K: KindWithDefault, V: KindWithDefault, Elem: Expr<Pair<K, V>>, OutK: Eq + Hash, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>, TailHashMap: Expr<RuntimeFn<HashMap<OutK, OutV>, ()>>> {
         k: PhantomData<K>,
         v: PhantomData<V>,
         elem: PhantomData<Elem>,
@@ -138,7 +138,7 @@ mod internal {
         tail_vec: PhantomData<TailHashMap>,
     }
 
-    impl<K: Kind, V: Kind, Elem: Expr<Pair<K, V>>, OutK: Eq + Hash, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>, TailHashMap: Expr<RuntimeFn<HashMap<OutK, OutV>, ()>>> RuntimeFnTrait<HashMap<OutK, OutV>, ()> for AddToHashMapImpl<K, V, Elem, OutK, OutV, KeyF, ValueF, TailHashMap> {
+    impl<K: KindWithDefault, V: KindWithDefault, Elem: Expr<Pair<K, V>>, OutK: Eq + Hash, OutV, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>, TailHashMap: Expr<RuntimeFn<HashMap<OutK, OutV>, ()>>> RuntimeFnTrait<HashMap<OutK, OutV>, ()> for AddToHashMapImpl<K, V, Elem, OutK, OutV, KeyF, ValueF, TailHashMap> {
         fn apply(_: ()) -> HashMap<OutK, OutV> {
             let mut s = call_runtime_fn::<HashMap<OutK, OutV>, (), TailHashMap>(());
             s.insert(

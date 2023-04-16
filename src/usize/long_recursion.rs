@@ -49,7 +49,6 @@ mod internal {
 #[allow(unused_imports)]
 mod tests {
     use crate::*;
-    use crate::bool::assertions::*;
 
     #[test]
     fn long_recursion() {

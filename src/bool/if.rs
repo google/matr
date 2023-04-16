@@ -58,8 +58,6 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
-    use crate::bool::assertions::*;
-    use crate::r#type::assertions::*;
 
     #[test]
     fn if_function() {

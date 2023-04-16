@@ -15,7 +15,7 @@
 use std::marker::PhantomData;
 use internal::*;
 
-pub struct Put<KeyK: EqualityComparableKind, ValueK: Kind, Key: Expr<KeyK>, Value: Expr<ValueK>, M: Expr<Map<KeyK, ValueK>>> {
+pub struct Put<KeyK: EqualityComparableKind + KindWithDefault, ValueK: KindWithDefault, Key: Expr<KeyK>, Value: Expr<ValueK>, M: Expr<Map<KeyK, ValueK>>> {
     key_k: PhantomData<KeyK>,
     value_k: PhantomData<ValueK>,
     key: PhantomData<Key>,
@@ -23,7 +23,7 @@ pub struct Put<KeyK: EqualityComparableKind, ValueK: Kind, Key: Expr<KeyK>, Valu
     m: PhantomData<M>,
 }
 
-impl<KeyK: EqualityComparableKind, ValueK: Kind, Key: Expr<KeyK>, Value: Expr<ValueK>, M: Expr<Map<KeyK, ValueK>>> Expr<Map<KeyK, ValueK>> for Put<KeyK, ValueK, Key, Value, M> {
+impl<KeyK: EqualityComparableKind + KindWithDefault, ValueK: KindWithDefault, Key: Expr<KeyK>, Value: Expr<ValueK>, M: Expr<Map<KeyK, ValueK>>> Expr<Map<KeyK, ValueK>> for Put<KeyK, ValueK, Key, Value, M> {
     type Eval = PutValue<KeyK, ValueK, ConsPair<KeyK, ValueK, Key, Value>, M>;
 }
 
@@ -31,18 +31,18 @@ mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
 
-    pub struct PutValue<K: EqualityComparableKind, V: Kind, X: Expr<Pair<K, V>>, M: Expr<Map<K, V>>> {
+    pub struct PutValue<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<Pair<K, V>>, M: Expr<Map<K, V>>> {
         k: PhantomData<K>,
         v: PhantomData<V>,
         x: PhantomData<X>,
         m: PhantomData<M>,
     }
 
-    impl<K: EqualityComparableKind, V: Kind, X: Expr<Pair<K, V>>, M: Expr<Map<K, V>>> MapValue<K, V> for PutValue<K, V, X, M> {
+    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<Pair<K, V>>, M: Expr<Map<K, V>>> MapValue<K, V> for PutValue<K, V, X, M> {
         type Impl = PutImpl<K, V, X, M>;
     }
 
-    pub struct PutImpl<K: EqualityComparableKind, V: Kind, X: Expr<Pair<K, V>>, M: Expr<Map<K, V>>> {
+    pub struct PutImpl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<Pair<K, V>>, M: Expr<Map<K, V>>> {
         k: PhantomData<K>,
         v: PhantomData<V>,
         x: PhantomData<X>,
@@ -63,7 +63,6 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
-    use crate::map::assertions::assert_type_map_eq;
 
     #[test]
     fn put_commutative() {

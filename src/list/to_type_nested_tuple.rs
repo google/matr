@@ -52,8 +52,6 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
-    use crate::r#type::assertions::assert_type_eq;
-    use crate::type_list::type_list;
 
     #[test]
     fn empty_list_to_type_nested_tuple() {

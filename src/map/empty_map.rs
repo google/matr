@@ -43,6 +43,6 @@ mod internal {
     }
 
     impl<K: EqualityComparableKind, V: Kind> MapTrait<K, V> for EmptyMapImpl<K, V> {
-        type GetList = EmptyList<K>;
+        type GetList = EmptyList<Pair<K, V>>;
     }
 }
