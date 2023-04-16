@@ -32,6 +32,7 @@ mod list;
 mod set;
 mod map;
 mod pair;
+mod option;
 
 pub use crate::bool::*;
 pub use const_fn::*;
@@ -50,3 +51,4 @@ pub use pair::*;
 pub use value::*;
 pub use kind_with_default::*;
 pub use crate::usize::*;
+pub use option::*;
