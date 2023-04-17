@@ -26,7 +26,7 @@ pub trait GetTypeResultTrait {
 }
 
 impl<E: Expr<Result<Type>>> GetTypeResultTrait for GetTypeResult<E> {
-    type Get = <GetType<OrValue<Type, E, WrapType<()>>> as GetTypeTrait>::Get;
+    type Get = <GetType<ResultOrValue<Type, E, WrapType<()>>> as GetTypeTrait>::Get;
 }
 
 mod internal {

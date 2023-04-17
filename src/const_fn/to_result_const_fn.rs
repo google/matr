@@ -22,7 +22,7 @@ pub struct ToResultConstFn<Out, Args: ~const Destruct, E: Expr<Result<ConstFn<Ou
 }
 
 impl<Out, Args: ~const Destruct, E: Expr<Result<ConstFn<Out, Args>>>> Expr<ConstFn<std::result::Result<Out, &'static str>, Args>> for ToResultConstFn<Out, Args, E> {
-    type Eval = <OrValue<ConstFn<std::result::Result<Out, &'static str>, Args>, AndThen<ConstFn<Out, Args>, ConstFn<std::result::Result<Out, &'static str>, Args>, E, ToResultConstFnAdapter>, ToResultConstFnError> as Expr<ConstFn<std::result::Result<Out, &'static str>, Args>>>::Eval;
+    type Eval = <ResultOrValue<ConstFn<std::result::Result<Out, &'static str>, Args>, AndThen<ConstFn<Out, Args>, ConstFn<std::result::Result<Out, &'static str>, Args>, E, ToResultConstFnAdapter>, ToResultConstFnError> as Expr<ConstFn<std::result::Result<Out, &'static str>, Args>>>::Eval;
 }
 
 mod internal {

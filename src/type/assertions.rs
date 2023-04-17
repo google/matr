@@ -28,8 +28,8 @@ macro_rules! assert_type_result_eq {
         const _: () = $crate::check_no_error::<Type, $X>();
         const _: () = $crate::check_no_error::<Type, $Y>();
         $crate::assert_raw_type_eq!(
-            <$crate::GetType<$crate::OrValue<$crate::Type, $X, $crate::WrapType<()>>> as $crate::GetTypeTrait>::Get,
-            <$crate::GetType<$crate::OrValue<$crate::Type, $Y, $crate::WrapType<()>>> as $crate::GetTypeTrait>::Get);
+            <$crate::GetType<$crate::ResultOrValue<$crate::Type, $X, $crate::WrapType<()>>> as $crate::GetTypeTrait>::Get,
+            <$crate::GetType<$crate::ResultOrValue<$crate::Type, $Y, $crate::WrapType<()>>> as $crate::GetTypeTrait>::Get);
     }};
 }
 pub use assert_type_result_eq;
@@ -50,8 +50,8 @@ macro_rules! assert_type_result_not_eq {
         const _: () = crate::check_no_error::<Type, $X>();
         const _: () = crate::check_no_error::<Type, $Y>();
         $crate::assert_raw_type_not_eq!(
-            <$crate::GetType<$crate::OrValue<$crate::Type, $X, $crate::WrapType<()>>> as $crate::GetTypeTrait>::Get,
-            <$crate::GetType<$crate::OrValue<$crate::Type, $Y, $crate::WrapType<()>>> as $crate::GetTypeTrait>::Get);
+            <$crate::GetType<$crate::ResultOrValue<$crate::Type, $X, $crate::WrapType<()>>> as $crate::GetTypeTrait>::Get,
+            <$crate::GetType<$crate::ResultOrValue<$crate::Type, $Y, $crate::WrapType<()>>> as $crate::GetTypeTrait>::Get);
     }};
 }
 pub use assert_type_result_not_eq;

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod or_value;
+mod result_or_value;
 mod ok;
 mod err;
 mod check_no_error;
@@ -20,7 +20,7 @@ mod and_then2;
 mod and_then;
 mod get_type_result;
 
-pub use or_value::*;
+pub use result_or_value::*;
 pub use ok::*;
 pub use err::*;
 pub use check_no_error::*;

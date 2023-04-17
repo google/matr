@@ -22,7 +22,7 @@ pub struct ToResultRuntimeFn<Out, Args, E: Expr<Result<RuntimeFn<Out, Args>>>> {
 }
 
 impl<Out, Args, E: Expr<Result<RuntimeFn<Out, Args>>>> Expr<RuntimeFn<std::result::Result<Out, &'static str>, Args>> for ToResultRuntimeFn<Out, Args, E> {
-    type Eval = <OrValue<RuntimeFn<std::result::Result<Out, &'static str>, Args>, AndThen<RuntimeFn<Out, Args>, RuntimeFn<std::result::Result<Out, &'static str>, Args>, E, ToResultRuntimeFnAdapter>, ToResultRuntimeFnError> as Expr<RuntimeFn<std::result::Result<Out, &'static str>, Args>>>::Eval;
+    type Eval = <ResultOrValue<RuntimeFn<std::result::Result<Out, &'static str>, Args>, AndThen<RuntimeFn<Out, Args>, RuntimeFn<std::result::Result<Out, &'static str>, Args>, E, ToResultRuntimeFnAdapter>, ToResultRuntimeFnError> as Expr<RuntimeFn<std::result::Result<Out, &'static str>, Args>>>::Eval;
 }
 
 mod internal {

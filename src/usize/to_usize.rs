@@ -15,8 +15,8 @@
 use internal::*;
 
 pub const fn result_to_usize<N: Expr<Result<USize>>>() -> std::result::Result<usize, &'static str> {
-    return call_const_fn::<std::result::Result<usize, &'static str>, (), 
-        OrValue<
+    return call_const_fn::<std::result::Result<usize, &'static str>, (),
+        ResultOrValue<
             ConstFn<std::result::Result<usize, &'static str>, ()>,
             AndThen<
                 USize,

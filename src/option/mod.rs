@@ -15,10 +15,12 @@
 mod is_none;
 mod none;
 mod some;
+mod option_or_value;
 
 pub use is_none::*;
 pub use none::*;
 pub use some::*;
+pub use option_or_value::*;
 
 use std::marker::PhantomData;
 use internal::*;

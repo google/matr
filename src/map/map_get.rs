@@ -24,8 +24,8 @@ pub struct MapGet<K: EqualityComparableKind + KindWithDefault, V: KindWithDefaul
     s: PhantomData<S>,
 }
 
-impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, M: Expr<Map<K, V>>> Expr<V> for MapGet<K, V, X, M> {
-    type Eval = <VisitMap<K, V, V, M, MapGetVisitor<K, V, X>> as Expr<V>>::Eval;
+impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, M: Expr<Map<K, V>>> Expr<Option<V>> for MapGet<K, V, X, M> {
+    type Eval = <VisitMap<K, V, Option<V>, M, MapGetVisitor<K, V, X>> as Expr<Option<V>>>::Eval;
 }
 
 mod internal {
@@ -38,11 +38,11 @@ mod internal {
         x: PhantomData<X>,
     }
 
-    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>> MapVisitor<K, V, V> for MapGetVisitor<K, V, X> {
-        type VisitEmptyMap = V::Default;
-        type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> = If<V, Equals<K, Key, X>,
-            Value,
-            VisitMap<K, V, V, Tail, MapGetVisitor<K, V, X>>
+    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>> MapVisitor<K, V, Option<V>> for MapGetVisitor<K, V, X> {
+        type VisitEmptyMap = None<V>;
+        type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> = If<Option<V>, Equals<K, Key, X>,
+            Some<V, Value>,
+            VisitMap<K, V, Option<V>, Tail, MapGetVisitor<K, V, X>>
         >;
     }
 }
@@ -62,18 +62,18 @@ mod tests {
 
     #[test]
     fn is_in_empty_map() {
-        assert_type_eq!(MapGet<Type, Type, WrapType<i32>, EmptyMap<Type, Type>>, WrapType<()>);
+        assert_type_eq!(OptionOrValue<Type, MapGet<Type, Type, WrapType<i32>, EmptyMap<Type, Type>>, WrapType<()>>, WrapType<()>);
     }
 
     #[test]
     fn is_in_map_found() {
         type M = Put<Type, Type, WrapType<i32>, WrapType<u32>, Put<Type, Type, WrapType<f64>, WrapType<u64>, Put<Type, Type, WrapType<usize>, WrapType<usize>, EmptyMap<Type, Type>>>>;
-        assert_type_eq!(MapGet<Type, Type, WrapType<f64>, M>, WrapType<u64>);
+        assert_type_eq!(OptionOrValue<Type, MapGet<Type, Type, WrapType<f64>, M>, WrapType<()>>, WrapType<u64>);
     }
 
     #[test]
     fn is_in_map_not_found() {
         type M = Put<Type, Type, WrapType<i32>, WrapType<u32>, Put<Type, Type, WrapType<f64>, WrapType<u64>, Put<Type, Type, WrapType<usize>, WrapType<usize>, EmptyMap<Type, Type>>>>;
-        assert_type_eq!(MapGet<Type, Type, WrapType<u32>, M>, WrapType<()>);
+        assert_type_eq!(OptionOrValue<Type, MapGet<Type, Type, WrapType<u32>, M>, WrapType<()>>, WrapType<()>);
     }
 }

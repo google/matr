@@ -180,9 +180,8 @@ mod internal {
 
     impl<K: EqualityComparableKind + KindWithDefault, V: EqualityComparableKind + KindWithDefault, CandidateSupermap: Expr<Map<K, V>>> MapVisitor<K, V, Bool> for IsSubmapVisitor<K, V, CandidateSupermap> {
         type VisitEmptyMap = True;
-        type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> = And<And<
-            IsInMap<K, V, Key, CandidateSupermap>,
-            Equals<V, MapGet<K, V, Key, CandidateSupermap>, Value>>,
+        type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> = And<
+            Equals<Option<V>, MapGet<K, V, Key, CandidateSupermap>, Some<V, Value>>,
             VisitMap<K, V, Bool, Tail, IsSubmapVisitor<K, V, CandidateSupermap>>>;
     }
 }

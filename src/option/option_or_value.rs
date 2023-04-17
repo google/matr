@@ -15,15 +15,14 @@
 use std::marker::PhantomData;
 use internal::*;
 
-// Intended to be used at toplevel, in conjunction with a call to check_no_error with the same Expr<Type>.
-pub struct OrValue<K: Kind, V: Expr<Result<K>>, Fallback: Expr<K>> {
+pub struct OptionOrValue<K: Kind, V: Expr<Option<K>>, Fallback: Expr<K>> {
     k: PhantomData<K>,
     v: PhantomData<V>,
     fallback: PhantomData<Fallback>,
 }
 
-impl<K: Kind, V: Expr<Result<K>>, Fallback: Expr<K>> Expr<K> for OrValue<K, V, Fallback> {
-    type Eval = <VisitResult<K, K, V, OrValueVisitor<K, V, Fallback>> as Expr<K>>::Eval;
+impl<K: Kind, V: Expr<Option<K>>, Fallback: Expr<K>> Expr<K> for OptionOrValue<K, V, Fallback> {
+    type Eval = <VisitOption<K, K, V, OptionOrValueVisitor<K, V, Fallback>> as Expr<K>>::Eval;
 }
 
 // These have to be public because otherwise Rust would complain that "can't leak private type".
@@ -32,14 +31,14 @@ mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
 
-    pub struct OrValueVisitor<K: Kind, V: Expr<Result<K>>, Fallback: Expr<K>> {
+    pub struct OptionOrValueVisitor<K: Kind, V: Expr<Option<K>>, Fallback: Expr<K>> {
         k: PhantomData<K>,
         v: PhantomData<V>,
         fallback: PhantomData<Fallback>,
     }
 
-    impl<K: Kind, V: Expr<Result<K>>, Fallback: Expr<K>> ResultVisitor<K, K> for OrValueVisitor<K, V, Fallback> {
-        type VisitOk<V2: Expr<K>> = V2;
-        type VisitErr<E> = Fallback;
+    impl<K: Kind, V: Expr<Option<K>>, Fallback: Expr<K>> OptionVisitor<K, K> for OptionOrValueVisitor<K, V, Fallback> {
+        type VisitNone = Fallback;
+        type VisitSome<V2: Expr<K>> = V2;
     }
 }
