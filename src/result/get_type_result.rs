@@ -17,6 +17,10 @@ use internal::*;
 
 // Use this at top-level when evaluating an Expr<Result<Type>>, in conjunction with
 // check_no_error (for the same expression).
+//
+// This is intentionally not implemented with meta! (even though it could be) so that matr users can
+// more easily understand how to access Get (since it's meant to be used outside meta! contexts,
+// unlike most other metafunctions).
 pub struct GetTypeResult<E: Expr<Result<Type>>> {
     e: PhantomData<E>,
 }

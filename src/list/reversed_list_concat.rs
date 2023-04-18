@@ -12,32 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
 // Concatenates L (reversed) and Tail.
-pub struct ReversedListConcat<K: Kind, L: Expr<List<K>>, Tail: Expr<List<K>>> {
-    k: PhantomData<K>,
-    l: PhantomData<L>,
-    tail: PhantomData<Tail>,
-}
-
-impl<K: Kind, L: Expr<List<K>>, Tail: Expr<List<K>>> Expr<List<K>> for ReversedListConcat<K, L, Tail> {
-    type Eval = <VisitList<K, List<K>, L, ReversedListConcatVisitor<K, Tail>> as Expr<List<K>>>::Eval;
+meta!{
+    pub type ReversedListConcat<
+        K: Kind,
+        L: Expr<List<K>>,
+        Tail: Expr<List<K>>
+    >: Expr<List<K>> =
+        VisitList<K, List<K>, L, ReversedListConcatVisitor<K, Tail>>;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-    
-    pub struct ReversedListConcatVisitor<K: Kind, Tail: Expr<List<K>>> {
-        k: PhantomData<K>,
-        tail: PhantomData<Tail>,
-    }
 
-    impl<K: Kind, Tail: Expr<List<K>>> ListVisitor<K, List<K>> for ReversedListConcatVisitor<K, Tail> {
-        type VisitEmptyList = Tail;
-        type VisitCons<Elem: Expr<K>, Remaining: Expr<List<K>>> = ReversedListConcat<K, Remaining, Cons<K, Elem, Tail>>;
+    meta!{
+        pub struct ReversedListConcatVisitor<
+            K: Kind,
+            Tail: Expr<List<K>>
+        >: ListVisitor<K, List<K>> {
+            type VisitEmptyList = Tail;
+            type VisitCons<Elem: Expr<K>, Remaining: Expr<List<K>>> = ReversedListConcat<K, Remaining, Cons<K, Elem, Tail>>;
+        }
     }
 }
 

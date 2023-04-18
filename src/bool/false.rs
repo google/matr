@@ -14,10 +14,10 @@
 
 use internal::*;
 
-pub struct False {}
-
-impl Expr<Bool> for False {
-    type Eval = FalseValue;
+meta!{
+    pub struct False: Expr<Bool> {
+        type Eval = FalseValue;
+    }
 }
 
 // These have to be public because otherwise Rust would complain that "can't leak private type".
@@ -25,15 +25,14 @@ impl Expr<Bool> for False {
 mod internal {
     pub use super::super::internal::*;
 
-    pub struct FalseValue {}
-    impl BoolValue for FalseValue {
-        type Impl = FalseImpl;
-    }
+    meta!{
+        pub struct FalseValue: BoolValue {
+            type Impl = FalseImpl;
+        }
 
-    pub struct FalseImpl {}
-
-    impl BoolTrait for FalseImpl {
-        type Cond<ResultK: Kind, IfTrue: Expr<ResultK>, IfFalse: Expr<ResultK>> = IfFalse;
+        pub struct FalseImpl: BoolTrait {
+            type Cond<ResultK: Kind, IfTrue: Expr<ResultK>, IfFalse: Expr<ResultK>> = IfFalse;
+        }
     }
 }
 

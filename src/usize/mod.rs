@@ -20,7 +20,6 @@ mod is_even;
 mod to_usize;
 mod long_recursion;
 
-use std::marker::PhantomData;
 pub use zero::*;
 pub use increment::*;
 pub use sum::*;
@@ -48,14 +47,13 @@ pub trait USizeVisitor<ResultK: Kind> {
     type VisitIncrement<N: Expr<USize>>: Expr<ResultK>;
 }
 
-pub struct VisitUSize<K: Kind, N: Expr<USize>, V: USizeVisitor<K>> {
-    k: PhantomData<K>,
-    n: PhantomData<N>,
-    v: PhantomData<V>,
-}
-
-impl<K: Kind, N: Expr<USize>, V: USizeVisitor<K>> Expr<K> for VisitUSize<K, N, V> {
-    type Eval = <<AsUSize<N> as USizeTrait>::Visit<K, V> as Expr<K>>::Eval;
+meta!{
+    pub type VisitUSize<
+        K: Kind,
+        N: Expr<USize>,
+        V: USizeVisitor<K>
+    >: Expr<K> =
+        <AsUSize<N> as USizeTrait>::Visit<K, V>;
 }
 
 mod internal {
@@ -86,37 +84,30 @@ mod internal {
         type Visit<ResultK: Kind, V: USizeVisitor<ResultK>>: Expr<ResultK>;
     }
 
-    pub struct USizeEquals<X: Expr<USize>, Y: Expr<USize>> {
-        x: PhantomData<X>,
-        y: PhantomData<Y>,
-    }
+    meta!{
+        pub type USizeEquals<
+            X: Expr<USize>,
+            Y: Expr<USize>
+        >: Expr<Bool> =
+            VisitUSize<Bool, X, USizeEqualsVisitor<Y>>;
 
-    impl<X: Expr<USize>, Y: Expr<USize>> Expr<Bool> for USizeEquals<X, Y> {
-        type Eval = <VisitUSize<Bool, X, USizeEqualsVisitor<Y>> as Expr<Bool>>::Eval;
-    }
+        pub struct USizeEqualsVisitor<
+            Other: Expr<USize>
+        >: USizeVisitor<Bool> {
+            type VisitZero = <AsUSize<Other> as USizeTrait>::Visit<Bool, IsZero>;
+            type VisitIncrement<N: Expr<USize>> = <AsUSize<Other> as USizeTrait>::Visit<Bool, USizeEqualsOnePlus<N>>;
+        }
 
-    pub struct USizeEqualsVisitor<Other: Expr<USize>> {
-        other: PhantomData<Other>,
-    }
+        pub struct IsZero: USizeVisitor<Bool> {
+            type VisitZero = True;
+            type VisitIncrement<N: Expr<USize>> = False;
+        }
 
-    impl<Other: Expr<USize>> USizeVisitor<Bool> for USizeEqualsVisitor<Other> {
-        type VisitZero = <AsUSize<Other> as USizeTrait>::Visit<Bool, IsZero>;
-        type VisitIncrement<N: Expr<USize>> = <AsUSize<Other> as USizeTrait>::Visit<Bool, USizeEqualsOnePlus<N>>;
-    }
-
-    pub struct IsZero {}
-
-    impl USizeVisitor<Bool> for IsZero {
-        type VisitZero = True;
-        type VisitIncrement<N: Expr<USize>> = False;
-    }
-
-    pub struct USizeEqualsOnePlus<Other: Expr<USize>> {
-        other: PhantomData<Other>,
-    }
-
-    impl<Other: Expr<USize>> USizeVisitor<Bool> for USizeEqualsOnePlus<Other> {
-        type VisitZero = False;
-        type VisitIncrement<N: Expr<USize>> = <AsUSize<N> as USizeTrait>::Visit<Bool, USizeEqualsVisitor<Other>>;
+        pub struct USizeEqualsOnePlus<
+            Other: Expr<USize>
+        >: USizeVisitor<Bool> {
+            type VisitZero = False;
+            type VisitIncrement<N: Expr<USize>> = <AsUSize<N> as USizeTrait>::Visit<Bool, USizeEqualsVisitor<Other>>;
+        }
     }
 }

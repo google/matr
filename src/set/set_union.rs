@@ -12,31 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct SetUnion<K: EqualityComparableKind, S1: Expr<Set<K>>, S2: Expr<Set<K>>> {
-    k: PhantomData<K>,
-    s1: PhantomData<S1>,
-    s2: PhantomData<S2>,
-}
-
-impl<K: EqualityComparableKind, S1: Expr<Set<K>>, S2: Expr<Set<K>>> Expr<Set<K>> for SetUnion<K, S1, S2> {
-    type Eval = <VisitSet<K, Set<K>, S1, SetUnionVisitor<K, S2>> as Expr<Set<K>>>::Eval;
+meta!{
+    pub type SetUnion<
+        K: EqualityComparableKind, 
+        S1: Expr<Set<K>>,
+        S2: Expr<Set<K>>
+    >: Expr<Set<K>> =
+        VisitSet<K, Set<K>, S1, SetUnionVisitor<K, S2>>;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct SetUnionVisitor<K: EqualityComparableKind, S: Expr<Set<K>>> {
-        k: PhantomData<K>,
-        s: PhantomData<S>,
-    }
-
-    impl<K: EqualityComparableKind, S: Expr<Set<K>>> SetVisitor<K, Set<K>> for SetUnionVisitor<K, S> {
-        type VisitEmptySet = S;
-        type VisitCons<Elem: Expr<K>, Tail: Expr<Set<K>>> = VisitSet<K, Set<K>, Tail, SetUnionVisitor<K, AddToSet<K, Elem, S>>>;
+    
+    meta!{
+        pub struct SetUnionVisitor<
+            K: EqualityComparableKind, 
+            S: Expr<Set<K>>
+        >: SetVisitor<K, Set<K>> {
+            type VisitEmptySet = S;
+            type VisitCons<Elem: Expr<K>, Tail: Expr<Set<K>>> = VisitSet<K, Set<K>, Tail, SetUnionVisitor<K, AddToSet<K, Elem, S>>>;
+        }
     }
 }
 

@@ -27,24 +27,20 @@ mod internal {
 mod tests {
     use super::internal::*;
 
-    struct Add42Impl {}
-
-    impl const ConstFnTrait<i32, i32> for Add42Impl {
-        fn apply(n: i32) -> i32 {
-            return n + 42;
+    meta!{
+        struct Add42Impl: const ConstFnTrait<i32, i32> {
+            fn apply(n: i32) -> i32 {
+                return n + 42;
+            }
         }
-    }
 
-    struct Add42Value {}
+        struct Add42Value: ConstFnValue<i32, i32> {
+            type Impl = Add42Impl;
+        }
 
-    impl ConstFnValue<i32, i32> for Add42Value {
-        type Impl = Add42Impl;
-    }
-
-    struct Add42 {}
-
-    impl Expr<ConstFn<i32, i32>> for Add42 {
-        type Eval = Add42Value;
+        struct Add42: Expr<ConstFn<i32, i32>> {
+            type Eval = Add42Value;
+        }
     }
 
     #[test]

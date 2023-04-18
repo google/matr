@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct RemoveFromSet<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> {
-    k: PhantomData<K>,
-    x: PhantomData<X>,
-    s: PhantomData<S>,
-}
-
-impl<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> Expr<Set<K>> for RemoveFromSet<K, X, S> {
-    type Eval = <ListToSetUnchecked<K, RemoveFromList<K, X, SetToList<K, S>>> as Expr<Set<K>>>::Eval;
+meta!{
+    pub type RemoveFromSet<
+        K: EqualityComparableKind,
+        X: Expr<K>,
+        S: Expr<Set<K>>
+    >: Expr<Set<K>> =
+        ListToSetUnchecked<K, RemoveFromList<K, X, SetToList<K, S>>>;
 }
 
 mod internal {

@@ -14,25 +14,23 @@
 
 use internal::*;
 
-pub struct Zero {}
-
-impl Expr<USize> for Zero {
-    type Eval = ZeroValue;
-}
-
-pub struct ZeroValue {}
-
-impl USizeValue for ZeroValue {
-    type Impl = ZeroImpl;
+meta!{
+    pub struct Zero: Expr<USize> {
+        type Eval = ZeroValue;
+    }
 }
 
 mod internal {
     pub use super::super::internal::*;
 
-    pub struct ZeroImpl {}
+    meta!{
+        pub struct ZeroValue: USizeValue {
+            type Impl = ZeroImpl;
+        }
 
-    impl USizeTrait for ZeroImpl {
-        type Visit<ResultK: Kind, V: USizeVisitor<ResultK>> = V::VisitZero;
+        pub struct ZeroImpl: USizeTrait {
+            type Visit<ResultK: Kind, V: USizeVisitor<ResultK>> = V::VisitZero;
+        }
     }
 }
 

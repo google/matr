@@ -12,28 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct IsNone<K: Kind, P: Expr<Option<K>>> {
-    k: PhantomData<K>,
-    p: PhantomData<P>,
-}
-
-impl<K: Kind, X: Expr<Option<K>>> Expr<Bool> for IsNone<K, X> {
-    type Eval = <VisitOption<K, Bool, X, IsNoneVisitor<K>> as Expr<Bool>>::Eval;
+meta!{
+    pub type IsNone<
+        K: Kind,
+        X: Expr<Option<K>>
+    >: Expr<Bool> =
+        VisitOption<K, Bool, X, IsNoneVisitor<K>>;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct IsNoneVisitor<K: Kind> {
-        k: PhantomData<K>,
-    }
-
-    impl<K: Kind> OptionVisitor<K, Bool> for IsNoneVisitor<K> {
-        type VisitNone = True;
-        type VisitSome<X: Expr<K>> = False;
+    
+    meta!{
+        pub struct IsNoneVisitor<
+            K: Kind
+        >: OptionVisitor<K, Bool> {
+            type VisitNone = True;
+            type VisitSome<X: Expr<K>> = False;
+        }
     }
 }

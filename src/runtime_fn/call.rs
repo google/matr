@@ -26,27 +26,23 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use super::internal::*;
-
-    struct Add42Impl {}
-
-    impl RuntimeFnTrait<i32, i32> for Add42Impl {
-        fn apply(n: i32) -> i32 {
-            return n + 42;
+    
+    meta!{
+        struct Add42Impl: RuntimeFnTrait<i32, i32> {
+            fn apply(n: i32) -> i32 {
+                return n + 42;
+            }
+        }
+        
+        struct Add42Value: RuntimeFnValue<i32, i32> {
+            type Impl = Add42Impl;
+        }
+        
+        struct Add42: Expr<RuntimeFn<i32, i32>> {
+            type Eval = Add42Value;
         }
     }
-
-    struct Add42Value {}
-
-    impl RuntimeFnValue<i32, i32> for Add42Value {
-        type Impl = Add42Impl;
-    }
-
-    struct Add42 {}
-
-    impl Expr<RuntimeFn<i32, i32>> for Add42 {
-        type Eval = Add42Value;
-    }
-
+    
     #[test]
     fn call() {
         assert_eq!(call_runtime_fn::<i32, i32, Add42>(1000), 1042);

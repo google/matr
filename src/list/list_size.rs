@@ -12,30 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-// Concatenates L and Tail.
-pub struct ListSize<K: Kind, L: Expr<List<K>>> {
-    k: PhantomData<K>,
-    l: PhantomData<L>,
-}
-
-impl<K: Kind, L: Expr<List<K>>> Expr<USize> for ListSize<K, L> {
-    type Eval = <VisitList<K, USize, L, ListSizeVisitor<K>> as Expr<USize>>::Eval;
+meta!{
+    pub type ListSize<
+        K: Kind,
+        L: Expr<List<K>>
+    >: Expr<USize> =
+        VisitList<K, USize, L, ListSizeVisitor<K>>;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
 
-    pub struct ListSizeVisitor<K: Kind> {
-        k: PhantomData<K>,
-    }
-
-    impl<K: Kind> ListVisitor<K, USize> for ListSizeVisitor<K> {
-        type VisitEmptyList = Zero;
-        type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> = Increment<ListSize<K, Tail>>;
+    meta!{
+        pub struct ListSizeVisitor<
+            K: Kind
+        >: ListVisitor<K, USize> {
+            type VisitEmptyList = Zero;
+            type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> = Increment<ListSize<K, Tail>>;
+        }
     }
 }
 

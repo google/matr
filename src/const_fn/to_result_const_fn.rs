@@ -12,84 +12,68 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::{Destruct, PhantomData};
+use std::marker::Destruct;
 use internal::*;
 
-pub struct ToResultConstFn<Out, Args: ~const Destruct, E: Expr<Result<ConstFn<Out, Args>>>> {
-    out: PhantomData<Out>,
-    args: PhantomData<Args>,
-    e: PhantomData<E>,
-}
-
-impl<Out, Args: ~const Destruct, E: Expr<Result<ConstFn<Out, Args>>>> Expr<ConstFn<std::result::Result<Out, &'static str>, Args>> for ToResultConstFn<Out, Args, E> {
-    type Eval = <ResultOrValue<ConstFn<std::result::Result<Out, &'static str>, Args>, AndThen<ConstFn<Out, Args>, ConstFn<std::result::Result<Out, &'static str>, Args>, E, ToResultConstFnAdapter>, ToResultConstFnError> as Expr<ConstFn<std::result::Result<Out, &'static str>, Args>>>::Eval;
+meta!{
+    pub type ToResultConstFn<
+        Out,
+        Args: ~const Destruct,
+        E: Expr<Result<ConstFn<Out, Args>>>
+    >: Expr<ConstFn<std::result::Result<Out, &'static str>, Args>> =
+        ResultOrValue<
+            ConstFn<std::result::Result<Out, &'static str>, Args>,
+            AndThen<
+                ConstFn<Out, Args>,
+                ConstFn<std::result::Result<Out, &'static str>, Args>,
+                E,
+                ToResultConstFnAdapter<Out, Args>>,
+            ToResultConstFnError<Out, Args>>;
 }
 
 mod internal {
-    use std::marker::{Destruct, PhantomData};
+    use std::marker::Destruct;
     pub use super::super::internal::*;
 
-    pub struct ToResultConstFnAdapter {}
-
-    impl<Out, Args> Functor1<ConstFn<Out, Args>, Result<ConstFn<std::result::Result<Out, &'static str>, Args>>> for ToResultConstFnAdapter {
-        type Apply<X: Expr<ConstFn<Out, Args>>> = Ok<ConstFn<std::result::Result<Out, &'static str>, Args>, ToResultConstFnAdapterExpr<Out, Args, X>>;
-    }
-
-    pub struct ToResultConstFnAdapterExpr<Out, Args, X: Expr<ConstFn<Out, Args>>> {
-        out: PhantomData<Out>,
-        args: PhantomData<Args>,
-        x: PhantomData<X>,
-    }
-
-    impl<Out, Args, X: Expr<ConstFn<Out, Args>>> Expr<ConstFn<std::result::Result<Out, &'static str>, Args>> for ToResultConstFnAdapterExpr<Out, Args, X> {
-        type Eval = ToResultConstFnAdapterValue<Out, Args, X>;
-    }
-
-    pub struct ToResultConstFnAdapterValue<Out, Args, X: Expr<ConstFn<Out, Args>>> {
-        out: PhantomData<Out>,
-        args: PhantomData<Args>,
-        x: PhantomData<X>,
-    }
-
-    impl<Out, Args, X: Expr<ConstFn<Out, Args>>> ConstFnValue<std::result::Result<Out, &'static str>, Args> for ToResultConstFnAdapterValue<Out, Args, X> {
-        type Impl = ToResultConstFnAdapterImpl<Out, Args, X>;
-    }
-
-    pub struct ToResultConstFnAdapterImpl<Out, Args, X: Expr<ConstFn<Out, Args>>> {
-        out: PhantomData<Out>,
-        args: PhantomData<Args>,
-        x: PhantomData<X>,
-    }
-
-    impl<Out, Args, X: Expr<ConstFn<Out, Args>>> const ConstFnTrait<std::result::Result<Out, &'static str>, Args> for ToResultConstFnAdapterImpl<Out, Args, X> {
-        fn apply(args: Args) -> std::result::Result<Out, &'static str> {
-            return Ok(call_const_fn::<Out, Args, X>(args));
+    meta!{
+        pub struct ToResultConstFnAdapter<Out, Args>: Functor1<ConstFn<Out, Args>, Result<ConstFn<std::result::Result<Out, &'static str>, Args>>> {
+            type Apply<X: Expr<ConstFn<Out, Args>>> = Ok<ConstFn<std::result::Result<Out, &'static str>, Args>, ToResultConstFnAdapterExpr<Out, Args, X>>;
         }
-    }
 
-    pub struct ToResultConstFnError {}
+        pub struct ToResultConstFnAdapterExpr<
+            Out,
+            Args,
+            X: Expr<ConstFn<Out, Args>>
+        >: Expr<ConstFn<std::result::Result<Out, &'static str>, Args>> {
+            type Eval = ToResultConstFnAdapterValue<Out, Args, X>;
+        }
 
-    impl<Out, Args: ~const Destruct> Expr<ConstFn<std::result::Result<Out, &'static str>, Args>> for ToResultConstFnError {
-        type Eval = ToResultConstFnErrorValue<Out, Args>;
-    }
+        pub struct ToResultConstFnAdapterValue<
+            Out,
+            Args,
+            X: Expr<ConstFn<Out, Args>>
+        >: ConstFnValue<std::result::Result<Out, &'static str>, Args> {
+            type Impl = ToResultConstFnAdapterImpl<Out, Args, X>;
+        }
 
-    pub struct ToResultConstFnErrorValue<Out, Args> {
-        out: PhantomData<Out>,
-        args: PhantomData<Args>,
-    }
+        pub struct ToResultConstFnAdapterImpl<Out, Args, X: Expr<ConstFn<Out, Args>>>: const ConstFnTrait<std::result::Result<Out, &'static str>, Args> {
+            fn apply(args: Args) -> std::result::Result<Out, &'static str> {
+                return Ok(call_const_fn::<Out, Args, X>(args));
+            }
+        }
 
-    impl<Out, Args: ~const Destruct> ConstFnValue<std::result::Result<Out, &'static str>, Args> for ToResultConstFnErrorValue<Out, Args> {
-        type Impl = ToResultConstFnErrorImpl<Out, Args>;
-    }
+        pub struct ToResultConstFnError<Out, Args: ~const Destruct>: Expr<ConstFn<std::result::Result<Out, &'static str>, Args>> {
+            type Eval = ToResultConstFnErrorValue<Out, Args>;
+        }
 
-    pub struct ToResultConstFnErrorImpl<Out, Args> {
-        out: PhantomData<Out>,
-        args: PhantomData<Args>,
-    }
+        pub struct ToResultConstFnErrorValue<Out, Args: ~const Destruct>: ConstFnValue<std::result::Result<Out, &'static str>, Args> {
+            type Impl = ToResultConstFnErrorImpl<Out, Args>;
+        }
 
-    impl<Out, Args: ~const Destruct> const ConstFnTrait<std::result::Result<Out, &'static str>, Args> for ToResultConstFnErrorImpl<Out, Args> {
-        fn apply(_: Args) -> std::result::Result<Out, &'static str> {
-            return Err("error Result in ToResultConstFn")
+        pub struct ToResultConstFnErrorImpl<Out, Args: ~const Destruct>: const ConstFnTrait<std::result::Result<Out, &'static str>, Args> {
+            fn apply(_: Args) -> std::result::Result<Out, &'static str> {
+                return Err("error Result in ToResultConstFn")
+            }
         }
     }
 }

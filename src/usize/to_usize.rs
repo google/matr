@@ -33,85 +33,64 @@ pub const fn to_usize<N: Expr<USize>>() -> usize {
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
 
-    pub struct ToUSizeError {}
-
-    impl Expr<ConstFn<std::result::Result<usize, &'static str>, ()>> for ToUSizeError {
-        type Eval = ToUSizeErrorValue;
-    }
-
-    pub struct ToUSizeErrorValue {}
-
-    impl ConstFnValue<std::result::Result<usize, &'static str>, ()> for ToUSizeErrorValue {
-        type Impl = ToUSizeErrorImpl;
-    }
-
-    pub struct ToUSizeErrorImpl {}
-
-    impl const ConstFnTrait<std::result::Result<usize, &'static str>, ()> for ToUSizeErrorImpl {
-        fn apply(_: ()) -> std::result::Result<usize, &'static str> {
-            panic!("result_to_usize called on an error")
+    meta!{
+        pub struct ToUSizeError: Expr<ConstFn<std::result::Result<usize, &'static str>, ()>> {
+            type Eval = ToUSizeErrorValue;
         }
-    }
 
-    pub struct ToUSizeFunctor {}
-
-    impl Functor1<USize, Result<ConstFn<std::result::Result<usize, &'static str>, ()>>> for ToUSizeFunctor {
-        type Apply<N: Expr<USize>> = Ok<ConstFn<std::result::Result<usize, &'static str>, ()>, ToResultConstFn<usize, (), Ok<ConstFn<usize, ()>, VisitUSize<ConstFn<usize, ()>, N, ToUSizeVisitor>>>>;
-    }
-
-    pub struct ToUSizeVisitor {}
-
-    impl USizeVisitor<ConstFn<usize, ()>> for ToUSizeVisitor {
-        type VisitZero = ZeroValueConstFn;
-        type VisitIncrement<N: Expr<USize>> = IncValueConstFn<<AsUSize<N> as USizeTrait>::Visit<ConstFn<usize, ()>, ToUSizeVisitor>>;
-    }
-
-    pub struct ZeroValueConstFn {}
-
-    impl Expr<ConstFn<usize, ()>> for ZeroValueConstFn {
-        type Eval = ZeroValueConstFnValue;
-    }
-
-    pub struct ZeroValueConstFnValue {}
-
-    impl ConstFnValue<usize, ()> for ZeroValueConstFnValue {
-        type Impl = ZeroValueConstFnImpl;
-    }
-
-    pub struct ZeroValueConstFnImpl {}
-
-    impl const ConstFnTrait<usize, ()> for ZeroValueConstFnImpl {
-        fn apply(_: ()) -> usize {
-            return 0;
+        pub struct ToUSizeErrorValue: ConstFnValue<std::result::Result<usize, &'static str>, ()> {
+            type Impl = ToUSizeErrorImpl;
         }
-    }
 
-    pub struct IncValueConstFn<F: Expr<ConstFn<usize, ()>>> {
-        f: PhantomData<F>,
-    }
+        pub struct ToUSizeErrorImpl: const ConstFnTrait<std::result::Result<usize, &'static str>, ()> {
+            fn apply(_: ()) -> std::result::Result<usize, &'static str> {
+                panic!("result_to_usize called on an error")
+            }
+        }
 
-    impl<F: Expr<ConstFn<usize, ()>>> Expr<ConstFn<usize, ()>> for IncValueConstFn<F> {
-        type Eval = IncValueConstFnValue<F>;
-    }
+        pub struct ToUSizeFunctor: Functor1<USize, Result<ConstFn<std::result::Result<usize, &'static str>, ()>>> {
+            type Apply<N: Expr<USize>> = Ok<ConstFn<std::result::Result<usize, &'static str>, ()>, ToResultConstFn<usize, (), Ok<ConstFn<usize, ()>, VisitUSize<ConstFn<usize, ()>, N, ToUSizeVisitor>>>>;
+        }
 
-    pub struct IncValueConstFnValue<F: Expr<ConstFn<usize, ()>>> {
-        f: PhantomData<F>,
-    }
+        pub struct ToUSizeVisitor: USizeVisitor<ConstFn<usize, ()>> {
+            type VisitZero = ZeroValueConstFn;
+            type VisitIncrement<N: Expr<USize>> = IncValueConstFn<<AsUSize<N> as USizeTrait>::Visit<ConstFn<usize, ()>, ToUSizeVisitor>>;
+        }
 
-    impl<F: Expr<ConstFn<usize, ()>>> ConstFnValue<usize, ()> for IncValueConstFnValue<F> {
-        type Impl = IncValueConstFnImpl<F>;
-    }
+        pub struct ZeroValueConstFn: Expr<ConstFn<usize, ()>> {
+            type Eval = ZeroValueConstFnValue;
+        }
 
-    pub struct IncValueConstFnImpl<F: Expr<ConstFn<usize, ()>>> {
-        f: PhantomData<F>,
-    }
+        pub struct ZeroValueConstFnValue: ConstFnValue<usize, ()> {
+            type Impl = ZeroValueConstFnImpl;
+        }
 
-    impl<F: Expr<ConstFn<usize, ()>>> const ConstFnTrait<usize, ()> for IncValueConstFnImpl<F> {
-        fn apply(_: ()) -> usize {
-            return 1 + call_const_fn::<usize, (), F>(());
+        pub struct ZeroValueConstFnImpl: const ConstFnTrait<usize, ()> {
+            fn apply(_: ()) -> usize {
+                return 0;
+            }
+        }
+
+        pub struct IncValueConstFn<
+            F: Expr<ConstFn<usize, ()>>
+        >: Expr<ConstFn<usize, ()>> {
+            type Eval = IncValueConstFnValue<F>;
+        }
+
+        pub struct IncValueConstFnValue<
+            F: Expr<ConstFn<usize, ()>>
+        >: ConstFnValue<usize, ()> {
+            type Impl = IncValueConstFnImpl<F>;
+        }
+
+        pub struct IncValueConstFnImpl<
+            F: Expr<ConstFn<usize, ()>>
+        >: const ConstFnTrait<usize, ()> {
+            fn apply(_: ()) -> usize {
+                return 1 + call_const_fn::<usize, (), F>(());
+            }
         }
     }
 }

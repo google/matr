@@ -12,40 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct IsEven<N: Expr<USize>> {
-    n: PhantomData<N>,
-}
-
-impl<N: Expr<USize>> Expr<Bool> for IsEven<N> {
-    type Eval = <VisitUSize<Bool, N, IsEvenVisitor> as Expr<Bool>>::Eval;
-}
-
-pub struct IsOdd<N: Expr<USize>> {
-    n: PhantomData<N>,
-}
-
-impl<N: Expr<USize>> Expr<Bool> for IsOdd<N> {
-    type Eval = <VisitUSize<Bool, N, IsOddVisitor> as Expr<Bool>>::Eval;
+meta!{
+    pub type IsEven<
+        N: Expr<USize>
+    >: Expr<Bool> = 
+        VisitUSize<Bool, N, IsEvenVisitor>;
+    
+    pub type IsOdd<
+        N: Expr<USize>
+    >: Expr<Bool> = 
+        VisitUSize<Bool, N, IsOddVisitor>;
 }
 
 mod internal {
     pub use super::super::internal::*;
+    
+    meta!{
+        pub struct IsEvenVisitor: USizeVisitor<Bool> {
+            type VisitZero = True;
+            type VisitIncrement<N: Expr<USize>> = VisitUSize<Bool, N, IsOddVisitor>;
+        }
 
-    pub struct IsEvenVisitor {}
-
-    impl USizeVisitor<Bool> for IsEvenVisitor {
-        type VisitZero = True;
-        type VisitIncrement<N: Expr<USize>> = VisitUSize<Bool, N, IsOddVisitor>;
-    }
-
-    pub struct IsOddVisitor {}
-
-    impl USizeVisitor<Bool> for IsOddVisitor {
-        type VisitZero = False;
-        type VisitIncrement<N: Expr<USize>> = VisitUSize<Bool, N, IsEvenVisitor>;
+        pub struct IsOddVisitor: USizeVisitor<Bool> {
+            type VisitZero = False;
+            type VisitIncrement<N: Expr<USize>> = VisitUSize<Bool, N, IsEvenVisitor>;
+        }
     }
 }
 

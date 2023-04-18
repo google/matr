@@ -12,15 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct EmptySet<K: EqualityComparableKind> {
-    k: PhantomData<K>,
-}
-
-impl<K: EqualityComparableKind> Expr<Set<K>> for EmptySet<K> {
-    type Eval = <ListToSetUnchecked<K, EmptyList<K>> as Expr<Set<K>>>::Eval;
+meta!{
+    pub type EmptySet<K: EqualityComparableKind>: Expr<Set<K>> =
+        ListToSetUnchecked<K, EmptyList<K>>;
 }
 
 mod internal {

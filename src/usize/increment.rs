@@ -12,40 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct Increment<N: Expr<USize>> {
-    n: PhantomData<N>,
-}
-
-impl<N: Expr<USize>> Expr<USize> for Increment<N> {
-    type Eval = IncrementValue<N>;
+meta!{
+    pub struct Increment<
+        N: Expr<USize>
+    >: Expr<USize> {
+        type Eval = IncrementValue<N>;
+    }
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
 
-    pub struct IncrementValue<N: Expr<USize>> {
-        n: PhantomData<N>,
-    }
+    meta!{
+        pub struct IncrementValue<
+            N: Expr<USize>
+        >: USizeValue {
+            type Impl = IncrementImpl<N>;
+        }
 
-    impl<N: Expr<USize>> USizeValue for IncrementValue<N> {
-        type Impl = IncrementImpl<N>;
-    }
-
-    pub struct IncrementFunctor {}
-
-    impl Functor1<USize, Result<USize>> for IncrementFunctor {
-        type Apply<V1: Expr<USize>> = Ok<USize, Increment<V1>>;
-    }
-
-    pub struct IncrementImpl<N: Expr<USize>> {
-        n: PhantomData<N>,
-    }
-
-    impl<N: Expr<USize>> USizeTrait for IncrementImpl<N> {
-        type Visit<ResultK: Kind, V: USizeVisitor<ResultK>> = V::VisitIncrement<N>;
+        pub struct IncrementImpl<
+            N: Expr<USize>
+        >: USizeTrait {
+            type Visit<ResultK: Kind, V: USizeVisitor<ResultK>> = V::VisitIncrement<N>;
+        }
     }
 }

@@ -12,31 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct Multiply<X: Expr<USize>, Y: Expr<USize>> {
-    x: PhantomData<X>,
-    y: PhantomData<Y>,
-}
-
-impl<X: Expr<USize>, Y: Expr<USize>> Expr<USize> for Multiply<X, Y> {
-    type Eval = <VisitUSize<USize, X, MultiplyValueVisitor<Y>> as Expr<USize>>::Eval;
+meta!{
+    pub type Multiply<
+        X: Expr<USize>, 
+        Y: Expr<USize>
+    >: Expr<USize> =
+        VisitUSize<USize, X, MultiplyValueVisitor<Y>>;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct MultiplyValueVisitor<N: Expr<USize>> {
-        n: PhantomData<N>,
+    
+    meta!{
+        pub struct MultiplyValueVisitor<
+            N: Expr<USize>
+        >: USizeVisitor<USize> {
+            type VisitZero = Zero;
+            type VisitIncrement<Y: Expr<USize>> = Sum<N, Multiply<N, Y>>;
+        }
     }
-
-    impl<X: Expr<USize>> USizeVisitor<USize> for MultiplyValueVisitor<X> {
-        type VisitZero = X;
-        type VisitIncrement<Y: Expr<USize>> = Sum<X, Multiply<X, Y>>;
-    }
-
 }
 
 // TODO: add tests

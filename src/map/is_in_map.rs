@@ -12,35 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct IsInMap<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, M: Expr<Map<K, V>>> {
-    k: PhantomData<K>,
-    v: PhantomData<V>,
-    x: PhantomData<X>,
-    m: PhantomData<M>,
-}
-
-impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, M: Expr<Map<K, V>>> Expr<Bool> for IsInMap<K, V, X, M> {
-    type Eval = <VisitMap<K, V, Bool, M, IsInMapVisitor<K, V, X>> as Expr<Bool>>::Eval;
+meta!{
+    pub type IsInMap<
+        K: EqualityComparableKind + KindWithDefault,
+        V: KindWithDefault,
+        X: Expr<K>,
+        M: Expr<Map<K, V>>
+    >: Expr<Bool> =
+        VisitMap<K, V, Bool, M, IsInMapVisitor<K, V, X>>;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct IsInMapVisitor<K: EqualityComparableKind + KindWithDefault, V: Kind, X: Expr<K>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        x: PhantomData<X>,
+    
+    meta!{
+        pub struct IsInMapVisitor<
+            K: EqualityComparableKind + KindWithDefault,
+            V: KindWithDefault,
+            X: Expr<K>
+        >: MapVisitor<K, V, Bool> {
+            type VisitEmptyMap = False;
+            type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> = Or<Equals<K, Key, X>, IsInMap<K, V, X, Tail>>;
+        }
     }
-
-    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>> MapVisitor<K, V, Bool> for IsInMapVisitor<K, V, X> {
-        type VisitEmptyMap = False;
-        type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> = Or<Equals<K, Key, X>, IsInMap<K, V, X, Tail>>;
-    }
-
 }
 
 #[cfg(test)]

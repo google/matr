@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct MapToList<K: KindWithDefault + EqualityComparableKind, V: Kind, M: Expr<Map<K, V>>> {
-    k: PhantomData<K>,
-    v: PhantomData<V>,
-    m: PhantomData<M>,
-}
-
-impl<K: KindWithDefault + EqualityComparableKind, V: Kind, M: Expr<Map<K, V>>> Expr<List<Pair<K, V>>> for MapToList<K, V, M> {
-    type Eval = <<AsMap<K, V, M> as MapTrait<K, V>>::GetList as Expr<List<Pair<K, V>>>>::Eval;
+meta!{
+    pub type MapToList<
+        K: KindWithDefault + EqualityComparableKind,
+        V: Kind,
+        M: Expr<Map<K, V>>
+    >: Expr<List<Pair<K, V>>> =
+        <AsMap<K, V, M> as MapTrait<K, V>>::GetList;
 }
 
 mod internal {

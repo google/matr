@@ -12,36 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct RemoveFromList<K: EqualityComparableKind, X: Expr<K>, L: Expr<List<K>>> {
-    k: PhantomData<K>,
-    x: PhantomData<X>,
-    l: PhantomData<L>,
-}
-
-impl<K: EqualityComparableKind, X: Expr<K>, L: Expr<List<K>>> Expr<List<K>> for RemoveFromList<K, X, L> {
-    type Eval = <VisitList<K, List<K>, L, RemoveFromListVisitor<K, X>> as Expr<List<K>>>::Eval;
+meta!{
+    pub type RemoveFromList<
+        K: EqualityComparableKind,
+        X: Expr<K>,
+        L: Expr<List<K>>
+    >: Expr<List<K>> =
+        VisitList<K, List<K>, L, RemoveFromListVisitor<K, X>>;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
 
-    pub struct RemoveFromListVisitor<K: EqualityComparableKind, X: Expr<K>> {
-        k: PhantomData<K>,
-        x: PhantomData<X>,
-    }
-
-    impl<K: EqualityComparableKind, X: Expr<K>> ListVisitor<K, List<K>> for RemoveFromListVisitor<K, X> {
-        type VisitEmptyList = EmptyList<K>;
-        type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> =
-            If<
-                List<K>,
-                Equals<K, Elem, X>,
-                RemoveFromList<K, X, Tail>,
-                Cons<K, Elem, RemoveFromList<K, X, Tail>>>;
+    meta!{
+        pub struct RemoveFromListVisitor<
+            K: EqualityComparableKind,
+            X: Expr<K>
+        >: ListVisitor<K, List<K>> {
+            type VisitEmptyList = EmptyList<K>;
+            type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> =
+                If<
+                    List<K>,
+                    Equals<K, Elem, X>,
+                    RemoveFromList<K, X, Tail>,
+                    Cons<K, Elem, RemoveFromList<K, X, Tail>>>;
+        }
     }
 }
 

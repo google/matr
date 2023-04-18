@@ -12,38 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
 // Returns the value associated with the key in the map, or the default value for the value kind otherwise.
-// It's the caller's responsibility to check if the key in the map if getting the default value is not acceptable (e.g. if that could be a valid value in the map).
-pub struct MapGet<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, S: Expr<Map<K, V>>> {
-    k: PhantomData<K>,
-    v: PhantomData<V>,
-    x: PhantomData<X>,
-    s: PhantomData<S>,
-}
-
-impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, M: Expr<Map<K, V>>> Expr<Option<V>> for MapGet<K, V, X, M> {
-    type Eval = <VisitMap<K, V, Option<V>, M, MapGetVisitor<K, V, X>> as Expr<Option<V>>>::Eval;
+meta!{
+    pub type MapGet<
+        K: EqualityComparableKind + KindWithDefault,
+        V: KindWithDefault, 
+        X: Expr<K>,
+        M: Expr<Map<K, V>>
+    >: Expr<Option<V>> =
+        VisitMap<K, V, Option<V>, M, MapGetVisitor<K, V, X>>;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct MapGetVisitor<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        x: PhantomData<X>,
-    }
-
-    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>> MapVisitor<K, V, Option<V>> for MapGetVisitor<K, V, X> {
-        type VisitEmptyMap = None<V>;
-        type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> = If<Option<V>, Equals<K, Key, X>,
-            Some<V, Value>,
-            VisitMap<K, V, Option<V>, Tail, MapGetVisitor<K, V, X>>
-        >;
+    
+    meta!{
+        pub struct MapGetVisitor<
+            K: EqualityComparableKind + KindWithDefault,
+            V: KindWithDefault, 
+            X: Expr<K>
+        >: MapVisitor<K, V, Option<V>> {
+            type VisitEmptyMap = None<V>;
+            type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> = If<Option<V>, Equals<K, Key, X>,
+                Some<V, Value>,
+                VisitMap<K, V, Option<V>, Tail, MapGetVisitor<K, V, X>>
+            >;
+        }
     }
 }
 

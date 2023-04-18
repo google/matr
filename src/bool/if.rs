@@ -12,45 +12,39 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct If<ResultK: Kind, B: Expr<Bool>, Then: Expr<ResultK>, Else: Expr<ResultK>> {
-    result_tag: PhantomData<ResultK>,
-    b: PhantomData<B>,
-    then: PhantomData<Then>,
-    else_data: PhantomData<Else>,
-}
+meta!{
+    pub type If<
+        ResultK: Kind,
+        B: Expr<Bool>,
+        Then: Expr<ResultK>,
+        Else: Expr<ResultK>
+    >: Expr<ResultK> =
+        <AsBool<B> as BoolTrait>::Cond<ResultK, Then, Else>;
 
-impl<ResultK: Kind, B: Expr<Bool>, Then: Expr<ResultK>, Else: Expr<ResultK>> Expr<ResultK> for If<ResultK, B, Then, Else> {
-    type Eval = <<AsBool<B> as BoolTrait>::Cond<ResultK, Then, Else> as Expr<ResultK>>::Eval;
-}
-
-pub struct IfResult<ResultK: Kind, B: Expr<Result<Bool>>, Then: Expr<Result<ResultK>>, Else: Expr<Result<ResultK>>> {
-    result_tag: PhantomData<ResultK>,
-    b: PhantomData<B>,
-    then: PhantomData<Then>,
-    else_data: PhantomData<Else>,
-}
-
-impl<ResultK: Kind, B: Expr<Result<Bool>>, Then: Expr<Result<ResultK>>, Else: Expr<Result<ResultK>>> Expr<Result<ResultK>> for IfResult<ResultK, B, Then, Else> {
-    type Eval = <AndThen<Bool, ResultK, B, IfResultImpl<ResultK, Then, Else>> as Expr<Result<ResultK>>>::Eval;
+    pub type IfResult<
+        ResultK: Kind,
+        B: Expr<Result<Bool>>,
+        Then: Expr<Result<ResultK>>,
+        Else: Expr<Result<ResultK>>
+    >: Expr<Result<ResultK>> =
+        AndThen<Bool, ResultK, B, IfResultImpl<ResultK, Then, Else>>;
 }
 
 // These have to be public because otherwise Rust would complain that "can't leak private type".
 // But they should never be explicitly referenced elsewhere.
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
 
-    pub struct IfResultImpl<ResultK: Kind, Then: Expr<Result<ResultK>>, Else: Expr<Result<ResultK>>> {
-        result_tag: PhantomData<ResultK>,
-        then: PhantomData<Then>,
-        else_data: PhantomData<Else>,
-    }
-
-    impl<ResultK: Kind, Then: Expr<Result<ResultK>>, Else: Expr<Result<ResultK>>> Functor1<Bool, Result<ResultK>> for IfResultImpl<ResultK, Then, Else> {
-        type Apply<B: Expr<Bool>> = <AsBool<B> as BoolTrait>::Cond<Result<ResultK>, Then, Else>;
+    meta!{
+        pub struct IfResultImpl<
+            ResultK: Kind,
+            Then: Expr<Result<ResultK>>,
+            Else: Expr<Result<ResultK>>
+        >: Functor1<Bool, Result<ResultK>> {
+            type Apply<B: Expr<Bool>> = <AsBool<B> as BoolTrait>::Cond<Result<ResultK>, Then, Else>;
+        }
     }
 }
 

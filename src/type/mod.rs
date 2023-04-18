@@ -57,7 +57,7 @@ impl<T: TypeValue> Value<Type> for T {
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
-
+    
     pub struct IsEqualToTypeImplHelper<X, Y> {
         x: PhantomData<X>,
         y: PhantomData<Y>,
@@ -81,14 +81,14 @@ mod internal {
     impl<X: Value<Type>, Y: Value<Type>> crate::bool::internal::BoolValue for IsEqualToTypeImpl<X, Y> {
         type Impl = IsEqualToTypeImplHelper<X::UnconstrainedImpl, Y::UnconstrainedImpl>;
     }
-
-    pub struct IsEqualToType<X: Expr<Type>, Y: Expr<Type>> {
-        x: PhantomData<X>,
-        y: PhantomData<Y>,
-    }
-
-    impl<X: Expr<Type>, Y: Expr<Type>> Expr<Bool> for IsEqualToType<X, Y> {
-        type Eval = IsEqualToTypeImpl<X::Eval, Y::Eval>;
+    
+    meta!{
+        pub struct IsEqualToType<
+            X: Expr<Type>, 
+            Y: Expr<Type>
+        >: Expr<Bool> {
+            type Eval = IsEqualToTypeImpl<X::Eval, Y::Eval>;
+        }
     }
 }
 

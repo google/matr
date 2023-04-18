@@ -19,38 +19,31 @@ pub fn to_usize_vec<L: Expr<List<USize>>>() -> Vec<usize> {
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
 
-    pub struct ToUsizeFunctor {}
+    meta!{
+        pub struct ToUsizeFunctor: Functor1<USize, RuntimeFn<usize, ()>> {
+            type Apply<N: Expr<USize>> = ToUSize<N>;
+        }
 
-    impl Functor1<USize, RuntimeFn<usize, ()>> for ToUsizeFunctor {
-        type Apply<N: Expr<USize>> = ToUSize<N>;
-    }
+        pub struct ToUSize<
+            N: Expr<USize>
+        >: Expr<RuntimeFn<usize, ()>> {
+            type Eval = ToUSizeValue<N>;
+        }
 
-    pub struct ToUSize<N: Expr<USize>> {
-        n: PhantomData<N>,
-    }
+        pub struct ToUSizeValue<
+            N: Expr<USize>
+        >: RuntimeFnValue<usize, ()> {
+            type Impl = ToUSizeImpl<N>;
+        }
 
-    impl<N: Expr<USize>> Expr<RuntimeFn<usize, ()>> for ToUSize<N> {
-        type Eval = ToUSizeValue<N>;
-    }
-
-    pub struct ToUSizeValue<N: Expr<USize>> {
-        n: PhantomData<N>,
-    }
-
-    impl<N: Expr<USize>> RuntimeFnValue<usize, ()> for ToUSizeValue<N> {
-        type Impl = ToUSizeImpl<N>;
-    }
-
-    pub struct ToUSizeImpl<N: Expr<USize>> {
-        n: PhantomData<N>,
-    }
-
-    impl<N: Expr<USize>> RuntimeFnTrait<usize, ()> for ToUSizeImpl<N> {
-        fn apply(_: ()) -> usize {
-            to_usize::<N>()
+        pub struct ToUSizeImpl<
+            N: Expr<USize>
+        >: RuntimeFnTrait<usize, ()> {
+            fn apply(_: ()) -> usize {
+                to_usize::<N>()
+            }
         }
     }
 }

@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use crate::*;
 
-pub struct Not<X: Expr<Bool>> {
-    x: PhantomData<X>,
-}
-
-impl<X: Expr<Bool>> Expr<Bool> for Not<X> {
-    type Eval = <If<Bool, X, False, True> as Expr<Bool>>::Eval;
+meta!{
+    pub type Not<
+        X: Expr<Bool>
+    >: Expr<Bool> =
+        If<Bool, X, False, True>;
 }
 
 #[cfg(test)]

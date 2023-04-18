@@ -22,87 +22,71 @@ mod internal {
     use std::marker::PhantomData;
     pub use super::super::internal::*;
 
-    pub struct ToReversedVec<K: Kind, L: Expr<List<K>>, OutT, F: Functor1<K, RuntimeFn<OutT, ()>>> {
-        k: PhantomData<K>,
-        l: PhantomData<L>,
-        out_t: PhantomData<OutT>,
-        f: PhantomData<F>,
-    }
-
-    impl<K: Kind, L: Expr<List<K>>, OutT, F: Functor1<K, RuntimeFn<OutT, ()>>> Expr<RuntimeFn<Vec<OutT>, ()>> for ToReversedVec<K, L, OutT, F> {
-        type Eval = ToReversedVecValue<K, L, OutT, F>;
-    }
-
-    pub struct ToReversedVecValue<K: Kind, L: Expr<List<K>>, OutT, F: Functor1<K, RuntimeFn<OutT, ()>>> {
-        k: PhantomData<K>,
-        l: PhantomData<L>,
-        out_t: PhantomData<OutT>,
-        f: PhantomData<F>,
-    }
-
-    impl<K: Kind, L: Expr<List<K>>, OutT, F: Functor1<K, RuntimeFn<OutT, ()>>> RuntimeFnValue<Vec<OutT>, ()> for ToReversedVecValue<K, L, OutT, F> {
-        type Impl = AsRuntimeFn<Vec<OutT>, (), <AsList<K, L> as ListTrait<K>>::Visit<RuntimeFn<Vec<OutT>, ()>, ToReversedVecVisitor<K, OutT, F>>>;
-    }
-
-    pub struct ToReversedVecVisitor<K: Kind, OutT, F: Functor1<K, RuntimeFn<OutT, ()>>> {
-        k: PhantomData<K>,
-        out_t: PhantomData<OutT>,
-        f: PhantomData<F>,
-    }
-
-    impl<K: Kind, OutT, F: Functor1<K, RuntimeFn<OutT, ()>>> ListVisitor<K, RuntimeFn<Vec<OutT>, ()>> for ToReversedVecVisitor<K, OutT, F> {
-        type VisitEmptyList = EmptyVec<OutT>;
-        type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> = AddToVec<K, Elem, OutT, F, ToReversedVec<K, Tail, OutT, F>>;
-    }
-
-    pub struct EmptyVec<OutT> {
-        out_t: PhantomData<OutT>,
-    }
-
-    impl<OutT> Expr<RuntimeFn<Vec<OutT>, ()>> for EmptyVec<OutT> {
-        type Eval = EmptyVecValue<OutT>;
-    }
-
-    pub struct EmptyVecValue<OutT> {
-        out_t: PhantomData<OutT>,
-    }
-
-    impl<OutT> RuntimeFnValue<Vec<OutT>, ()> for EmptyVecValue<OutT> {
-        type Impl = EmptyVecImpl<OutT>;
-    }
-
-    pub struct EmptyVecImpl<OutT> {
-        out_t: PhantomData<OutT>,
-    }
-
-    impl<OutT> RuntimeFnTrait<Vec<OutT>, ()> for EmptyVecImpl<OutT> {
-        fn apply(_: ()) -> Vec<OutT> {
-            return vec![];
+    meta!{
+        pub struct ToReversedVec<
+            K: Kind,
+            L: Expr<List<K>>,
+            OutT,
+            F: Functor1<K, RuntimeFn<OutT, ()>>
+        >: Expr<RuntimeFn<Vec<OutT>, ()>> {
+            type Eval = ToReversedVecValue<K, L, OutT, F>;
         }
-    }
 
-    pub struct AddToVec<K: Kind, Elem: Expr<K>, OutT, F: Functor1<K, RuntimeFn<OutT, ()>>, TailVec: Expr<RuntimeFn<Vec<OutT>, ()>>> {
-        k: PhantomData<K>,
-        elem: PhantomData<Elem>,
-        out_t: PhantomData<OutT>,
-        f: PhantomData<F>,
-        tail_vec: PhantomData<TailVec>,
-    }
+        pub struct ToReversedVecValue<
+            K: Kind,
+            L: Expr<List<K>>,
+            OutT,
+            F: Functor1<K, RuntimeFn<OutT, ()>>
+        >: RuntimeFnValue<Vec<OutT>, ()> {
+            type Impl = AsRuntimeFn<Vec<OutT>, (), <AsList<K, L> as ListTrait<K>>::Visit<RuntimeFn<Vec<OutT>, ()>, ToReversedVecVisitor<K, OutT, F>>>;
+        }
 
-    impl<K: Kind, Elem: Expr<K>, OutT, F: Functor1<K, RuntimeFn<OutT, ()>>, TailVec: Expr<RuntimeFn<Vec<OutT>, ()>>> Expr<RuntimeFn<Vec<OutT>, ()>> for AddToVec<K, Elem, OutT, F, TailVec> {
-        type Eval = AddToVecValue<K, Elem, OutT, F, TailVec>;
-    }
+        pub struct ToReversedVecVisitor<
+            K: Kind,
+            OutT,
+            F: Functor1<K, RuntimeFn<OutT, ()>>
+        >: ListVisitor<K, RuntimeFn<Vec<OutT>, ()>> {
+            type VisitEmptyList = EmptyVec<OutT>;
+            type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> = AddToVec<K, Elem, OutT, F, ToReversedVec<K, Tail, OutT, F>>;
+        }
 
-    pub struct AddToVecValue<K: Kind, Elem: Expr<K>, OutT, F: Functor1<K, RuntimeFn<OutT, ()>>, TailVec: Expr<RuntimeFn<Vec<OutT>, ()>>> {
-        k: PhantomData<K>,
-        elem: PhantomData<Elem>,
-        out_t: PhantomData<OutT>,
-        f: PhantomData<F>,
-        tail_vec: PhantomData<TailVec>,
-    }
+        pub struct EmptyVec<
+            OutT
+        >: Expr<RuntimeFn<Vec<OutT>, ()>> {
+            type Eval = EmptyVecValue<OutT>;
+        }
 
-    impl<K: Kind, Elem: Expr<K>, OutT, F: Functor1<K, RuntimeFn<OutT, ()>>, TailVec: Expr<RuntimeFn<Vec<OutT>, ()>>> RuntimeFnValue<Vec<OutT>, ()> for AddToVecValue<K, Elem, OutT, F, TailVec> {
-        type Impl = AddToVecImpl<K, Elem, OutT, F, TailVec>;
+        pub struct EmptyVecValue<
+            OutT
+        >: RuntimeFnValue<Vec<OutT>, ()> {
+            type Impl = EmptyVecImpl<OutT>;
+        }
+
+        pub struct EmptyVecImpl<OutT>: RuntimeFnTrait<Vec<OutT>, ()> {
+            fn apply(_: ()) -> Vec<OutT> {
+                return vec![];
+            }
+        }
+
+        pub struct AddToVec<
+            K: Kind,
+            Elem: Expr<K>,
+            OutT,
+            F: Functor1<K, RuntimeFn<OutT, ()>>,
+            TailVec: Expr<RuntimeFn<Vec<OutT>, ()>>
+        >: Expr<RuntimeFn<Vec<OutT>, ()>> {
+            type Eval = AddToVecValue<K, Elem, OutT, F, TailVec>;
+        }
+
+        pub struct AddToVecValue<
+            K: Kind,
+            Elem: Expr<K>,
+            OutT,
+            F: Functor1<K, RuntimeFn<OutT, ()>>,
+            TailVec: Expr<RuntimeFn<Vec<OutT>, ()>>
+        >: RuntimeFnValue<Vec<OutT>, ()> {
+            type Impl = AddToVecImpl<K, Elem, OutT, F, TailVec>;
+        }
     }
 
     pub struct AddToVecImpl<K: Kind, Elem: Expr<K>, OutT, F: Functor1<K, RuntimeFn<OutT, ()>>, TailVec: Expr<RuntimeFn<Vec<OutT>, ()>>> {

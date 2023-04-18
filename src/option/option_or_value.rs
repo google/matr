@@ -12,33 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct OptionOrValue<K: Kind, V: Expr<Option<K>>, Fallback: Expr<K>> {
-    k: PhantomData<K>,
-    v: PhantomData<V>,
-    fallback: PhantomData<Fallback>,
-}
-
-impl<K: Kind, V: Expr<Option<K>>, Fallback: Expr<K>> Expr<K> for OptionOrValue<K, V, Fallback> {
-    type Eval = <VisitOption<K, K, V, OptionOrValueVisitor<K, V, Fallback>> as Expr<K>>::Eval;
+meta!{
+    pub type OptionOrValue<
+        K: Kind, 
+        V: Expr<Option<K>>, 
+        Fallback: Expr<K>
+    >: Expr<K> =
+        VisitOption<K, K, V, OptionOrValueVisitor<K, V, Fallback>>;
 }
 
 // These have to be public because otherwise Rust would complain that "can't leak private type".
 // But they should never be explicitly referenced elsewhere.
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct OptionOrValueVisitor<K: Kind, V: Expr<Option<K>>, Fallback: Expr<K>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        fallback: PhantomData<Fallback>,
-    }
-
-    impl<K: Kind, V: Expr<Option<K>>, Fallback: Expr<K>> OptionVisitor<K, K> for OptionOrValueVisitor<K, V, Fallback> {
-        type VisitNone = Fallback;
-        type VisitSome<V2: Expr<K>> = V2;
+    
+    meta!{
+        pub struct OptionOrValueVisitor<
+            K: Kind, 
+            V: Expr<Option<K>>,
+            Fallback: Expr<K>
+        >: OptionVisitor<K, K> {
+            type VisitNone = Fallback;
+            type VisitSome<V2: Expr<K>> = V2;
+        }
     }
 }

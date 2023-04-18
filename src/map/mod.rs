@@ -66,64 +66,57 @@ pub trait MapVisitor<K: EqualityComparableKind + KindWithDefault, V: Kind, OutK:
     type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>>: Expr<OutK>;
 }
 
-pub struct VisitMap<K: EqualityComparableKind + KindWithDefault, V: Kind, OutK: Kind, M: Expr<Map<K, V>>, Visitor: MapVisitor<K, V, OutK>> {
-    k: PhantomData<K>,
-    v: PhantomData<V>,
-    out_k: PhantomData<OutK>,
-    m: PhantomData<M>,
-    visitor: PhantomData<Visitor>,
-}
-
-impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, OutK: Kind, M: Expr<Map<K, V>>, Visitor: MapVisitor<K, V, OutK>> Expr<OutK> for VisitMap<K, V, OutK, M, Visitor> {
-    type Eval = <VisitList<Pair<K, V>, OutK, <AsMap<K, V, M> as MapTrait<K, V>>::GetList, MapVisitorToListVisitorAdapter<K, V, OutK, Visitor>> as Expr<OutK>>::Eval;
+meta!{
+    pub type VisitMap<
+        K: EqualityComparableKind + KindWithDefault, 
+        V: KindWithDefault, 
+        OutK: Kind, 
+        M: Expr<Map<K, V>>, 
+        Visitor: MapVisitor<K, V, OutK>
+    >: Expr<OutK> =
+        VisitList<Pair<K, V>, OutK, <AsMap<K, V, M> as MapTrait<K, V>>::GetList, MapVisitorToListVisitorAdapter<K, V, OutK, Visitor>>;
 }
 
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
+    
+    meta!{
+        pub struct ListToMapUnchecked<
+            K: EqualityComparableKind, 
+            V: Kind, 
+            L: Expr<List<Pair<K, V>>>
+        >: Expr<Map<K, V>> {
+            type Eval = ListToMapUncheckedValue<K, V, L>;
+        }
 
-    pub struct ListToMapUnchecked<K: EqualityComparableKind, V: Kind, L: Expr<List<Pair<K, V>>>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        l: PhantomData<L>,
+        pub struct ListToMapUncheckedValue<
+            K: EqualityComparableKind, 
+            V: Kind, 
+            L: Expr<List<Pair<K, V>>>
+        >: MapValue<K, V> {
+            type Impl = ListToMapUncheckedImpl<K, V, L>;
+        }
+
+        pub struct ListToMapUncheckedImpl<
+            K: EqualityComparableKind,
+            V: Kind, 
+            L: Expr<List<Pair<K, V>>>
+        >: MapTrait<K, V> {
+            type GetList = L;
+        }
+
+        pub struct MapVisitorToListVisitorAdapter<
+            K: EqualityComparableKind + KindWithDefault, 
+            V: KindWithDefault,
+            OutK: Kind,
+            Visitor: MapVisitor<K, V, OutK>
+        >: ListVisitor<Pair<K, V>, OutK> {
+            type VisitEmptyList = Visitor::VisitEmptyMap;
+            type VisitCons<Elem: Expr<Pair<K, V>>, Tail: Expr<List<Pair<K, V>>>> = Visitor::VisitEntry<GetFirst<K, V, Elem>, GetSecond<K, V, Elem>, ListToMapUnchecked<K, V, Tail>>;
+        }
     }
-
-    impl<K: EqualityComparableKind, V: Kind, L: Expr<List<Pair<K, V>>>> Expr<Map<K, V>> for ListToMapUnchecked<K, V, L> {
-        type Eval = ListToMapUncheckedValue<K, V, L>;
-    }
-
-    pub struct ListToMapUncheckedValue<K: EqualityComparableKind, V: Kind, L: Expr<List<Pair<K, V>>>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        l: PhantomData<L>,
-    }
-
-    impl<K: EqualityComparableKind, V: Kind, L: Expr<List<Pair<K, V>>>> MapValue<K, V> for ListToMapUncheckedValue<K, V, L> {
-        type Impl = ListToMapUncheckedImpl<K, V, L>;
-    }
-
-    pub struct ListToMapUncheckedImpl<K: EqualityComparableKind, V: Kind, L: Expr<List<Pair<K, V>>>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        l: PhantomData<L>,
-    }
-
-    impl<K: EqualityComparableKind, V: Kind, L: Expr<List<Pair<K, V>>>> MapTrait<K, V> for ListToMapUncheckedImpl<K, V, L> {
-        type GetList = L;
-    }
-
-    pub struct MapVisitorToListVisitorAdapter<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, OutK: Kind, Visitor: MapVisitor<K, V, OutK>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        out_k: PhantomData<OutK>,
-        visitor: PhantomData<Visitor>,
-    }
-
-    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, OutK: Kind, Visitor: MapVisitor<K, V, OutK>> ListVisitor<Pair<K, V>, OutK> for MapVisitorToListVisitorAdapter<K, V, OutK, Visitor> {
-        type VisitEmptyList = Visitor::VisitEmptyMap;
-        type VisitCons<Elem: Expr<Pair<K, V>>, Tail: Expr<List<Pair<K, V>>>> = Visitor::VisitEntry<GetFirst<K, V, Elem>, GetSecond<K, V, Elem>, ListToMapUnchecked<K, V, Tail>>;
-    }
-
+    
     pub trait MapValue<K: EqualityComparableKind, V: Kind> {
         type Impl: MapTrait<K, V>;
     }
@@ -149,39 +142,33 @@ mod internal {
     impl<K: KindWithDefault + EqualityComparableKind, V: Kind, M: Expr<Map<K, V>>> MapTrait<K, V> for AsMap<K, V, M> where <<M as Expr<Map<K, V>>>::Eval as Value<Map<K, V>>>::UnconstrainedImpl: MapTrait<K, V> {
         type GetList = <<<M as Expr<Map<K, V>>>::Eval as Value<Map<K, V>>>::UnconstrainedImpl as MapTrait<K, V>>::GetList;
     }
+    
+    meta!{
+        pub type MapEquals<
+            K: KindWithDefault + EqualityComparableKind,
+            V: KindWithDefault + EqualityComparableKind, 
+            X: Expr<Map<K, V>>,
+            Y: Expr<Map<K, V>>
+        >: Expr<Bool> =
+            And<IsSubmap<K, V, X, Y>, IsSubmap<K, V, Y, X>>;
 
-    pub struct MapEquals<K: EqualityComparableKind, V: EqualityComparableKind, X: Expr<Map<K, V>>, Y: Expr<Map<K, V>>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        x: PhantomData<X>,
-        y: PhantomData<Y>,
-    }
+        pub type IsSubmap<
+            K: KindWithDefault + EqualityComparableKind,
+            V: KindWithDefault + EqualityComparableKind, 
+            CandidateSubmap: Expr<Map<K, V>>, 
+            CandidateSupermap: Expr<Map<K, V>>
+        >: Expr<Bool> =
+            VisitMap<K, V, Bool, CandidateSubmap, IsSubmapVisitor<K, V, CandidateSupermap>>;
 
-    impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault + EqualityComparableKind, X: Expr<Map<K, V>>, Y: Expr<Map<K, V>>> Expr<Bool> for MapEquals<K, V, X, Y> {
-        type Eval = <And<IsSubmap<K, V, X, Y>, IsSubmap<K, V, Y, X>> as Expr<Bool>>::Eval;
-    }
-
-    pub struct IsSubmap<K: EqualityComparableKind, V: EqualityComparableKind, CandidateSubmap: Expr<Map<K, V>>, CandidateSupermap: Expr<Map<K, V>>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        candidate_submap: PhantomData<CandidateSubmap>,
-        candidate_supermap: PhantomData<CandidateSupermap>,
-    }
-
-    impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault + EqualityComparableKind, CandidateSubmap: Expr<Map<K, V>>, CandidateSupermap: Expr<Map<K, V>>> Expr<Bool> for IsSubmap<K, V, CandidateSubmap, CandidateSupermap> {
-        type Eval = <VisitMap<K, V, Bool, CandidateSubmap, IsSubmapVisitor<K, V, CandidateSupermap>> as Expr<Bool>>::Eval;
-    }
-
-    pub struct IsSubmapVisitor<K: EqualityComparableKind, V: EqualityComparableKind, CandidateSupermap: Expr<Map<K, V>>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        candidate_supermap: PhantomData<CandidateSupermap>,
-    }
-
-    impl<K: EqualityComparableKind + KindWithDefault, V: EqualityComparableKind + KindWithDefault, CandidateSupermap: Expr<Map<K, V>>> MapVisitor<K, V, Bool> for IsSubmapVisitor<K, V, CandidateSupermap> {
-        type VisitEmptyMap = True;
-        type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> = And<
-            Equals<Option<V>, MapGet<K, V, Key, CandidateSupermap>, Some<V, Value>>,
-            VisitMap<K, V, Bool, Tail, IsSubmapVisitor<K, V, CandidateSupermap>>>;
+        pub struct IsSubmapVisitor<
+            K: KindWithDefault + EqualityComparableKind,
+            V: KindWithDefault + EqualityComparableKind,
+            CandidateSupermap: Expr<Map<K, V>>
+        >: MapVisitor<K, V, Bool> {
+            type VisitEmptyMap = True;
+            type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> = And<
+                Equals<Option<V>, MapGet<K, V, Key, CandidateSupermap>, Some<V, Value>>,
+                VisitMap<K, V, Bool, Tail, IsSubmapVisitor<K, V, CandidateSupermap>>>;
+        }
     }
 }

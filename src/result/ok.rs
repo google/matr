@@ -12,39 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct Ok<K: Kind, V: Expr<K>> {
-    k: PhantomData<K>,
-    v: PhantomData<V>,
-}
-
-impl<K: Kind, V: Expr<K>> Expr<Result<K>> for Ok<K, V> {
-    type Eval = OkValue<K, V>;
+meta!{
+    pub struct Ok<
+        K: Kind, 
+        V: Expr<K>
+    >: Expr<Result<K>> {
+        type Eval = OkValue<K, V>;
+    }
 }
 
 // These have to be public because otherwise Rust would complain that "can't leak private type".
 // But they should never be explicitly referenced elsewhere.
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct OkValue<K: Kind, V: Expr<K>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-    }
-
-    impl<K: Kind, V: Expr<K>> ResultValue<K> for OkValue<K, V> {
-        type Impl = OkImpl<K, V>;
-    }
-
-    pub struct OkImpl<K: Kind, V: Expr<K>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-    }
-
-    impl<K: Kind, V: Expr<K>> ResultTrait<K> for OkImpl<K, V> {
-        type Visit<ResultK: Kind, Visitor: ResultVisitor<K, ResultK>> = Visitor::VisitOk<V>;
+    
+    meta!{
+        pub struct OkValue<
+            K: Kind, 
+            V: Expr<K>
+        >: ResultValue<K> {
+            type Impl = OkImpl<K, V>;
+        }
+        
+        pub struct OkImpl<
+            K: Kind, 
+            V: Expr<K>
+        >: ResultTrait<K> {
+            type Visit<ResultK: Kind, Visitor: ResultVisitor<K, ResultK>> = Visitor::VisitOk<V>;
+        }
     }
 }

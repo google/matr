@@ -12,31 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct IsSubset<K: EqualityComparableKind, CandidateSubset: Expr<Set<K>>, CandidateSuperset: Expr<Set<K>>> {
-    k: PhantomData<K>,
-    candidate_subset: PhantomData<CandidateSubset>,
-    candidate_superset: PhantomData<CandidateSuperset>,
-}
-
-impl<K: EqualityComparableKind, CandidateSubset: Expr<Set<K>>, CandidateSuperset: Expr<Set<K>>> Expr<Bool> for IsSubset<K, CandidateSubset, CandidateSuperset> {
-    type Eval = <VisitSet<K, Bool, CandidateSubset, IsSubsetVisitor<K, CandidateSuperset>> as Expr<Bool>>::Eval;
+meta!{
+    pub type IsSubset<
+        K: EqualityComparableKind, 
+        CandidateSubset: Expr<Set<K>>, 
+        CandidateSuperset: Expr<Set<K>>
+    >: Expr<Bool> =
+        VisitSet<K, Bool, CandidateSubset, IsSubsetVisitor<K, CandidateSuperset>>;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct IsSubsetVisitor<K: EqualityComparableKind, CandidateSuperset: Expr<Set<K>>> {
-        k: PhantomData<K>,
-        candidate_superset: PhantomData<CandidateSuperset>,
-    }
-
-    impl<K: EqualityComparableKind, CandidateSuperset: Expr<Set<K>>> SetVisitor<K, Bool> for IsSubsetVisitor<K, CandidateSuperset> {
-        type VisitEmptySet = True;
-        type VisitCons<Elem: Expr<K>, Tail: Expr<Set<K>>> = And<IsInSet<K, Elem, CandidateSuperset>, VisitSet<K, Bool, Tail, IsSubsetVisitor<K, CandidateSuperset>>>;
+    
+    meta!{
+        pub struct IsSubsetVisitor<
+            K: EqualityComparableKind,
+            CandidateSuperset: Expr<Set<K>>
+        >: SetVisitor<K, Bool> {
+            type VisitEmptySet = True;
+            type VisitCons<Elem: Expr<K>, Tail: Expr<Set<K>>> = And<IsInSet<K, Elem, CandidateSuperset>, VisitSet<K, Bool, Tail, IsSubsetVisitor<K, CandidateSuperset>>>;
+        }
     }
 }
 

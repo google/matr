@@ -12,25 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use super::internal::*;
 
-pub struct Or<X: Expr<Bool>, Y: Expr<Bool>> {
-    x: PhantomData<X>,
-    y: PhantomData<Y>,
-}
+meta!{
+    pub type Or<
+        X: Expr<Bool>,
+        Y: Expr<Bool>
+    >: Expr<Bool> =
+        If<Bool, X, True, Y>;
 
-impl<X: Expr<Bool>, Y: Expr<Bool>> Expr<Bool> for Or<X, Y> {
-    type Eval = <If<Bool, X, True, Y> as Expr<Bool>>::Eval;
-}
-
-pub struct OrResults<X: Expr<Result<Bool>>, Y: Expr<Result<Bool>>> {
-    x: PhantomData<X>,
-    y: PhantomData<Y>,
-}
-
-impl<X: Expr<Result<Bool>>, Y: Expr<Result<Bool>>> Expr<Result<Bool>> for OrResults<X, Y> {
-    type Eval = <IfResult<Bool, X, Ok<Bool, True>, Y> as Expr<Result<Bool>>>::Eval;
+    pub type OrResults<
+        X: Expr<Result<Bool>>,
+        Y: Expr<Result<Bool>>
+    >: Expr<Result<Bool>> =
+        IfResult<Bool, X, Ok<Bool, True>, Y>;
 }
 
 #[cfg(test)]

@@ -21,41 +21,26 @@ pub const fn check_no_error<K: Kind, V: Expr<Result<K>>>() {
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct PanickingConstFnImpl<E> {
-        e: PhantomData<E>,
-    }
-
-    impl<E> const ConstFnTrait<(), ()> for PanickingConstFnImpl<E> {
-        fn apply(_: ()) -> () {
-            panic!("Error found in check_no_error");
+    
+    meta!{
+        pub struct PanickingConstFnImpl<E>: const ConstFnTrait<(), ()> {
+            fn apply(_: ()) -> () {
+                panic!("Error found in check_no_error");
+            }
         }
-    }
-
-    pub struct PanickingConstFnValue<E> {
-        e: PhantomData<E>,
-    }
-
-    impl<E> ConstFnValue<(), ()> for PanickingConstFnValue<E> {
-        type Impl = PanickingConstFnImpl<E>;
-    }
-
-    pub struct PanickingConstFn<E> {
-        e: PhantomData<E>,
-    }
-
-    impl<E> Expr<ConstFn<(), ()>> for PanickingConstFn<E> {
-        type Eval = PanickingConstFnValue<E>;
-    }
-
-    pub struct CheckNoError<K: Kind> {
-        k: PhantomData<K>,
-    }
-
-    impl<K: Kind> ResultVisitor<K, ConstFn<(), ()>> for CheckNoError<K> {
-        type VisitOk<V: Expr<K>> = NoOpConstFn;
-        type VisitErr<E> = PanickingConstFn<E>;
+        
+        pub struct PanickingConstFnValue<E>: ConstFnValue<(), ()> {
+            type Impl = PanickingConstFnImpl<E>;
+        }
+        
+        pub struct PanickingConstFn<E>: Expr<ConstFn<(), ()>> {
+            type Eval = PanickingConstFnValue<E>;
+        }
+        
+        pub struct CheckNoError<K: Kind>: ResultVisitor<K, ConstFn<(), ()>> {
+            type VisitOk<V: Expr<K>> = NoOpConstFn;
+            type VisitErr<E> = PanickingConstFn<E>;
+        }
     }
 }

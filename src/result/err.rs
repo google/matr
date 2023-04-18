@@ -12,39 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct Err<K: Kind, E> {
-    k: PhantomData<K>,
-    e: PhantomData<E>,
-}
-
-impl<K: Kind, E> Expr<Result<K>> for Err<K, E> {
-    type Eval = ErrValue<K, E>;
+meta!{
+    pub struct Err<
+        K: Kind, 
+        E
+    >: Expr<Result<K>> {
+        type Eval = ErrValue<K, E>;
+    }
 }
 
 // These have to be public because otherwise Rust would complain that "can't leak private type".
 // But they should never be explicitly referenced elsewhere.
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct ErrImpl<K: Kind, E> {
-        k: PhantomData<K>,
-        e: PhantomData<E>,
-    }
-
-    impl<K: Kind, E> ResultTrait<K> for ErrImpl<K, E> {
-        type Visit<ResultK: Kind, Visitor: ResultVisitor<K, ResultK>> = Visitor::VisitErr<E>;
-    }
-
-    pub struct ErrValue<K: Kind, E> {
-        k: PhantomData<K>,
-        e: PhantomData<E>,
-    }
-
-    impl<K: Kind, E> ResultValue<K> for ErrValue<K, E> {
-        type Impl = ErrImpl<K, E>;
+    
+    meta!{
+        pub struct ErrImpl<K: Kind, E>: ResultTrait<K> {
+            type Visit<ResultK: Kind, Visitor: ResultVisitor<K, ResultK>> = Visitor::VisitErr<E>;
+        }
+        
+        pub struct ErrValue<K: Kind, E>: ResultValue<K> {
+            type Impl = ErrImpl<K, E>;
+        }
     }
 }

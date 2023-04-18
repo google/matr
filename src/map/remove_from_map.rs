@@ -12,38 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct RemoveFromMap<K: EqualityComparableKind, V: Kind, X: Expr<K>, S: Expr<Map<K, V>>> {
-    k: PhantomData<K>,
-    v: PhantomData<V>,
-    x: PhantomData<X>,
-    s: PhantomData<S>,
-}
-
-impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>, M: Expr<Map<K, V>>> Expr<Map<K, V>> for RemoveFromMap<K, V, X, M> {
-    type Eval = <ListToMapUnchecked<K, V, VisitList<Pair<K, V>, List<Pair<K, V>>, MapToList<K, V, M>, RemoveFromMapVisitor<K, V, X>>> as Expr<Map<K, V>>>::Eval;
+meta!{
+    pub type RemoveFromMap<
+        K: KindWithDefault + EqualityComparableKind, 
+        V: KindWithDefault,
+        X: Expr<K>, 
+        M: Expr<Map<K, V>>
+    >: Expr<Map<K, V>> =
+        ListToMapUnchecked<K, V, VisitList<Pair<K, V>, List<Pair<K, V>>, MapToList<K, V, M>, RemoveFromMapVisitor<K, V, X>>>;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct RemoveFromMapVisitor<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        x: PhantomData<X>,
-    }
-
-    impl<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, X: Expr<K>> ListVisitor<Pair<K, V>, List<Pair<K, V>>> for RemoveFromMapVisitor<K, V, X> {
-        type VisitEmptyList = EmptyList<Pair<K, V>>;
-        type VisitCons<Elem: Expr<Pair<K, V>>, Tail: Expr<List<Pair<K, V>>>> = If<
-            List<Pair<K, V>>,
-            Equals<K, GetFirst<K, V, Elem>, X>,
-            VisitList<Pair<K, V>, List<Pair<K, V>>, Tail, RemoveFromMapVisitor<K, V, X>>,
-            Cons<Pair<K, V>, Elem, VisitList<Pair<K, V>, List<Pair<K, V>>, Tail, RemoveFromMapVisitor<K, V, X>>>
-        >;
+    
+    meta!{
+        pub struct RemoveFromMapVisitor<
+            K: EqualityComparableKind + KindWithDefault, 
+            V: KindWithDefault, 
+            X: Expr<K>
+        >: ListVisitor<Pair<K, V>, List<Pair<K, V>>> {
+            type VisitEmptyList = EmptyList<Pair<K, V>>;
+            type VisitCons<Elem: Expr<Pair<K, V>>, Tail: Expr<List<Pair<K, V>>>> = If<
+                List<Pair<K, V>>,
+                Equals<K, GetFirst<K, V, Elem>, X>,
+                VisitList<Pair<K, V>, List<Pair<K, V>>, Tail, RemoveFromMapVisitor<K, V, X>>,
+                Cons<Pair<K, V>, Elem, VisitList<Pair<K, V>, List<Pair<K, V>>, Tail, RemoveFromMapVisitor<K, V, X>>>
+            >;
+        }
     }
 }
 

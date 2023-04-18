@@ -71,17 +71,16 @@ mod internal {
     pub trait PairVisitor<FirstK: Kind, SecondK: Kind, ResultK: Kind> {
         type Visit<First: Expr<FirstK>, Second: Expr<SecondK>>: Expr<ResultK>;
     }
-
-    pub struct PairEquals<FirstK: EqualityComparableKind, SecondK: EqualityComparableKind, X: Expr<Pair<FirstK, SecondK>>, Y: Expr<Pair<FirstK, SecondK>>> {
-        first_k: PhantomData<FirstK>,
-        second_k: PhantomData<SecondK>,
-        x: PhantomData<X>,
-        y: PhantomData<Y>,
-    }
-
-    impl<FirstK: EqualityComparableKind + KindWithDefault, SecondK: EqualityComparableKind + KindWithDefault, X: Expr<Pair<FirstK, SecondK>>, Y: Expr<Pair<FirstK, SecondK>>> Expr<Bool> for PairEquals<FirstK, SecondK, X, Y> {
-        type Eval = <And<
-            Equals<FirstK, GetFirst<FirstK, SecondK, X>, GetFirst<FirstK, SecondK, Y>>,
-            Equals<SecondK, GetSecond<FirstK, SecondK, X>, GetSecond<FirstK, SecondK, Y>>> as Expr<Bool>>::Eval;
+    
+    meta!{
+        pub type PairEquals<
+            FirstK: EqualityComparableKind + KindWithDefault, 
+            SecondK: EqualityComparableKind + KindWithDefault, 
+            X: Expr<Pair<FirstK, SecondK>>, 
+            Y: Expr<Pair<FirstK, SecondK>>
+        >: Expr<Bool> =
+            And<
+                Equals<FirstK, GetFirst<FirstK, SecondK, X>, GetFirst<FirstK, SecondK, Y>>,
+                Equals<SecondK, GetSecond<FirstK, SecondK, X>, GetSecond<FirstK, SecondK, Y>>>;
     }
 }

@@ -12,19 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-// An Expr<K> that, when evaluated, causes a compilation error due to exceeding the maximum
-// number of allowed recursion steps.
-// This isn't *really* infinite (that is impossible due to Rust's type checker) but it recurses
-// so many times that any reasonable recursion steps maximum would be exceeded.
-pub struct LongRecursion<N: Expr<USize>> {
-    n: PhantomData<N>,
-}
-
-impl<N: Expr<USize>> Expr<Bool> for LongRecursion<N> {
-    type Eval = <IsEven<Sum<N, OneBillion>> as Expr<Bool>>::Eval;
+meta!{
+    // An Expr<K> that, when evaluated, causes a compilation error due to exceeding the maximum
+    // number of allowed recursion steps.
+    // This isn't *really* infinite (that is impossible due to Rust's type checker) but it recurses
+    // so many times that any reasonable recursion steps maximum would be exceeded.
+    pub type LongRecursion<
+        N: Expr<USize>
+    >: Expr<Bool> = 
+        IsEven<Sum<N, OneBillion>>;
 }
 
 mod internal {

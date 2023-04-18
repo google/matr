@@ -12,18 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
 // Concatenates L and Tail.
-pub struct ListConcat<K: Kind, L: Expr<List<K>>, Tail: Expr<List<K>>> {
-    k: PhantomData<K>,
-    l: PhantomData<L>,
-    tail: PhantomData<Tail>,
-}
-
-impl<K: Kind, L: Expr<List<K>>, Tail: Expr<List<K>>> Expr<List<K>> for ListConcat<K, L, Tail> {
-    type Eval = <ReversedListConcat<K, ReverseList<K, L>, Tail> as Expr<List<K>>>::Eval;
+meta!{
+    pub type ListConcat<
+        K: Kind,
+        L: Expr<List<K>>,
+        Tail: Expr<List<K>>
+    >: Expr<List<K>> =
+        ReversedListConcat<K, ReverseList<K, L>, Tail>;
 }
 
 mod internal {

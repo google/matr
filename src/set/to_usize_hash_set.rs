@@ -21,38 +21,31 @@ pub fn to_usize_hash_set<S: Expr<Set<USize>>, OutT: Eq + Hash>() -> HashSet<usiz
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct ToUSizeHashSetFunctor {}
-
-    impl Functor1<USize, RuntimeFn<usize, ()>> for ToUSizeHashSetFunctor {
-        type Apply<N: Expr<USize>> = ToUSizeConstFn<N>;
-    }
-
-    pub struct ToUSizeConstFn<N: Expr<USize>> {
-        n: PhantomData<N>,
-    }
-
-    impl<N: Expr<USize>> Expr<RuntimeFn<usize, ()>> for ToUSizeConstFn<N> {
-        type Eval = ToUSizeConstFnValue<N>;
-    }
-
-    pub struct ToUSizeConstFnValue<N: Expr<USize>> {
-        n: PhantomData<N>,
-    }
-
-    impl<N: Expr<USize>> RuntimeFnValue<usize, ()> for ToUSizeConstFnValue<N> {
-        type Impl = ToUSizeConstFnImpl<N>;
-    }
-
-    pub struct ToUSizeConstFnImpl<N: Expr<USize>> {
-        n: PhantomData<N>,
-    }
-
-    impl<N: Expr<USize>> RuntimeFnTrait<usize, ()> for ToUSizeConstFnImpl<N> {
-        fn apply(_: ()) -> usize {
-            to_usize::<N>()
+    
+    meta!{
+        pub struct ToUSizeHashSetFunctor: Functor1<USize, RuntimeFn<usize, ()>> {
+            type Apply<N: Expr<USize>> = ToUSizeConstFn<N>;
+        }
+        
+        pub struct ToUSizeConstFn<
+            N: Expr<USize>
+        >: Expr<RuntimeFn<usize, ()>> {
+            type Eval = ToUSizeConstFnValue<N>;
+        }
+        
+        pub struct ToUSizeConstFnValue<
+            N: Expr<USize>
+        >: RuntimeFnValue<usize, ()> {
+            type Impl = ToUSizeConstFnImpl<N>;
+        }
+        
+        pub struct ToUSizeConstFnImpl<
+            N: Expr<USize>
+        >: RuntimeFnTrait<usize, ()> {
+            fn apply(_: ()) -> usize {
+                to_usize::<N>()
+            }
         }
     }
 }

@@ -12,38 +12,35 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct SetDifference<K: EqualityComparableKind, S1: Expr<Set<K>>, S2: Expr<Set<K>>> {
-    k: PhantomData<K>,
-    s1: PhantomData<S1>,
-    s2: PhantomData<S2>,
-}
-
-impl<K: EqualityComparableKind, S1: Expr<Set<K>>, S2: Expr<Set<K>>> Expr<Set<K>> for SetDifference<K, S1, S2> {
-    type Eval = <VisitSet<K, Set<K>, S1, SetDifferenceVisitor<K, S2, EmptySet<K>>> as Expr<Set<K>>>::Eval;
+meta!{
+    pub type SetDifference<
+        K: EqualityComparableKind, 
+        S1: Expr<Set<K>>, 
+        S2: Expr<Set<K>>
+    >: Expr<Set<K>> = 
+        VisitSet<K, Set<K>, S1, SetDifferenceVisitor<K, S2, EmptySet<K>>>;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct SetDifferenceVisitor<K: EqualityComparableKind, S: Expr<Set<K>>, ResultS: Expr<Set<K>>> {
-        k: PhantomData<K>,
-        s: PhantomData<S>,
-        result_s: PhantomData<ResultS>,
-    }
-
-    impl<K: EqualityComparableKind, S: Expr<Set<K>>, ResultS: Expr<Set<K>>> SetVisitor<K, Set<K>> for SetDifferenceVisitor<K, S, ResultS> {
-        type VisitEmptySet = EmptySet<K>;
-        type VisitCons<Elem: Expr<K>, Tail: Expr<Set<K>>> =
-            VisitSet<K, Set<K>, Tail, SetDifferenceVisitor<K, S,
-                If<Set<K>,
-                    IsInSet<K, Elem, S>,
-                    ResultS,
-                    AddToSet<K, Elem, ResultS>
-                >>>;
+    
+    meta!{
+        pub struct SetDifferenceVisitor<
+            K: EqualityComparableKind,
+            S: Expr<Set<K>>, 
+            ResultS: Expr<Set<K>>
+        >: SetVisitor<K, Set<K>> {
+            type VisitEmptySet = EmptySet<K>;
+            type VisitCons<Elem: Expr<K>, Tail: Expr<Set<K>>> =
+                VisitSet<K, Set<K>, Tail, SetDifferenceVisitor<K, S,
+                    If<Set<K>,
+                        IsInSet<K, Elem, S>,
+                        ResultS,
+                        AddToSet<K, Elem, ResultS>
+                    >>>;
+        }
     }
 }
 

@@ -12,22 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct AddToSet<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> {
-    k: PhantomData<K>,
-    x: PhantomData<X>,
-    s: PhantomData<S>,
-}
-
-impl<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> Expr<Set<K>> for AddToSet<K, X, S> {
-    type Eval = <If<
-        Set<K>,
-        IsInSet<K, X, S>,
-        S,
-        ListToSetUnchecked<K, Cons<K, X, SetToList<K, S>>>
-    > as Expr<Set<K>>>::Eval;
+meta!{
+    pub type AddToSet<
+        K: EqualityComparableKind, 
+        X: Expr<K>, 
+        S: Expr<Set<K>>
+    >: Expr<Set<K>> =
+        If<
+            Set<K>,
+            IsInSet<K, X, S>,
+            S,
+            ListToSetUnchecked<K, Cons<K, X, SetToList<K, S>>>>;
 }
 
 mod internal {

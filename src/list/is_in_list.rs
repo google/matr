@@ -12,31 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct IsInList<K: EqualityComparableKind, X: Expr<K>, L: Expr<List<K>>> {
-    k: PhantomData<K>,
-    x: PhantomData<X>,
-    l: PhantomData<L>,
-}
-
-impl<K: EqualityComparableKind, X: Expr<K>, L: Expr<List<K>>> Expr<Bool> for IsInList<K, X, L> {
-    type Eval = <VisitList<K, Bool, L, IsInListVisitor<K, X>> as Expr<Bool>>::Eval;
+meta!{
+    pub type IsInList<
+        K: EqualityComparableKind,
+        X: Expr<K>,
+        L: Expr<List<K>>
+    >: Expr<Bool> =
+        VisitList<K, Bool, L, IsInListVisitor<K, X>>;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
 
-    pub struct IsInListVisitor<K: EqualityComparableKind, X: Expr<K>> {
-        k: PhantomData<K>,
-        x: PhantomData<X>,
-    }
-
-    impl<K: EqualityComparableKind, X: Expr<K>> ListVisitor<K, Bool> for IsInListVisitor<K, X> {
-        type VisitEmptyList = False;
-        type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> = Or<Equals<K, Elem, X>, IsInList<K, X, Tail>>;
+    meta!{
+        pub struct IsInListVisitor<
+            K: EqualityComparableKind,
+            X: Expr<K>
+        >: ListVisitor<K, Bool> {
+            type VisitEmptyList = False;
+            type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> = Or<Equals<K, Elem, X>, IsInList<K, X, Tail>>;
+        }
     }
 }
 

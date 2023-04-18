@@ -73,15 +73,14 @@ pub trait ListVisitor<ElemK: Kind, OutK: Kind> {
     type VisitCons<Elem: Expr<ElemK>, Tail: Expr<List<ElemK>>>: Expr<OutK>;
 }
 
-pub struct VisitList<ElemK: Kind, OutK: Kind, L: Expr<List<ElemK>>, V: ListVisitor<ElemK, OutK>> {
-    elem_k: PhantomData<ElemK>,
-    out_k: PhantomData<OutK>,
-    l: PhantomData<L>,
-    v: PhantomData<V>,
-}
-
-impl<ElemK: Kind, OutK: Kind, L: Expr<List<ElemK>>, V: ListVisitor<ElemK, OutK>> Expr<OutK> for VisitList<ElemK, OutK, L, V> {
-    type Eval = <<AsList<ElemK, L> as ListTrait<ElemK>>::Visit<OutK, V> as Expr<OutK>>::Eval;
+meta!{
+    pub type VisitList<
+        ElemK: Kind,
+        OutK: Kind,
+        L: Expr<List<ElemK>>,
+        V: ListVisitor<ElemK, OutK>
+    >: Expr<OutK> =
+        <AsList<ElemK, L> as ListTrait<ElemK>>::Visit<OutK, V>;
 }
 
 mod internal {
@@ -104,43 +103,37 @@ mod internal {
     pub trait ListTrait<K: Kind> {
         type Visit<OutK: Kind, V: ListVisitor<K, OutK>>: Expr<OutK>;
     }
-    pub struct ListEquals<K: EqualityComparableKind, X: Expr<List<K>>, Y: Expr<List<K>>> {
-        k: PhantomData<K>,
-        x: PhantomData<X>,
-        y: PhantomData<Y>,
-    }
 
-    impl<K: EqualityComparableKind, X: Expr<List<K>>, Y: Expr<List<K>>> Expr<Bool> for ListEquals<K, X, Y> {
-        type Eval = <VisitList<K, Bool, X, ListEqualsVisitor<K, Y>> as Expr<Bool>>::Eval;
-    }
+    meta!{
+        pub type ListEquals<
+            K: EqualityComparableKind,
+            X: Expr<List<K>>,
+            Y: Expr<List<K>>
+        >: Expr<Bool> =
+            VisitList<K, Bool, X, ListEqualsVisitor<K, Y>>;
 
-    pub struct ListEqualsVisitor<K: EqualityComparableKind, Other: Expr<List<K>>> {
-        k: PhantomData<K>,
-        other: PhantomData<Other>,
-    }
+        pub struct ListEqualsVisitor<
+            K: EqualityComparableKind,
+            Other: Expr<List<K>>
+        >: ListVisitor<K, Bool> {
+            type VisitEmptyList = <AsList<K, Other> as ListTrait<K>>::Visit<Bool, IsEmpty<K>>;
+            type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> = <AsList<K, Other> as ListTrait<K>>::Visit<Bool, ListEqualsCons<K, Elem, Tail>>;
+        }
 
-    impl<K: EqualityComparableKind, Other: Expr<List<K>>> ListVisitor<K, Bool> for ListEqualsVisitor<K, Other> {
-        type VisitEmptyList = <AsList<K, Other> as ListTrait<K>>::Visit<Bool, IsEmpty<K>>;
-        type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> = <AsList<K, Other> as ListTrait<K>>::Visit<Bool, ListEqualsCons<K, Elem, Tail>>;
-    }
+        pub struct IsEmpty<
+            K: EqualityComparableKind
+        >: ListVisitor<K, Bool> {
+            type VisitEmptyList = True;
+            type VisitCons<Elem: Expr<K>, Tail: Expr<crate::List<K>>> = False;
+        }
 
-    pub struct IsEmpty<K: EqualityComparableKind> {
-        k: PhantomData<K>,
-    }
-
-    impl<K: EqualityComparableKind> ListVisitor<K, Bool> for IsEmpty<K> {
-        type VisitEmptyList = True;
-        type VisitCons<Elem: Expr<K>, Tail: Expr<crate::List<K>>> = False;
-    }
-
-    pub struct ListEqualsCons<K: EqualityComparableKind, Elem: Expr<K>, Tail: Expr<List<K>>> {
-        k: PhantomData<K>,
-        elem: PhantomData<Elem>,
-        tail: PhantomData<Tail>,
-    }
-
-    impl<K: EqualityComparableKind, Elem: Expr<K>, Tail: Expr<List<K>>> ListVisitor<K, Bool> for ListEqualsCons<K, Elem, Tail> {
-        type VisitEmptyList = False;
-        type VisitCons<Elem2: Expr<K>, Tail2: Expr<List<K>>> = And<Equals<K, Elem, Elem2>, Equals<List<K>, Tail, Tail2>>;
+        pub struct ListEqualsCons<
+            K: EqualityComparableKind,
+            Elem: Expr<K>,
+            Tail: Expr<List<K>>
+        >: ListVisitor<K, Bool> {
+            type VisitEmptyList = False;
+            type VisitCons<Elem2: Expr<K>, Tail2: Expr<List<K>>> = And<Equals<K, Elem, Elem2>, Equals<List<K>, Tail, Tail2>>;
+        }
     }
 }

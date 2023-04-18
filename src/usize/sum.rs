@@ -12,29 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct Sum<X: Expr<USize>, Y: Expr<USize>> {
-    x: PhantomData<X>,
-    y: PhantomData<Y>,
-}
-
-impl<X: Expr<USize>, Y: Expr<USize>> Expr<USize> for Sum<X, Y> {
-    type Eval = <VisitUSize<USize, X, SumValueVisitor<Y>> as Expr<USize>>::Eval;
+meta!{
+    pub type Sum<
+        X: Expr<USize>,
+        Y: Expr<USize>
+    >: Expr<USize> =
+        VisitUSize<USize, X, SumValueVisitor<Y>>;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct SumValueVisitor<N: Expr<USize>> {
-        n: PhantomData<N>,
-    }
-
-    impl<X: Expr<USize>> USizeVisitor<USize> for SumValueVisitor<X> {
-        type VisitZero = X;
-        type VisitIncrement<N: Expr<USize>> = Increment<VisitUSize<USize, N, SumValueVisitor<X>>>;
+    
+    meta!{
+        pub struct SumValueVisitor<
+            X: Expr<USize>
+        >: USizeVisitor<USize> {
+            type VisitZero = X;
+            type VisitIncrement<N: Expr<USize>> = Increment<VisitUSize<USize, N, SumValueVisitor<X>>>;
+        }
     }
 }
 

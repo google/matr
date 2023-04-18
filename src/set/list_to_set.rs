@@ -12,28 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct ListToSet<K: EqualityComparableKind, L: Expr<List<K>>> {
-    k: PhantomData<K>,
-    l: PhantomData<L>,
-}
-
-impl<K: EqualityComparableKind, L: Expr<List<K>>> Expr<Set<K>> for ListToSet<K, L> {
-    type Eval = <VisitList<K, Set<K>, L, ListToSetVisitor<K>> as Expr<Set<K>>>::Eval;
+meta!{
+    pub type ListToSet<
+        K: EqualityComparableKind, 
+        L: Expr<List<K>>
+    >: Expr<Set<K>> =
+        VisitList<K, Set<K>, L, ListToSetVisitor<K>>;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct ListToSetVisitor<K: EqualityComparableKind> {
-        k: PhantomData<K>,
-    }
-
-    impl<K: EqualityComparableKind> ListVisitor<K, Set<K>> for ListToSetVisitor<K> {
-        type VisitEmptyList = EmptySet<K>;
-        type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> = AddToSet<K, Elem, ListToSet<K, Tail>>;
+    
+    meta!{
+        pub struct ListToSetVisitor<K: EqualityComparableKind>: ListVisitor<K, Set<K>> {
+            type VisitEmptyList = EmptySet<K>;
+            type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> = AddToSet<K, Elem, ListToSet<K, Tail>>;
+        }
     }
 }

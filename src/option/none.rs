@@ -12,34 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct None<K: Kind> {
-    k: PhantomData<K>,
-}
-
-impl<K: Kind> Expr<Option<K>> for None<K> {
-    type Eval = NoneValue<K>;
+meta!{
+    pub struct None<
+        K: Kind
+    >: Expr<Option<K>> {
+        type Eval = NoneValue<K>;
+    }
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
+    
+    meta!{
+        pub struct NoneValue<
+            K: Kind
+        >: OptionValue<K> {
+            type Impl = NoneImpl<K>;
+        }
 
-    pub struct NoneValue<K: Kind> {
-        k: PhantomData<K>,
-    }
-
-    impl<K: Kind> OptionValue<K> for NoneValue<K> {
-        type Impl = NoneImpl<K>;
-    }
-
-    pub struct NoneImpl<K: Kind> {
-        k: PhantomData<K>,
-    }
-
-    impl<K: Kind> OptionTrait<K> for NoneImpl<K> {
-        type Visit<ResultK: Kind, Visitor: OptionVisitor<K, ResultK>> = Visitor::VisitNone;
+        pub struct NoneImpl<
+            K: Kind
+        >: OptionTrait<K> {
+            type Visit<ResultK: Kind, Visitor: OptionVisitor<K, ResultK>> = Visitor::VisitNone;
+        }
     }
 }

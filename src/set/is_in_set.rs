@@ -12,31 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct IsInSet<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> {
-    k: PhantomData<K>,
-    x: PhantomData<X>,
-    s: PhantomData<S>,
-}
-
-impl<K: EqualityComparableKind, X: Expr<K>, S: Expr<Set<K>>> Expr<Bool> for IsInSet<K, X, S> {
-    type Eval = <VisitSet<K, Bool, S, IsInSetVisitor<K, X>> as Expr<Bool>>::Eval;
+meta!{
+    pub type IsInSet<
+        K: EqualityComparableKind, 
+        X: Expr<K>,
+        S: Expr<Set<K>>
+    >: Expr<Bool> =
+        VisitSet<K, Bool, S, IsInSetVisitor<K, X>>;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
-
-    pub struct IsInSetVisitor<K: EqualityComparableKind, X: Expr<K>> {
-        k: PhantomData<K>,
-        x: PhantomData<X>,
-    }
-
-    impl<K: EqualityComparableKind, X: Expr<K>> SetVisitor<K, Bool> for IsInSetVisitor<K, X> {
-        type VisitEmptySet = False;
-        type VisitCons<Elem: Expr<K>, Tail: Expr<Set<K>>> = Or<Equals<K, Elem, X>, IsInSet<K, X, Tail>>;
+    
+    meta!{
+        pub struct IsInSetVisitor<
+            K: EqualityComparableKind, 
+            X: Expr<K>
+        >: SetVisitor<K, Bool> {
+            type VisitEmptySet = False;
+            type VisitCons<Elem: Expr<K>, Tail: Expr<Set<K>>> = Or<Equals<K, Elem, X>, IsInSet<K, X, Tail>>;
+        }
     }
 }
 

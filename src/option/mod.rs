@@ -44,15 +44,14 @@ pub trait OptionVisitor<K: Kind, ResultK: Kind> {
     type VisitSome<X: Expr<K>>: Expr<ResultK>;
 }
 
-pub struct VisitOption<K: Kind, OutK: Kind, X: Expr<Option<K>>, V: OptionVisitor<K, OutK>> {
-    k: PhantomData<K>,
-    out_k: PhantomData<OutK>,
-    x: PhantomData<X>,
-    v: PhantomData<V>,
-}
-
-impl<K: Kind, OutK: Kind, X: Expr<Option<K>>, V: OptionVisitor<K, OutK>> Expr<OutK> for VisitOption<K, OutK, X, V> {
-    type Eval = <<AsOption<K, X> as OptionTrait<K>>::Visit<OutK, V> as Expr<OutK>>::Eval;
+meta!{
+    pub type VisitOption<
+        K: Kind, 
+        OutK: Kind, 
+        X: Expr<Option<K>>, 
+        V: OptionVisitor<K, OutK>
+    >: Expr<OutK> = 
+        <AsOption<K, X> as OptionTrait<K>>::Visit<OutK, V>;
 }
 
 mod internal {
@@ -83,34 +82,29 @@ mod internal {
     pub trait OptionTrait<K: Kind> {
         type Visit<ResultK: Kind, Visitor: OptionVisitor<K, ResultK>>: Expr<ResultK>;
     }
+    
+    meta!{
+        pub type OptionEquals<
+            K: EqualityComparableKind,
+            X: Expr<Option<K>>,
+            Y: Expr<Option<K>>
+        >: Expr<Bool> =
+            VisitOption<K, Bool, X, OptionEqualsVisitor<K, Y>>;
 
-    pub struct OptionEquals<K: EqualityComparableKind, X: Expr<Option<K>>, Y: Expr<Option<K>>> {
-        k: PhantomData<K>,
-        x: PhantomData<X>,
-        y: PhantomData<Y>,
-    }
+        pub struct OptionEqualsVisitor<
+            K: EqualityComparableKind,
+            Other: Expr<Option<K>>
+        >: OptionVisitor<K, Bool> {
+            type VisitNone = IsNone<K, Other>;
+            type VisitSome<X: Expr<K>> = VisitOption<K, Bool, Other, OptionEqualsSomeVisitor<K, X>>;
+        }
 
-    impl<K: EqualityComparableKind, X: Expr<Option<K>>, Y: Expr<Option<K>>> Expr<Bool> for OptionEquals<K, X, Y> {
-        type Eval = <VisitOption<K, Bool, X, OptionEqualsVisitor<K, Y>> as Expr<Bool>>::Eval;
-    }
-
-    pub struct OptionEqualsVisitor<K: EqualityComparableKind, Other: Expr<Option<K>>> {
-        k: PhantomData<K>,
-        other: PhantomData<Other>,
-    }
-
-    impl<K: EqualityComparableKind, Other: Expr<Option<K>>> OptionVisitor<K, Bool> for OptionEqualsVisitor<K, Other> {
-        type VisitNone = IsNone<K, Other>;
-        type VisitSome<X: Expr<K>> = VisitOption<K, Bool, Other, OptionEqualsSomeVisitor<K, X>>;
-    }
-
-    pub struct OptionEqualsSomeVisitor<K: EqualityComparableKind, Other: Expr<K>> {
-        k: PhantomData<K>,
-        other: PhantomData<Other>,
-    }
-
-    impl<K: EqualityComparableKind, Other: Expr<K>> OptionVisitor<K, Bool> for OptionEqualsSomeVisitor<K, Other> {
-        type VisitNone = False;
-        type VisitSome<X: Expr<K>> = Equals<K, X, Other>;
+        pub struct OptionEqualsSomeVisitor<
+            K: EqualityComparableKind, 
+            Other: Expr<K>
+        >: OptionVisitor<K, Bool> {
+            type VisitNone = False;
+            type VisitSome<X: Expr<K>> = Equals<K, X, Other>;
+        }
     }
 }

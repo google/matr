@@ -12,16 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct ReverseList<K: Kind, L: Expr<List<K>>> {
-    k: PhantomData<K>,
-    l: PhantomData<L>,
-}
-
-impl<K: Kind, L: Expr<List<K>>> Expr<List<K>> for ReverseList<K, L> {
-    type Eval = <ReversedListConcat<K, L, EmptyList<K>> as Expr<List<K>>>::Eval;
+meta!{
+    pub type ReverseList<
+        K: Kind, 
+        L: Expr<List<K>>
+    >: Expr<List<K>> =
+        ReversedListConcat<K, L, EmptyList<K>>;
 }
 
 mod internal {

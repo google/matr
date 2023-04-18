@@ -12,25 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct GetFirst<FirstK: KindWithDefault, SecondK: KindWithDefault, P: Expr<Pair<FirstK, SecondK>>> {
-    first_k: PhantomData<FirstK>,
-    second_k: PhantomData<SecondK>,
-    p: PhantomData<P>,
-}
-
-impl<FirstK: KindWithDefault, SecondK: KindWithDefault, P: Expr<Pair<FirstK, SecondK>>> Expr<FirstK> for GetFirst<FirstK, SecondK, P> {
-    type Eval = <<AsPair<FirstK, SecondK, P> as PairTrait<FirstK, SecondK>>::Visit<FirstK, GetFirstVisitor> as Expr<FirstK>>::Eval;
+meta!{
+    pub type GetFirst<
+        FirstK: KindWithDefault,
+        SecondK: KindWithDefault,
+        P: Expr<Pair<FirstK, SecondK>>
+    >: Expr<FirstK> =
+        <AsPair<FirstK, SecondK, P> as PairTrait<FirstK, SecondK>>::Visit<FirstK, GetFirstVisitor<FirstK, SecondK>>;
 }
 
 mod internal {
     pub use super::super::internal::*;
-
-    pub struct GetFirstVisitor {}
-
-    impl<FirstK: Kind, SecondK: Kind> PairVisitor<FirstK, SecondK, FirstK> for GetFirstVisitor {
-        type Visit<First: Expr<FirstK>, Second: Expr<SecondK>> = First;
+    
+    meta!{
+        pub struct GetFirstVisitor<FirstK: Kind, SecondK: Kind>: PairVisitor<FirstK, SecondK, FirstK> {
+            type Visit<First: Expr<FirstK>, Second: Expr<SecondK>> = First;
+        }
     }
 }

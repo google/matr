@@ -12,62 +12,57 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct MapCommonKeysWithDifferentValue<K: EqualityComparableKind, V: EqualityComparableKind, M1: Expr<Map<K, V>>, M2: Expr<Map<K, V>>> {
-    k: PhantomData<K>,
-    v: PhantomData<V>,
-    m1: PhantomData<M1>,
-    m2: PhantomData<M2>,
-}
-
-impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault + EqualityComparableKind, M1: Expr<Map<K, V>>, M2: Expr<Map<K, V>>> Expr<Map<K, Pair<V, V>>> for MapCommonKeysWithDifferentValue<K, V, M1, M2> {
-    type Eval = <VisitMap<K, V, Map<K, Pair<V, V>>, M1, MapCommonKeysWithDifferentValueVisitor<K, V, M2, EmptyMap<K, Pair<V, V>>>> as Expr<Map<K, Pair<V, V>>>>::Eval;
+meta!{
+    pub type MapCommonKeysWithDifferentValue<
+        K: EqualityComparableKind + KindWithDefault,
+        V: EqualityComparableKind + KindWithDefault, 
+        M1: Expr<Map<K, V>>, 
+        M2: Expr<Map<K, V>>
+    >: Expr<Map<K, Pair<V, V>>> =
+        VisitMap<K, V, Map<K, Pair<V, V>>, M1, MapCommonKeysWithDifferentValueVisitor<K, V, M2, EmptyMap<K, Pair<V, V>>>>;
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
+    
+    meta!{
+        pub struct MapCommonKeysWithDifferentValueVisitor<
+            K: KindWithDefault + EqualityComparableKind,
+            V: KindWithDefault + EqualityComparableKind, 
+            M: Expr<Map<K, V>>, 
+            ResultM: Expr<Map<K, Pair<V, V>>>
+        >: MapVisitor<K, V, Map<K, Pair<V, V>>> {
+            type VisitEmptyMap = EmptyMap<K, Pair<V, V>>;
+            type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> =
+                VisitMap<K, V, Map<K, Pair<V, V>>, Tail, MapCommonKeysWithDifferentValueVisitor<K, V, M,
+                    VisitOption<
+                        V,
+                        Map<K, Pair<V, V>>,
+                        MapGet<K, V, Key, M>,
+                        MapCommonKeysWithDifferentValueMapGetVisitor<K, V, M, ResultM, Key, Value>
+                    >
+            >>;
+        }
 
-    pub struct MapCommonKeysWithDifferentValueVisitor<K: EqualityComparableKind, V: EqualityComparableKind, M: Expr<Map<K, V>>, ResultM: Expr<Map<K, Pair<V, V>>>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        m: PhantomData<M>,
-        result_m: PhantomData<ResultM>,
-    }
-
-    impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault + EqualityComparableKind, M: Expr<Map<K, V>>, ResultM: Expr<Map<K, Pair<V, V>>>> MapVisitor<K, V, Map<K, Pair<V, V>>> for MapCommonKeysWithDifferentValueVisitor<K, V, M, ResultM> {
-        type VisitEmptyMap = EmptyMap<K, Pair<V, V>>;
-        type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> =
-            VisitMap<K, V, Map<K, Pair<V, V>>, Tail, MapCommonKeysWithDifferentValueVisitor<K, V, M,
-                VisitOption<
-                    V,
-                    Map<K, Pair<V, V>>,
-                    MapGet<K, V, Key, M>,
-                    MapCommonKeysWithDifferentValueMapGetVisitor<K, V, M, ResultM, Key, Value>
-                >
-        >>;
-    }
-
-    pub struct MapCommonKeysWithDifferentValueMapGetVisitor<K: EqualityComparableKind, V: EqualityComparableKind, M: Expr<Map<K, V>>, ResultM: Expr<Map<K, Pair<V, V>>>, Key: Expr<K>, Value: Expr<V>> {
-        k: PhantomData<K>,
-        v: PhantomData<V>,
-        m: PhantomData<M>,
-        result_m: PhantomData<ResultM>,
-        key: PhantomData<Key>,
-        value: PhantomData<Value>,
-    }
-
-    impl<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault + EqualityComparableKind, M: Expr<Map<K, V>>, ResultM: Expr<Map<K, Pair<V, V>>>, Key: Expr<K>, Value: Expr<V>> OptionVisitor<V, Map<K, Pair<V, V>>> for MapCommonKeysWithDifferentValueMapGetVisitor<K, V, M, ResultM, Key, Value> {
-        type VisitNone = ResultM;
-        type VisitSome<ValueInMap: Expr<V>> =
-            If<Map<K, Pair<V, V>>,
-                Not<Equals<V,
-                    ValueInMap,
-                    Value>>,
-                Put<K, Pair<V, V>, Key, ConsPair<V, V, ValueInMap, Value>, ResultM>,
-                ResultM>;
+        pub struct MapCommonKeysWithDifferentValueMapGetVisitor<
+            K: KindWithDefault + EqualityComparableKind, 
+            V: KindWithDefault + EqualityComparableKind, 
+            M: Expr<Map<K, V>>, 
+            ResultM: Expr<Map<K, Pair<V, V>>>, 
+            Key: Expr<K>, 
+            Value: Expr<V>
+        >: OptionVisitor<V, Map<K, Pair<V, V>>> {
+            type VisitNone = ResultM;
+            type VisitSome<ValueInMap: Expr<V>> =
+                If<Map<K, Pair<V, V>>,
+                    Not<Equals<V,
+                        ValueInMap,
+                        Value>>,
+                    Put<K, Pair<V, V>, Key, ConsPair<V, V, ValueInMap, Value>, ResultM>,
+                    ResultM>;
+        }
     }
 }
 

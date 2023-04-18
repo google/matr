@@ -12,34 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
 // Converts a List<Pair<Type, Type> into a tuple of the form (T0, (T1, (T2, ()))).
-pub struct ToTypePairNestedTuple<L: Expr<List<Pair<Type, Type>>>> {
-    l: PhantomData<L>,
-}
-
-impl<L: Expr<List<Pair<Type, Type>>>> Expr<Type> for ToTypePairNestedTuple<L> {
-    type Eval = <VisitList<Pair<Type, Type>, Type, L, ToTypePairNestedTupleVisitor> as Expr<Type>>::Eval;
+meta!{
+    pub type ToTypePairNestedTuple<
+        L: Expr<List<Pair<Type, Type>>>
+    >: Expr<Type> =
+        VisitList<Pair<Type, Type>, Type, L, ToTypePairNestedTupleVisitor>;
 }
 
 mod internal {
     pub use super::super::internal::*;
     
-    pub struct ToTypePairNestedTupleVisitor {}
-
-    impl ListVisitor<Pair<Type, Type>, Type> for ToTypePairNestedTupleVisitor {
-        type VisitEmptyList = WrapType<()>;
-        type VisitCons<Elem: Expr<Pair<Type, Type>>, Tail: Expr<List<Pair<Type, Type>>>> = WrapType<(
-            (
-                <GetType<GetFirst<Type, Type, Elem>> as GetTypeTrait>::Get,
-                <GetType<GetSecond<Type, Type, Elem>> as GetTypeTrait>::Get,
-            ),
-            <GetType<ToTypePairNestedTuple<Tail>> as GetTypeTrait>::Get
-        )>;
+    meta!{
+        pub struct ToTypePairNestedTupleVisitor: ListVisitor<Pair<Type, Type>, Type> {
+            type VisitEmptyList = WrapType<()>;
+            type VisitCons<Elem: Expr<Pair<Type, Type>>, Tail: Expr<List<Pair<Type, Type>>>> = WrapType<(
+                (
+                    <GetType<GetFirst<Type, Type, Elem>> as GetTypeTrait>::Get,
+                    <GetType<GetSecond<Type, Type, Elem>> as GetTypeTrait>::Get,
+                ),
+                <GetType<ToTypePairNestedTuple<Tail>> as GetTypeTrait>::Get
+            )>;
+        }
     }
-
 }
 
 #[cfg(test)]

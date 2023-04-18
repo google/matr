@@ -12,34 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct EmptyList<K: Kind> {
-    k: PhantomData<K>,
-}
-
-impl<K: Kind> Expr<List<K>> for EmptyList<K> {
-    type Eval = EmptyListValue<K>;
+meta!{
+    pub struct EmptyList<
+        K: Kind
+    >: Expr<List<K>> {
+        type Eval = EmptyListValue<K>;
+    }
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
+    
+    meta!{
+        pub struct EmptyListValue<
+            K: Kind
+        >: ListValue<K> {
+            type Impl = EmptyListImpl<K>;
+        }
 
-    pub struct EmptyListValue<K: Kind> {
-        k: PhantomData<K>,
-    }
-
-    impl<K: Kind> ListValue<K> for EmptyListValue<K> {
-        type Impl = EmptyListImpl<K>;
-    }
-
-    pub struct EmptyListImpl<K: Kind> {
-        k: PhantomData<K>,
-    }
-
-    impl<K: Kind> ListTrait<K> for EmptyListImpl<K> {
-        type Visit<ResultK: Kind, V: ListVisitor<K, ResultK>> = V::VisitEmptyList;
+        pub struct EmptyListImpl<
+            K: Kind
+        >: ListTrait<K> {
+            type Visit<ResultK: Kind, V: ListVisitor<K, ResultK>> = V::VisitEmptyList;
+        }
     }
 }

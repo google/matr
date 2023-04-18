@@ -12,16 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct EmptyMap<K: EqualityComparableKind, V: Kind> {
-    k: PhantomData<K>,
-    v: PhantomData<V>,
-}
-
-impl<K: EqualityComparableKind, V: Kind> Expr<Map<K, V>> for EmptyMap<K, V> {
-    type Eval = <ListToMapUnchecked<K, V, EmptyList<Pair<K, V>>> as Expr<Map<K, V>>>::Eval;
+meta!{
+    pub type EmptyMap<
+        K: EqualityComparableKind,
+        V: Kind
+    >: Expr<Map<K, V>> =
+        ListToMapUnchecked<K, V, EmptyList<Pair<K, V>>>;
 }
 
 mod internal {

@@ -12,24 +12,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct Put<KeyK: EqualityComparableKind + KindWithDefault, ValueK: KindWithDefault, Key: Expr<KeyK>, Value: Expr<ValueK>, M: Expr<Map<KeyK, ValueK>>> {
-    key_k: PhantomData<KeyK>,
-    value_k: PhantomData<ValueK>,
-    key: PhantomData<Key>,
-    value: PhantomData<Value>,
-    m: PhantomData<M>,
-}
-
-impl<KeyK: EqualityComparableKind + KindWithDefault, ValueK: KindWithDefault, Key: Expr<KeyK>, Value: Expr<ValueK>, M: Expr<Map<KeyK, ValueK>>> Expr<Map<KeyK, ValueK>> for Put<KeyK, ValueK, Key, Value, M> {
-    type Eval = <If<
-        Map<KeyK, ValueK>,
-        IsInMap<KeyK, ValueK, Key, M>,
-        M,
-        ListToMapUnchecked<KeyK, ValueK, Cons<Pair<KeyK, ValueK>, ConsPair<KeyK, ValueK, Key, Value>, MapToList<KeyK, ValueK, M>>>
-    > as Expr<Map<KeyK, ValueK>>>::Eval;
+meta!{
+    pub type Put<
+        KeyK: EqualityComparableKind + KindWithDefault, 
+        ValueK: KindWithDefault, 
+        Key: Expr<KeyK>,
+        Value: Expr<ValueK>, 
+        M: Expr<Map<KeyK, ValueK>>
+    >: Expr<Map<KeyK, ValueK>> =
+        If<
+            Map<KeyK, ValueK>,
+            IsInMap<KeyK, ValueK, Key, M>,
+            M,
+            ListToMapUnchecked<KeyK, ValueK, Cons<Pair<KeyK, ValueK>, ConsPair<KeyK, ValueK, Key, Value>, MapToList<KeyK, ValueK, M>>>
+        >;
 }
 
 mod internal {

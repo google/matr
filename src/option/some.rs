@@ -12,37 +12,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct Some<K: Kind, X: Expr<K>> {
-    k: PhantomData<K>,
-    x: PhantomData<X>,
-}
-
-impl<K: Kind, X: Expr<K>> Expr<Option<K>> for Some<K, X> {
-    type Eval = SomeValue<K, X>;
+meta!{
+    pub struct Some<
+        K: Kind,
+        X: Expr<K>
+    >: Expr<Option<K>> {
+        type Eval = SomeValue<K, X>;
+    }
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
 
-    pub struct SomeValue<K: Kind, X: Expr<K>> {
-        k: PhantomData<K>,
-        x: PhantomData<X>,
-    }
+    meta!{
+        pub struct SomeValue<
+            K: Kind,
+            X: Expr<K>
+        >: OptionValue<K> {
+            type Impl = SomeImpl<K, X>;
+        }
 
-    impl<K: Kind, X: Expr<K>> OptionValue<K> for SomeValue<K, X> {
-        type Impl = SomeImpl<K, X>;
-    }
-
-    pub struct SomeImpl<K: Kind, X: Expr<K>> {
-        k: PhantomData<K>,
-        x: PhantomData<X>,
-    }
-
-    impl<K: Kind, X: Expr<K>> OptionTrait<K> for SomeImpl<K, X> {
-        type Visit<ResultK: Kind, Visitor: OptionVisitor<K, ResultK>> = Visitor::VisitSome<X>;
+        pub struct SomeImpl<
+            K: Kind,
+            X: Expr<K>
+        >: OptionTrait<K> {
+            type Visit<ResultK: Kind, Visitor: OptionVisitor<K, ResultK>> = Visitor::VisitSome<X>;
+        }
     }
 }

@@ -12,16 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use super::internal::*;
 
-pub struct And<X: Expr<Bool>, Y: Expr<Bool>> {
-    x: PhantomData<X>,
-    y: PhantomData<Y>,
-}
-
-impl<X: Expr<Bool>, Y: Expr<Bool>> Expr<Bool> for And<X, Y> {
-    type Eval = <If<Bool, X, Y, False> as Expr<Bool>>::Eval;
+meta!{
+    pub type And<
+        X: Expr<Bool>,
+        Y: Expr<Bool>
+    >: Expr<Bool> =
+        If<Bool, X, Y, False>;
 }
 
 mod internal {

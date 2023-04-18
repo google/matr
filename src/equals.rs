@@ -12,21 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use crate::*;
 
 pub trait EqualityComparableKind: Kind {
     type Eq<X: Expr<Self>, Y: Expr<Self>>: Expr<Bool>;
 }
 
-pub struct Equals<K: EqualityComparableKind, X: Expr<K>, Y: Expr<K>> {
-    k: PhantomData<K>,
-    x: PhantomData<X>,
-    y: PhantomData<Y>,
-}
-
-impl<K: EqualityComparableKind, X: Expr<K>, Y: Expr<K>> Expr<Bool> for Equals<K, X, Y> {
-    type Eval = <<K as EqualityComparableKind>::Eq<X, Y> as Expr<Bool>>::Eval;
+meta!{
+    pub type Equals<
+        K: EqualityComparableKind,
+        X: Expr<K>,
+        Y: Expr<K>
+    >: Expr<Bool> =
+        <K as EqualityComparableKind>::Eq<X, Y>;
 }
 
 #[cfg(test)]

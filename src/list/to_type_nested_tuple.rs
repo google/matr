@@ -12,31 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
 // Converts a List<Type> into a tuple of the form (T0, (T1, (T2, ()))).
-pub struct ToTypeNestedTuple<L: Expr<List<Type>>> {
-    l: PhantomData<L>,
-}
-
-impl<L: Expr<List<Type>>> Expr<Type> for ToTypeNestedTuple<L> {
-    type Eval = <VisitList<Type, Type, L, ToTypeNestedTupleVisitor> as Expr<Type>>::Eval;
+meta!{
+    pub type ToTypeNestedTuple<
+        L: Expr<List<Type>>
+    >: Expr<Type> =
+        VisitList<Type, Type, L, ToTypeNestedTupleVisitor>;
 }
 
 mod internal {
     pub use super::super::internal::*;
-    
-    pub struct ToTypeNestedTupleVisitor {}
 
-    impl ListVisitor<Type, Type> for ToTypeNestedTupleVisitor {
-        type VisitEmptyList = WrapType<()>;
-        type VisitCons<Elem: Expr<Type>, Tail: Expr<List<Type>>> = WrapType<(
-            <GetType<Elem> as GetTypeTrait>::Get,
-            <GetType<ToTypeNestedTuple<Tail>> as GetTypeTrait>::Get
-        )>;
+    meta!{
+        pub struct ToTypeNestedTupleVisitor: ListVisitor<Type, Type> {
+            type VisitEmptyList = WrapType<()>;
+            type VisitCons<Elem: Expr<Type>, Tail: Expr<List<Type>>> = WrapType<(
+                <GetType<Elem> as GetTypeTrait>::Get,
+                <GetType<ToTypeNestedTuple<Tail>> as GetTypeTrait>::Get
+            )>;
+        }
     }
-
 }
 
 #[cfg(test)]
