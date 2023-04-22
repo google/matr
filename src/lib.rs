@@ -16,6 +16,9 @@
 #![feature(specialization)]
 #![feature(const_trait_impl)]
 
+mod assertions;
+mod meta;
+
 mod bool;
 mod const_fn;
 mod result;
@@ -33,7 +36,8 @@ mod set;
 mod map;
 mod pair;
 mod option;
-mod meta;
+mod kind_with_debug_form;
+mod expr_wrapper;
 
 pub use crate::bool::*;
 pub use const_fn::*;
@@ -54,3 +58,5 @@ pub use kind_with_default::*;
 pub use crate::usize::*;
 pub use option::*;
 pub use meta::*;
+pub use kind_with_debug_form::*;
+pub use expr_wrapper::*;

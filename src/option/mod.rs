@@ -39,6 +39,10 @@ impl<K: Kind> KindWithDefault for Option<K> {
     type Default = None<K>;
 }
 
+impl<K: Kind> KindWithDebugForm for Option<K> {
+    type DebugForm<X: Expr<Option<K>>> = VisitOption<K, ExprWrapper<Option<K>>, X, ToOptionDebugFormVisitor<K>>;
+}
+
 pub trait OptionVisitor<K: Kind, ResultK: Kind> {
     type VisitNone: Expr<ResultK>;
     type VisitSome<X: Expr<K>>: Expr<ResultK>;
@@ -84,6 +88,12 @@ mod internal {
     }
     
     meta!{
+
+        pub struct ToOptionDebugFormVisitor<K: Kind>: OptionVisitor<K, ExprWrapper<Option<K>>> {
+            type VisitNone = WrapExpr<Option<K>, None<K>>;
+            type VisitSome<X: Expr<K>> = WrapExpr<Option<K>, Some<K, X>>;
+        }
+
         pub type OptionEquals<
             K: EqualityComparableKind,
             X: Expr<Option<K>>,

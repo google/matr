@@ -122,7 +122,7 @@ macro_rules! meta {
         // Semantically `$ReturnIdents1:ident $($ReturnIdents2:ident)?` is really
         // `$($ConstQualifier:ident)? $ReturnIdents:ident` but Rust doesn't support matching that
         // directly.
-        >)?: $($ReturnIdents1:ident $($ReturnIdents2:ident)? $(<$ReturnIdentsTypeArg1:ty $(, $ReturnIdentsTypeArgs:ty)* >)?)::* {
+        >)?: $($ReturnIdents1:ident $($ReturnIdents2:ident)? $(<$($ReturnIdentsTypeArgs:ty),*>)?)::* {
             $($Body:tt)*
         }
         $($Tail:tt)*
@@ -152,7 +152,7 @@ macro_rules! meta {
                     )*
                 )*
             ),*
-        >)* $($ReturnIdents1 $($ReturnIdents2)* $(<$ReturnIdentsTypeArg1 $(, $ReturnIdentsTypeArgs)* >)*)::* for $Fn $(<$($Args),*>)* {
+        >)* $($ReturnIdents1 $($ReturnIdents2)* $(<$($ReturnIdentsTypeArgs),*>)*)::* for $Fn $(<$($Args),*>)* {
             $($Body)*
         }
 

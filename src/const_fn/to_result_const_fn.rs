@@ -53,7 +53,11 @@ mod internal {
             Args,
             X: Expr<ConstFn<Out, Args>>
         >: ConstFnValue<std::result::Result<Out, &'static str>, Args> {
-            type Impl = ToResultConstFnAdapterImpl<Out, Args, X>;
+            type Impl = ToResultConstFnAdapterImplWrapper<Out, Args, X>;
+        }
+
+        pub struct ToResultConstFnAdapterImplWrapper<Out, Args, X: Expr<ConstFn<Out, Args>>>: ConstFnTraitWrapper<std::result::Result<Out, &'static str>, Args> {
+            type Fn = ToResultConstFnAdapterImpl<Out, Args, X>;
         }
 
         pub struct ToResultConstFnAdapterImpl<Out, Args, X: Expr<ConstFn<Out, Args>>>: const ConstFnTrait<std::result::Result<Out, &'static str>, Args> {
@@ -67,7 +71,11 @@ mod internal {
         }
 
         pub struct ToResultConstFnErrorValue<Out, Args: ~const Destruct>: ConstFnValue<std::result::Result<Out, &'static str>, Args> {
-            type Impl = ToResultConstFnErrorImpl<Out, Args>;
+            type Impl = ToResultConstFnErrorImplWrapper<Out, Args>;
+        }
+
+        pub struct ToResultConstFnErrorImplWrapper<Out, Args: ~const Destruct>: ConstFnTraitWrapper<std::result::Result<Out, &'static str>, Args> {
+            type Fn = ToResultConstFnErrorImpl<Out, Args>;
         }
 
         pub struct ToResultConstFnErrorImpl<Out, Args: ~const Destruct>: const ConstFnTrait<std::result::Result<Out, &'static str>, Args> {

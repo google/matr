@@ -33,15 +33,15 @@ mod tests {
 
     #[test]
     fn and() {
-        assert_true!(And<True, True>);
-        assert_false!(And<True, False>);
-        assert_false!(And<False, True>);
-        assert_false!(And<False, False>);
+        meta_assert_eq!(Bool, And<True, True>, True);
+        meta_assert_eq!(Bool, And<True, False>, False);
+        meta_assert_eq!(Bool, And<False, True>, False);
+        meta_assert_eq!(Bool, And<False, False>, False);
     }
 
     #[test]
     fn and_does_not_eval_other_branch() {
-        assert_false!(And<False, LongRecursion<Zero>>);
+        meta_assert_eq!(Bool, And<False, LongRecursion<Zero>>, False);
 
         // This causes a build error: "overflow evaluating the requirement" (as desired).
         // assert_true!(And<True, LongRecursion<Zero>>);

@@ -44,18 +44,18 @@ mod tests {
 
     #[test]
     fn is_in_empty_list() {
-        assert_false!(IsInList<Type, WrapType<i32>, EmptyList<Type>>);
+        meta_assert_eq!(Bool, IsInList<Type, WrapType<i32>, EmptyList<Type>>, False);
     }
 
     #[test]
     fn is_in_list_found() {
         type L = type_list![i32, f64, usize];
-        assert_true!(IsInList<Type, WrapType<f64>, L>);
+        meta_assert_eq!(Bool, IsInList<Type, WrapType<f64>, L>, True);
     }
 
     #[test]
     fn is_in_list_not_found() {
         type L = type_list![i32, f64, usize];
-        assert_false!(IsInList<Type, WrapType<u32>, L>);
+        meta_assert_eq!(Bool, IsInList<Type, WrapType<u32>, L>, False);
     }
 }

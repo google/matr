@@ -46,7 +46,7 @@ mod tests {
 
     #[test]
     fn empty_list_to_type_nested_tuple() {
-        assert_type_eq!(ToTypePairNestedTuple<EmptyList<Pair<Type, Type>>>, WrapType<()>);
+        meta_assert_eq!(Type, ToTypePairNestedTuple<EmptyList<Pair<Type, Type>>>, WrapType<()>);
     }
 
     #[test]
@@ -55,6 +55,6 @@ mod tests {
             ConsPair<Type, Type, WrapType<usize>, WrapType<isize>>,
             ConsPair<Type, Type, WrapType<f32>, WrapType<f64>>,
             ConsPair<Type, Type, WrapType<u64>, WrapType<i64>>]);
-        assert_type_eq!(ToTypePairNestedTuple<L>, WrapType<((usize, isize), ((f32, f64), ((u64, i64), ())))>);
+        meta_assert_eq!(Type, ToTypePairNestedTuple<L>, WrapType<((usize, isize), ((f32, f64), ((u64, i64), ())))>);
     }
 }

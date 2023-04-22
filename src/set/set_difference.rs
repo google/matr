@@ -32,7 +32,7 @@ mod internal {
             S: Expr<Set<K>>, 
             ResultS: Expr<Set<K>>
         >: SetVisitor<K, Set<K>> {
-            type VisitEmptySet = EmptySet<K>;
+            type VisitEmptySet = ResultS;
             type VisitCons<Elem: Expr<K>, Tail: Expr<Set<K>>> =
                 VisitSet<K, Set<K>, Tail, SetDifferenceVisitor<K, S,
                     If<Set<K>,
@@ -51,40 +51,41 @@ mod tests {
 
     #[test]
     fn is_empty_set_and_empty_set() {
-        assert_type_set_eq!(SetDifference<Type, EmptySet<Type>, EmptySet<Type>>, EmptySet<Type>);
+        meta_assert_eq!(Set<Type>, SetDifference<Type, EmptySet<Type>, EmptySet<Type>>, EmptySet<Type>);
     }
 
     #[test]
     fn is_non_empty_set_and_empty_set() {
         type S = AddToSet<Type, WrapType<i32>, EmptySet<Type>>;
-        assert_type_set_eq!(SetDifference<Type, S, EmptySet<Type>>, S);
+        meta_assert_eq!(Set<Type>, SetDifference<Type, S, EmptySet<Type>>, S);
     }
 
     #[test]
     fn is_empty_set_and_non_empty_set() {
         type S = AddToSet<Type, WrapType<i32>, EmptySet<Type>>;
-        assert_type_set_eq!(SetDifference<Type, EmptySet<Type>, S>, S);
+        meta_assert_eq!(Set<Type>, SetDifference<Type, EmptySet<Type>, S>, EmptySet<Type>);
     }
 
     #[test]
-    fn union_subset() {
+    fn subset() {
         type S1 = AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<f64>, EmptySet<Type>>>;
         type S2 = AddToSet<Type, WrapType<u32>, AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<u64>, AddToSet<Type, WrapType<f64>, EmptySet<Type>>>>>;
-        assert_type_set_eq!(SetDifference<Type, S1, S2>, S2);
+        meta_assert_eq!(Set<Type>, SetDifference<Type, S1, S2>, EmptySet<Type>);
     }
 
     #[test]
-    fn union_superset() {
+    fn superset() {
         type S1 = AddToSet<Type, WrapType<u32>, AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<u64>, AddToSet<Type, WrapType<f64>, EmptySet<Type>>>>>;
         type S2 = AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<f64>, EmptySet<Type>>>;
-        assert_type_set_eq!(SetDifference<Type, S1, S2>, S1);
+        type S3 = AddToSet<Type, WrapType<u32>, AddToSet<Type, WrapType<u64>, EmptySet<Type>>>;
+        meta_assert_eq!(Set<Type>, SetDifference<Type, S1, S2>, S3);
     }
 
     #[test]
-    fn union_general() {
+    fn general() {
         type S1 = AddToSet<Type, WrapType<u32>, AddToSet<Type, WrapType<i32>, EmptySet<Type>>>;
         type S2 = AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<f64>, EmptySet<Type>>>;
-        type S3 = AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<f64>, AddToSet<Type, WrapType<f64>, EmptySet<Type>>>>;
-        assert_type_set_eq!(SetDifference<Type, S1, S2>, S3);
+        type S3 = AddToSet<Type, WrapType<u32>, EmptySet<Type>>;
+        meta_assert_eq!(Set<Type>, SetDifference<Type, S1, S2>, S3);
     }
 }

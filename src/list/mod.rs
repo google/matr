@@ -60,6 +60,10 @@ impl<K: Kind> KindWithDefault for List<K> {
     type Default = EmptyList<K>;
 }
 
+impl<K: EqualityComparableKind> KindWithDebugForm for List<K> {
+    type DebugForm<L: Expr<List<K>>> = VisitList<K, ExprWrapper<List<K>>, L, ToListDebugFormVisitor<K>>;
+}
+
 pub trait ListValue<K: Kind> {
     type Impl: ListTrait<K>;
 }
@@ -105,6 +109,13 @@ mod internal {
     }
 
     meta!{
+        pub struct ToListDebugFormVisitor<K: Kind>: ListVisitor<K, ExprWrapper<List<K>>> {
+            type VisitEmptyList = WrapExpr<List<K>, EmptyList<K>>;
+            type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> = WrapExpr<List<K>, Cons<K, Elem,
+                <AsWrappedExpr<List<K>, VisitList<K, ExprWrapper<List<K>>, Tail, ToListDebugFormVisitor<K>>> as AsWrappedExprTrait<List<K>>>::Get
+            >>;
+        }
+
         pub type ListEquals<
             K: EqualityComparableKind,
             X: Expr<List<K>>,

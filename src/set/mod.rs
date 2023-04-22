@@ -17,7 +17,6 @@ mod add_to_set;
 mod is_in_set;
 mod is_subset;
 mod set_union;
-pub mod assertions;
 mod set_to_list;
 mod set_intersection;
 mod set_difference;
@@ -56,6 +55,11 @@ impl<K: EqualityComparableKind> KindWithDefault for Set<K> {
     type Default = EmptySet<K>;
 }
 
+impl<K: EqualityComparableKind> KindWithDebugForm for Set<K> {
+    type DebugForm<S: Expr<Set<K>>> =
+        VisitSet<K, ExprWrapper<Set<K>>, S, ToSetDebugFormVisitor<K>>;
+}
+
 pub trait SetVisitor<ElemK: EqualityComparableKind, OutK: Kind> {
     type VisitEmptySet: Expr<OutK>;
     type VisitCons<Elem: Expr<ElemK>, Tail: Expr<Set<ElemK>>>: Expr<OutK>;
@@ -76,6 +80,14 @@ mod internal {
     pub use crate::*;
 
     meta!{
+        pub struct ToSetDebugFormVisitor<K: EqualityComparableKind>: SetVisitor<K, ExprWrapper<Set<K>>> {
+            type VisitEmptySet = WrapExpr<Set<K>, EmptySet<K>>;
+            type VisitCons<Elem: Expr<K>, Tail: Expr<Set<K>>> =
+                WrapExpr<Set<K>, AddToSet<K, Elem,
+                    <AsWrappedExpr<Set<K>, VisitSet<K, ExprWrapper<Set<K>>, Tail, ToSetDebugFormVisitor<K>>> as AsWrappedExprTrait<Set<K>>>::Get
+                >>;
+        }
+
         pub struct SetVisitorToListVisitorAdapter<
             ElemK: EqualityComparableKind,
             OutK: Kind,

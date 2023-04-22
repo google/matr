@@ -57,11 +57,33 @@ impl<K: Kind, OutK: Kind, R: Expr<Result<K>>, V: ResultVisitor<K, OutK>> Expr<Ou
     type Eval = <<AsResult<K, R> as ResultTrait<K>>::Visit<OutK, V> as Expr<OutK>>::Eval;
 }
 
+impl<K: EqualityComparableKind> EqualityComparableKind for Result<K> {
+    type Eq<X: Expr<Result<K>>, Y: Expr<Result<K>>> = VisitResult<K, Bool, X, ResultEqualsVisitor<K, Y>>;
+}
+
+impl<K: KindWithDebugForm + KindWithDefault> KindWithDebugForm for Result<K> {
+    type DebugForm<R: Expr<Result<K>>> = VisitResult<K, ExprWrapper<Result<K>>, R, ResultDebugFormVisitor<K>>;
+}
+
 // These have to be public because otherwise Rust would complain that "can't leak private type".
 // But they should never be explicitly referenced elsewhere.
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
+
+    meta!{
+        pub struct ResultDebugFormVisitor<
+            K: KindWithDebugForm + KindWithDefault
+        >: ResultVisitor<K, ExprWrapper<Result<K>>> {
+            type VisitErr<E> = WrapExpr<Result<K>, Err<K, E>>;
+            type VisitOk<V: Expr<K>> = WrapExpr<
+                Result<K>,
+                Ok<K,
+                    <AsWrappedExpr<K, K::DebugForm<V>> as AsWrappedExprTrait<K>>::Get
+                >
+            >;
+        }
+    }
 
     pub trait ResultValue<K: Kind> {
         type Impl: ResultTrait<K>;
@@ -89,5 +111,31 @@ mod internal {
 
     impl<K: Kind, V: Expr<Result<K>>> ResultTrait<K> for AsResult<K, V> where <<V as Expr<Result<K>>>::Eval as Value<Result<K>>>::UnconstrainedImpl: ResultTrait<K> {
         type Visit<ResultK: Kind, Visitor: ResultVisitor<K, ResultK>> = <<<V as Expr<Result<K>>>::Eval as Value<Result<K>>>::UnconstrainedImpl as ResultTrait<K>>::Visit<ResultK, Visitor>;
+    }
+
+    meta!{
+        pub struct ResultEqualsVisitor<
+            K: EqualityComparableKind,
+            Other: Expr<Result<K>>
+        >: ResultVisitor<K, Bool> {
+            type VisitOk<V: Expr<K>> = VisitResult<K, Bool, Other, ResultEqualsValueVisitor<K, V>>;
+            type VisitErr<E> = VisitResult<K, Bool, Other, ResultEqualsErrorVisitor<K, E>>;
+        }
+
+        pub struct ResultEqualsValueVisitor<
+            K: EqualityComparableKind,
+            OtherV: Expr<K>
+        >: ResultVisitor<K, Bool> {
+            type VisitOk<V: Expr<K>> = Equals<K, V, OtherV>;
+            type VisitErr<E> = False;
+        }
+
+        pub struct ResultEqualsErrorVisitor<
+            K: EqualityComparableKind,
+            OtherE
+        >: ResultVisitor<K, Bool> {
+            type VisitOk<V: Expr<K>> = False;
+            type VisitErr<E> = Equals<Type, WrapType<E>, WrapType<OtherE>>;
+        }
     }
 }

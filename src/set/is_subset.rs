@@ -44,32 +44,32 @@ mod tests {
 
     #[test]
     fn is_empty_set_in_empty_set() {
-        assert_true!(IsSubset<Type, EmptySet<Type>, EmptySet<Type>>);
+        meta_assert_eq!(Bool, IsSubset<Type, EmptySet<Type>, EmptySet<Type>>, True);
     }
 
     #[test]
     fn is_non_empty_set_in_empty_set() {
         type S = AddToSet<Type, WrapType<i32>, EmptySet<Type>>;
-        assert_false!(IsSubset<Type, S, EmptySet<Type>>);
+        meta_assert_eq!(Bool, IsSubset<Type, S, EmptySet<Type>>, False);
     }
 
     #[test]
     fn is_empty_set_in_non_empty_set() {
         type S = AddToSet<Type, WrapType<i32>, EmptySet<Type>>;
-        assert_true!(IsSubset<Type, EmptySet<Type>, S>);
+        meta_assert_eq!(Bool, IsSubset<Type, EmptySet<Type>, S>, True);
     }
 
     #[test]
     fn subset() {
         type S1 = AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<f64>, EmptySet<Type>>>;
         type S2 = AddToSet<Type, WrapType<u32>, AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<u64>, AddToSet<Type, WrapType<f64>, EmptySet<Type>>>>>;
-        assert_true!(IsSubset<Type, S1, S2>);
+        meta_assert_eq!(Bool, IsSubset<Type, S1, S2>, True);
     }
 
     #[test]
     fn not_subset() {
         type S1 = AddToSet<Type, WrapType<u32>, AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<u64>, AddToSet<Type, WrapType<f64>, EmptySet<Type>>>>>;
         type S2 = AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<f64>, EmptySet<Type>>>;
-        assert_false!(IsSubset<Type, S1, S2>);
+        meta_assert_eq!(Bool, IsSubset<Type, S1, S2>, False);
     }
 }

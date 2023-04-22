@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-pub mod assertions;
 mod get_type;
 
 pub use get_type::*;
@@ -36,6 +35,10 @@ impl EqualityComparableKind for Type {
     type Eq<X: Expr<Type>, Y: Expr<Type>> = IsEqualToType<X, Y>;
 }
 
+impl KindWithDebugForm for Type {
+    type DebugForm<T: Expr<Type>> = WrapExpr<Type, WrapType<<GetType<T> as GetTypeTrait>::Get>>;
+}
+
 pub struct WrapType<T> {
     t: PhantomData<T>,
 }
@@ -57,7 +60,7 @@ impl<T: TypeValue> Value<Type> for T {
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
-    
+
     pub struct IsEqualToTypeImplHelper<X, Y> {
         x: PhantomData<X>,
         y: PhantomData<Y>,
@@ -81,10 +84,10 @@ mod internal {
     impl<X: Value<Type>, Y: Value<Type>> crate::bool::internal::BoolValue for IsEqualToTypeImpl<X, Y> {
         type Impl = IsEqualToTypeImplHelper<X::UnconstrainedImpl, Y::UnconstrainedImpl>;
     }
-    
+
     meta!{
         pub struct IsEqualToType<
-            X: Expr<Type>, 
+            X: Expr<Type>,
             Y: Expr<Type>
         >: Expr<Bool> {
             type Eval = IsEqualToTypeImpl<X::Eval, Y::Eval>;
@@ -99,8 +102,8 @@ mod tests {
 
     #[test]
     fn is_equal_to_type() {
-        assert_true!(IsEqualToType<WrapType<i32>, WrapType<i32>>);
-        assert_false!(IsEqualToType<WrapType<i32>, WrapType<i64>>);
+        meta_assert_eq!(Bool, IsEqualToType<WrapType<i32>, WrapType<i32>>, True);
+        meta_assert_eq!(Bool, IsEqualToType<WrapType<i32>, WrapType<i64>>, False);
     }
 }
 

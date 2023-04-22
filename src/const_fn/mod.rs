@@ -35,8 +35,16 @@ pub trait ConstFnTrait<Result, Args> {
     fn apply(args: Args) -> Result;
 }
 
+// This wrapper is needed (rather than using ConstFnTrait as trait directly) so that we can
+// specialize based on whether ConstFnTraitWrapper is implemented or not.
+// Specializing on const traits doesn't seem to work ATM (as of Rust nightly 2023-04-20), if that
+// becomes supported then we can get rid of this.
+pub trait ConstFnTraitWrapper<Result, Args> {
+    type Fn: ~const ConstFnTrait<Result, Args>;
+}
+
 pub trait ConstFnValue<Result, Args> {
-    type Impl: ~const ConstFnTrait<Result, Args>;
+    type Impl: ConstFnTraitWrapper<Result, Args>;
 }
 
 impl<Result, Args, U: ConstFnValue<Result, Args>> Value<ConstFn<Result, Args>> for U {
@@ -49,17 +57,13 @@ pub struct AsConstFn<Result, Args, Fn: Expr<ConstFn<Result, Args>>> {
     f: PhantomData<Fn>,
 }
 
-impl<Result, Args, Fn: Expr<ConstFn<Result, Args>>> const ConstFnTrait<Result, Args> for AsConstFn<Result, Args, Fn> {
-    default fn apply(_: Args) -> Result {
-        panic!("AsConstFn was called on a Value<ConstFn<...>> that does not implement ConstFnTrait")
-    }
+impl<Result, Args, Fn: Expr<ConstFn<Result, Args>>> ConstFnTraitWrapper<Result, Args> for AsConstFn<Result, Args, Fn> {
+    default type Fn = PanicWithAsConstFnError<Result, Args, Fn>;
 }
 
-impl<Result, Args, Fn: Expr<ConstFn<Result, Args>>> const ConstFnTrait<Result, Args> for AsConstFn<Result, Args, Fn>
-    where <<Fn as Expr<ConstFn<Result, Args>>>::Eval as Value<ConstFn<Result, Args>>>::UnconstrainedImpl: ~ const ConstFnTrait<Result, Args> {
-    fn apply(args: Args) -> Result {
-        return <<<Fn as Expr<ConstFn<Result, Args>>>::Eval as Value<ConstFn<Result, Args>>>::UnconstrainedImpl as ConstFnTrait<Result, Args>>::apply(args);
-    }
+impl<Result, Args, Fn: Expr<ConstFn<Result, Args>>> ConstFnTraitWrapper<Result, Args> for AsConstFn<Result, Args, Fn>
+    where <<Fn as Expr<ConstFn<Result, Args>>>::Eval as Value<ConstFn<Result, Args>>>::UnconstrainedImpl: ConstFnTraitWrapper<Result, Args> {
+    type Fn = <<<Fn as Expr<ConstFn<Result, Args>>>::Eval as Value<ConstFn<Result, Args>>>::UnconstrainedImpl as ConstFnTraitWrapper<Result, Args>>::Fn;
 }
 
 // The contents of this module have to be "pub" because otherwise Rust would complain that
@@ -67,4 +71,24 @@ impl<Result, Args, Fn: Expr<ConstFn<Result, Args>>> const ConstFnTrait<Result, A
 // referenced outside.
 mod internal {
     pub use crate::*;
+
+    // This is extracted as a separate function so that the build error message shows the expr, value
+    // and impl that caused the error, to simplify debugging.
+    const fn panic_with_as_const_fn_error<Result, Args, FnExpr, FnValue, FnImpl>() -> ! {
+        panic!("AsConstFn was called on a Value<ConstFn<...>> that does not implement const ConstFnTraitWrapper")
+    }
+
+    meta!{
+        pub struct PanicWithAsConstFnError<Result, Args, Fn: Expr<ConstFn<Result, Args>>>: const ConstFnTrait<Result, Args> {
+            fn apply(_: Args) -> Result {
+                panic_with_as_const_fn_error::<
+                    Result,
+                    Args,
+                    Fn,
+                    <Fn as Expr<ConstFn<Result, Args>>>::Eval,
+                    <<Fn as Expr<ConstFn<Result, Args>>>::Eval as Value<ConstFn<Result, Args>>>::UnconstrainedImpl
+                >();
+            }
+        }
+    }
 }

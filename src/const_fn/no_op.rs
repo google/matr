@@ -26,7 +26,11 @@ mod internal {
 
     meta!{
         pub struct NoOpConstFnValue: ConstFnValue<(), ()> {
-            type Impl = NoOpConstFnImpl;
+            type Impl = NoOpConstFnImplWrapper;
+        }
+        
+        pub struct NoOpConstFnImplWrapper: ConstFnTraitWrapper<(), ()> {
+            type Fn = NoOpConstFnImpl;
         }
         
         pub struct NoOpConstFnImpl: const ConstFnTrait<(), ()> {

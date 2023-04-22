@@ -41,7 +41,11 @@ mod internal {
         }
 
         pub struct ToUSizeErrorValue: ConstFnValue<std::result::Result<usize, &'static str>, ()> {
-            type Impl = ToUSizeErrorImpl;
+            type Impl = ToUSizeErrorImplWrapper;
+        }
+
+        pub struct ToUSizeErrorImplWrapper: ConstFnTraitWrapper<std::result::Result<usize, &'static str>, ()> {
+            type Fn = ToUSizeErrorImpl;
         }
 
         pub struct ToUSizeErrorImpl: const ConstFnTrait<std::result::Result<usize, &'static str>, ()> {
@@ -64,7 +68,11 @@ mod internal {
         }
 
         pub struct ZeroValueConstFnValue: ConstFnValue<usize, ()> {
-            type Impl = ZeroValueConstFnImpl;
+            type Impl = ZeroValueConstFnImplWrapper;
+        }
+
+        pub struct ZeroValueConstFnImplWrapper: ConstFnTraitWrapper<usize, ()> {
+            type Fn = ZeroValueConstFnImpl;
         }
 
         pub struct ZeroValueConstFnImpl: const ConstFnTrait<usize, ()> {
@@ -82,7 +90,13 @@ mod internal {
         pub struct IncValueConstFnValue<
             F: Expr<ConstFn<usize, ()>>
         >: ConstFnValue<usize, ()> {
-            type Impl = IncValueConstFnImpl<F>;
+            type Impl = IncValueConstFnImplWrapper<F>;
+        }
+
+        pub struct IncValueConstFnImplWrapper<
+            F: Expr<ConstFn<usize, ()>>
+        >: ConstFnTraitWrapper<usize, ()> {
+            type Fn = IncValueConstFnImpl<F>;
         }
 
         pub struct IncValueConstFnImpl<

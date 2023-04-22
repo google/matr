@@ -43,12 +43,12 @@ mod tests {
 
     #[test]
     fn empty_list_to_type_nested_tuple() {
-        assert_type_eq!(ToTypeNestedTuple<EmptyList<Type>>, WrapType<()>);
+        meta_assert_eq!(Type, ToTypeNestedTuple<EmptyList<Type>>, WrapType<()>);
     }
 
     #[test]
     fn list_to_type_nested_tuple() {
         type L = type_list![usize, f32, u64];
-        assert_type_eq!(ToTypeNestedTuple<L>, WrapType<(usize, (f32, (u64, ())))>);
+        meta_assert_eq!(Type, ToTypeNestedTuple<L>, WrapType<(usize, (f32, (u64, ())))>);
     }
 }

@@ -24,6 +24,10 @@ mod internal {
     pub use super::super::internal::*;
     
     meta!{
+        pub struct PanickingConstFnImplWrapper<E>: ConstFnTraitWrapper<(), ()> {
+            type Fn = PanickingConstFnImpl<E>;
+        }
+        
         pub struct PanickingConstFnImpl<E>: const ConstFnTrait<(), ()> {
             fn apply(_: ()) -> () {
                 panic!("Error found in check_no_error");
@@ -31,7 +35,7 @@ mod internal {
         }
         
         pub struct PanickingConstFnValue<E>: ConstFnValue<(), ()> {
-            type Impl = PanickingConstFnImpl<E>;
+            type Impl = PanickingConstFnImplWrapper<E>;
         }
         
         pub struct PanickingConstFn<E>: Expr<ConstFn<(), ()>> {

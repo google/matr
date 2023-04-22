@@ -14,11 +14,11 @@
 
 mod and;
 mod r#true;
-pub mod assertions;
 mod r#false;
 mod r#if;
 mod not;
 mod or;
+mod to_bool;
 
 pub use and::*;
 pub use r#true::*;
@@ -26,6 +26,7 @@ pub use r#false::*;
 pub use r#if::*;
 pub use not::*;
 pub use or::*;
+pub use to_bool::*;
 
 use internal::*;
 
@@ -39,6 +40,10 @@ impl EqualityComparableKind for Bool {
 
 impl KindWithDefault for Bool {
     type Default = False;
+}
+
+impl KindWithDebugForm for Bool {
+    type DebugForm<B: Expr<Bool>> = If<ExprWrapper<Bool>, B, WrapExpr<Bool, True>, WrapExpr<Bool, False>>;
 }
 
 // These have to be public because otherwise Rust would complain that "can't leak private type".
@@ -79,15 +84,15 @@ mod tests {
 
     #[test]
     fn as_bool() {
-        assert_false!(False);
-        assert_true!(True);
+        meta_assert_eq!(Bool, False, False);
+        meta_assert_eq!(Bool, True, True);
     }
 
     #[test]
     fn equals() {
-        assert_true!(Equals<Bool, True, True>);
-        assert_true!(Equals<Bool, False, False>);
-        assert_false!(Equals<Bool, False, True>);
-        assert_false!(Equals<Bool, True, False>);
+        meta_assert_eq!(Bool, Equals<Bool, True, True>, True);
+        meta_assert_eq!(Bool, Equals<Bool, False, False>, True);
+        meta_assert_eq!(Bool, Equals<Bool, False, True>, False);
+        meta_assert_eq!(Bool, Equals<Bool, True, False>, False);
     }
 }

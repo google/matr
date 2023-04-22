@@ -43,12 +43,12 @@ mod tests {
 
     #[test]
     fn true_literal() {
-        assert_true!(True);
+        meta_assert_eq!(Bool, True, True);
     }
 
     #[test]
     fn true_does_not_eval_other_branch() {
-        assert_true!(If<Bool, True, True, LongRecursion<Zero>>);
+        meta_assert_eq!(Bool, If<Bool, True, True, LongRecursion<Zero>>, True);
 
         // This causes a build error: "overflow evaluating the requirement" (as desired).
         // assert_true!(If<Bool, True, LongRecursion<Zero>, True>);

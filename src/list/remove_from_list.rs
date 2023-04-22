@@ -49,18 +49,18 @@ mod tests {
 
     #[test]
     fn remove_from_empty_list() {
-        assert_type_eq!(ToTypeNestedTuple<RemoveFromList<Type, WrapType<f32>, EmptyList<Type>>>, WrapType<()>);
+        meta_assert_eq!(List<Type>, RemoveFromList<Type, WrapType<f32>, EmptyList<Type>>, EmptyList<Type>);
     }
 
     #[test]
     fn remove_from_list_found() {
         type L = type_list![usize, f32, u64];
-        assert_type_eq!(ToTypeNestedTuple<RemoveFromList<Type, WrapType<f32>, L>>, WrapType<(usize, (u64, ()))>);
+        meta_assert_eq!(List<Type>, RemoveFromList<Type, WrapType<f32>, L>, type_list![usize, u64]);
     }
 
     #[test]
     fn remove_from_list_not_found() {
         type L = type_list![usize, f32, u64];
-        assert_type_eq!(ToTypeNestedTuple<RemoveFromList<Type, WrapType<bool>, L>>, WrapType<(usize, (f32, (u64, ())))>);
+        meta_assert_eq!(List<Type>, RemoveFromList<Type, WrapType<bool>, L>, type_list![usize, f32, u64]);
     }
 }

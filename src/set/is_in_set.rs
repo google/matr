@@ -52,18 +52,18 @@ mod tests {
 
     #[test]
     fn is_in_empty_set() {
-        assert_false!(IsInSet<Type, WrapType<i32>, EmptySet<Type>>);
+        meta_assert_eq!(Bool, IsInSet<Type, WrapType<i32>, EmptySet<Type>>, False);
     }
 
     #[test]
     fn is_in_set_found() {
         type S = AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<f64>, AddToSet<Type, WrapType<usize>, EmptySet<Type>>>>;
-        assert_true!(IsInSet<Type, WrapType<f64>, S>);
+        meta_assert_eq!(Bool, IsInSet<Type, WrapType<f64>, S>, True);
     }
 
     #[test]
     fn is_in_set_not_found() {
         type S = AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<f64>, AddToSet<Type, WrapType<usize>, EmptySet<Type>>>>;
-        assert_false!(IsInSet<Type, WrapType<u32>, S>);
+        meta_assert_eq!(Bool, IsInSet<Type, WrapType<u32>, S>, False);
     }
 }

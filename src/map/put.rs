@@ -43,13 +43,13 @@ mod tests {
     fn put_commutative() {
         type S1 = Put<Type, Type, WrapType<i32>, WrapType<u32>, Put<Type, Type, WrapType<i64>, WrapType<u64>, EmptyMap<Type, Type>>>;
         type S2 = Put<Type, Type, WrapType<i64>, WrapType<u64>, Put<Type, Type, WrapType<i32>, WrapType<u32>, EmptyMap<Type, Type>>>;
-        assert_type_map_eq!(S1, S2);
+        meta_assert_eq!(Map<Type, Type>, S1, S2);
     }
 
     #[test]
     fn put_idempotent() {
         type S1 = Put<Type, Type, WrapType<i32>, WrapType<u32>, Put<Type, Type, WrapType<i32>, WrapType<u32>, EmptyMap<Type, Type>>>;
         type S2 = Put<Type, Type, WrapType<i32>, WrapType<u32>, EmptyMap<Type, Type>>;
-        assert_type_map_eq!(S1, S2);
+        meta_assert_eq!(Map<Type, Type>, S1, S2);
     }
 }

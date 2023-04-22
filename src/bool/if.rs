@@ -55,19 +55,19 @@ mod tests {
 
     #[test]
     fn if_function() {
-        assert_type_eq!(If<Type, True, WrapType<u32>, WrapType<f64>>, WrapType<u32>);
-        assert_type_eq!(If<Type, False, WrapType<u32>, WrapType<f64>>, WrapType<f64>);
+        meta_assert_eq!(Type, If<Type, True, WrapType<u32>, WrapType<f64>>, WrapType<u32>);
+        meta_assert_eq!(Type, If<Type, False, WrapType<u32>, WrapType<f64>>, WrapType<f64>);
 
-        assert_true!(If<Bool, False, False, True>);
-        assert_false!(If<Bool, True, False, True>);
+        meta_assert_eq!(Bool, If<Bool, False, False, True>, True);
+        meta_assert_eq!(Bool, If<Bool, True, False, True>, False);
     }
 
     #[test]
     fn if_result_function() {
-        assert_type_result_eq!(IfResult<Type, Ok<Bool, True>, Ok<Type, WrapType<u32>>, Ok<Type, WrapType<f64>>>, Ok<Type, WrapType<u32>>);
-        assert_type_result_eq!(IfResult<Type, Ok<Bool, False>, Ok<Type, WrapType<u32>>, Ok<Type, WrapType<f64>>>, Ok<Type, WrapType<f64>>);
+        meta_assert_eq!(Result<Type>, IfResult<Type, Ok<Bool, True>, Ok<Type, WrapType<u32>>, Ok<Type, WrapType<f64>>>, Ok<Type, WrapType<u32>>);
+        meta_assert_eq!(Result<Type>, IfResult<Type, Ok<Bool, False>, Ok<Type, WrapType<u32>>, Ok<Type, WrapType<f64>>>, Ok<Type, WrapType<f64>>);
 
-        assert_true_result!(IfResult<Bool, Ok<Bool, False>, Ok<Bool, False>, Ok<Bool, True>>);
-        assert_false_result!(IfResult<Bool, Ok<Bool, True>, Ok<Bool, False>, Ok<Bool, True>>);
+        meta_assert_eq!(Result<Bool>, IfResult<Bool, Ok<Bool, False>, Ok<Bool, False>, Ok<Bool, True>>, Ok<Bool, True>);
+        meta_assert_eq!(Result<Bool>, IfResult<Bool, Ok<Bool, True>, Ok<Bool, False>, Ok<Bool, True>>, Ok<Bool, False>);
     }
 }

@@ -34,7 +34,7 @@ mod internal {
             S: Expr<Set<K>>,
             ResultM: Expr<Map<K, V>>
         >: MapVisitor<K, V, Map<K, V>> {
-            type VisitEmptyMap = EmptyMap<K, V>;
+            type VisitEmptyMap = ResultM;
             type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> =
                 VisitMap<K, V, Map<K, V>, Tail, MapRemoveKeySetVisitor<K, V, S,
                     If<Map<K, V>,
@@ -53,40 +53,59 @@ mod tests {
 
     #[test]
     fn empty_map_and_empty_set() {
-        assert_type_map_eq!(MapRemoveKeySet<Type, Type, EmptyMap<Type, Type>, EmptySet<Type>>, EmptyMap<Type, Type>);
+        meta_assert_eq!(
+            Map<Type, Type>,
+            MapRemoveKeySet<Type, Type, EmptyMap<Type, Type>, EmptySet<Type>>,
+            EmptyMap<Type, Type>);
     }
 
     #[test]
     fn non_empty_map_and_empty_set() {
         type M = Put<Type, Type, WrapType<i32>, WrapType<i64>, EmptyMap<Type, Type>>;
-        assert_type_map_eq!(MapRemoveKeySet<Type, Type, M, EmptySet<Type>>, M);
+        meta_assert_eq!(
+            Map<Type, Type>,
+            MapRemoveKeySet<Type, Type, M, EmptySet<Type>>,
+            M);
     }
 
     #[test]
     fn empty_map_and_non_empty_set() {
         type S = AddToSet<Type, WrapType<i32>, EmptySet<Type>>;
-        assert_type_map_eq!(MapRemoveKeySet<Type, Type, EmptyMap<Type, Type>, S>, EmptyMap<Type, Type>);
+        meta_assert_eq!(
+            Map<Type, Type>,
+            MapRemoveKeySet<Type, Type, EmptyMap<Type, Type>, S>,
+            EmptyMap<Type, Type>);
     }
 
     #[test]
     fn subset() {
         type M = Put<Type, Type, WrapType<i32>, WrapType<i64>, Put<Type, Type, WrapType<f64>, WrapType<f32>, EmptyMap<Type, Type>>>;
         type S = AddToSet<Type, WrapType<u32>, AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<u64>, AddToSet<Type, WrapType<f64>, EmptySet<Type>>>>>;
-        assert_type_map_eq!(MapRemoveKeySet<Type, Type, M, S>, EmptyMap<Type, Type>);
+        meta_assert_eq!(
+            Map<Type, Type>,
+            MapRemoveKeySet<Type, Type, M, S>,
+            EmptyMap<Type, Type>);
     }
 
     #[test]
     fn superset() {
         type M = Put<Type, Type, WrapType<u32>, WrapType<(u32,)>, Put<Type, Type, WrapType<i32>, WrapType<(i32,)>, Put<Type, Type, WrapType<u64>, WrapType<(u64,)>, Put<Type, Type, WrapType<f64>, WrapType<(f64,)>, EmptyMap<Type, Type>>>>>;
         type S = AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<f64>, EmptySet<Type>>>;
-        assert_type_map_eq!(MapRemoveKeySet<Type, Type, M, S>, M);
+        type M2 = Put<Type, Type, WrapType<u32>, WrapType<(u32,)>, Put<Type, Type, WrapType<u64>, WrapType<(u64,)>, EmptyMap<Type, Type>>>;
+        meta_assert_eq!(
+            Map<Type, Type>,
+            MapRemoveKeySet<Type, Type, M, S>,
+            M2);
     }
 
     #[test]
     fn general() {
         type M = Put<Type, Type, WrapType<u32>, WrapType<(u32,)>, Put<Type, Type, WrapType<i32>, WrapType<(i32,)>, EmptyMap<Type, Type>>>;
         type S = AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<f64>, EmptySet<Type>>>;
-        type M2 = Put<Type, Type, WrapType<i32>, WrapType<(i32,)>, Put<Type, Type, WrapType<f64>, WrapType<(f64,)>, Put<Type, Type, WrapType<f64>, WrapType<(f64,)>, EmptyMap<Type, Type>>>>;
-        assert_type_map_eq!(MapRemoveKeySet<Type, Type, M, S>, M2);
+        type M2 = Put<Type, Type, WrapType<u32>, WrapType<(u32,)>, EmptyMap<Type, Type>>;
+        meta_assert_eq!(
+            Map<Type, Type>,
+            MapRemoveKeySet<Type, Type, M, S>,
+            M2);
     }
 }

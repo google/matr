@@ -35,15 +35,15 @@ mod tests {
 
     #[test]
     fn or() {
-        assert_true!(Or<True, True>);
-        assert_true!(Or<True, False>);
-        assert_true!(Or<False, True>);
-        assert_false!(Or<False, False>);
+        meta_assert_eq!(Bool, Or<True, True>, True);
+        meta_assert_eq!(Bool, Or<True, False>, True);
+        meta_assert_eq!(Bool, Or<False, True>, True);
+        meta_assert_eq!(Bool, Or<False, False>, False);
     }
 
     #[test]
     fn or_does_not_eval_other_branch() {
-        assert_true!(Or<True, LongRecursion<Zero>>);
+        meta_assert_eq!(Bool, Or<True, LongRecursion<Zero>>, True);
 
         // This causes a build error: "overflow evaluating the requirement" (as desired).
         // assert_true!(Or<False, LongRecursion<Zero>>);

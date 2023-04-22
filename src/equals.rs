@@ -34,15 +34,15 @@ mod tests {
 
     #[test]
     fn equals_types() {
-        assert_true!(Equals<Type, WrapType<i32>, WrapType<i32>>);
-        assert_false!(Equals<Type, WrapType<i32>, WrapType<i64>>);
+        meta_assert_eq!(Bool, Equals<Type, WrapType<i32>, WrapType<i32>>, True);
+        meta_assert_eq!(Bool, Equals<Type, WrapType<i32>, WrapType<i64>>, False);
     }
 
     #[test]
     fn equals_bools() {
-        assert_true!(Equals<Bool, True, True>);
-        assert_true!(Equals<Bool, False, False>);
-        assert_false!(Equals<Bool, True, False>);
-        assert_false!(Equals<Bool, False, True>);
+        meta_assert_eq!(Bool, Equals<Bool, True, True>, True);
+        meta_assert_eq!(Bool, Equals<Bool, False, False>, True);
+        meta_assert_eq!(Bool, Equals<Bool, True, False>, False);
+        meta_assert_eq!(Bool, Equals<Bool, False, True>, False);
     }
 }

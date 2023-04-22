@@ -54,18 +54,18 @@ mod tests {
 
     #[test]
     fn is_in_empty_map() {
-        assert_false!(IsInMap<Type, Type, WrapType<i32>, EmptyMap<Type, Type>>);
+        meta_assert_eq!(Bool, IsInMap<Type, Type, WrapType<i32>, EmptyMap<Type, Type>>, False);
     }
 
     #[test]
     fn is_in_map_found() {
         type M = Put<Type, Type, WrapType<i32>, WrapType<u32>, Put<Type, Type, WrapType<f64>, WrapType<u64>, Put<Type, Type, WrapType<usize>, WrapType<usize>, EmptyMap<Type, Type>>>>;
-        assert_true!(IsInMap<Type, Type, WrapType<f64>, M>);
+        meta_assert_eq!(Bool, IsInMap<Type, Type, WrapType<f64>, M>, True);
     }
 
     #[test]
     fn is_in_map_not_found() {
         type M = Put<Type, Type, WrapType<i32>, WrapType<u32>, Put<Type, Type, WrapType<f64>, WrapType<u64>, Put<Type, Type, WrapType<usize>, WrapType<usize>, EmptyMap<Type, Type>>>>;
-        assert_false!(IsInMap<Type, Type, WrapType<u32>, M>);
+        meta_assert_eq!(Bool, IsInMap<Type, Type, WrapType<u32>, M>, False);
     }
 }

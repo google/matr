@@ -14,22 +14,9 @@
 
 use crate::*;
 
-meta!{
-    pub type Not<
-        X: Expr<Bool>
-    >: Expr<Bool> =
-        If<Bool, X, False, True>;
-}
-
-#[cfg(test)]
-#[allow(dead_code)]
-mod tests {
-    use crate::*;
-
-    #[test]
-    fn test_not() {
-        meta_assert_eq!(Bool, Not<False>, True);
-        meta_assert_eq!(Bool, Not<True>, False);
-        meta_assert_eq!(Bool, Not<Not<True>>, True);
-    }
+pub trait KindWithDebugForm: Kind {
+    // A wrapped Expr equivalent to the given expression but fully-evaluated and composed only of
+    // constructor metafunctions.
+    // Used to show mismatches in assertions.
+    type DebugForm<E: Expr<Self>>: Expr<ExprWrapper<Self>>;
 }

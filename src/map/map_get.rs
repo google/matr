@@ -58,18 +58,27 @@ mod tests {
 
     #[test]
     fn is_in_empty_map() {
-        assert_type_eq!(OptionOrValue<Type, MapGet<Type, Type, WrapType<i32>, EmptyMap<Type, Type>>, WrapType<()>>, WrapType<()>);
+        meta_assert_eq!(
+            Option<Type>,
+            MapGet<Type, Type, WrapType<i32>, EmptyMap<Type, Type>>,
+            None<Type>);
     }
 
     #[test]
     fn is_in_map_found() {
         type M = Put<Type, Type, WrapType<i32>, WrapType<u32>, Put<Type, Type, WrapType<f64>, WrapType<u64>, Put<Type, Type, WrapType<usize>, WrapType<usize>, EmptyMap<Type, Type>>>>;
-        assert_type_eq!(OptionOrValue<Type, MapGet<Type, Type, WrapType<f64>, M>, WrapType<()>>, WrapType<u64>);
+        meta_assert_eq!(
+            Option<Type>,
+            MapGet<Type, Type, WrapType<f64>, M>,
+            Some<Type, WrapType<u64>>);
     }
 
     #[test]
     fn is_in_map_not_found() {
         type M = Put<Type, Type, WrapType<i32>, WrapType<u32>, Put<Type, Type, WrapType<f64>, WrapType<u64>, Put<Type, Type, WrapType<usize>, WrapType<usize>, EmptyMap<Type, Type>>>>;
-        assert_type_eq!(OptionOrValue<Type, MapGet<Type, Type, WrapType<u32>, M>, WrapType<()>>, WrapType<()>);
+        meta_assert_eq!(
+            Option<Type>,
+            MapGet<Type, Type, WrapType<u32>, M>,
+            None<Type>);
     }
 }

@@ -15,7 +15,6 @@
 mod empty_map;
 mod put;
 mod is_in_map;
-pub mod assertions;
 mod map_to_list;
 mod list_to_map;
 mod to_hash_map;
@@ -61,6 +60,10 @@ impl<K: EqualityComparableKind, V: Kind> KindWithDefault for Map<K, V> {
     type Default = EmptyMap<K, V>;
 }
 
+impl<K: EqualityComparableKind + KindWithDefault, V: EqualityComparableKind + KindWithDefault> KindWithDebugForm for Map<K, V> {
+    type DebugForm<M: Expr<Map<K, V>>> = VisitMap<K, V, ExprWrapper<Map<K, V>>, M, ToMapDebugFormVisitor<K, V>>;
+}
+
 pub trait MapVisitor<K: EqualityComparableKind + KindWithDefault, V: Kind, OutK: Kind> {
     type VisitEmptyMap: Expr<OutK>;
     type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>>: Expr<OutK>;
@@ -82,6 +85,14 @@ mod internal {
     pub use crate::*;
     
     meta!{
+        pub struct ToMapDebugFormVisitor<K: KindWithDefault + EqualityComparableKind, V: KindWithDefault + EqualityComparableKind>: MapVisitor<K, V, ExprWrapper<Map<K, V>>> {
+            type VisitEmptyMap = WrapExpr<Map<K, V>, EmptyMap<K, V>>;
+            type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> =
+                WrapExpr<Map<K, V>, Put<K, V, Key, Value,
+                    <AsWrappedExpr<Map<K, V>, VisitMap<K, V, ExprWrapper<Map<K, V>>, Tail, ToMapDebugFormVisitor<K, V>>> as AsWrappedExprTrait<Map<K, V>>>::Get
+                >>;
+        }
+
         pub struct ListToMapUnchecked<
             K: EqualityComparableKind, 
             V: Kind, 

@@ -51,7 +51,10 @@ mod tests {
 
     #[test]
     fn remove_from_empty_map() {
-        assert_type_eq!(ToTypeNestedTuple<RemoveFromList<Type, WrapType<f32>, EmptyList<Type>>>, WrapType<()>);
+        meta_assert_eq!(
+            List<Type>,
+            RemoveFromList<Type, WrapType<f32>, EmptyList<Type>>,
+            EmptyList<Type>);
     }
 
     #[test]
@@ -64,7 +67,10 @@ mod tests {
         type M2 = type_map!{
             usize: (usize,),
             u64: (u64,)};
-        assert_type_map_eq!(RemoveFromMap<Type, Type, WrapType<f32>, M>, M2);
+        meta_assert_eq!(
+            Map<Type, Type>,
+            RemoveFromMap<Type, Type, WrapType<f32>, M>,
+            M2);
     }
 
     #[test]
@@ -73,6 +79,9 @@ mod tests {
             usize: (usize,),
             f32: (f32,),
             u64: (u64,)};
-        assert_type_map_eq!(RemoveFromMap<Type, Type, WrapType<bool>, M>, M);
+        meta_assert_eq!(
+            Map<Type, Type>,
+            RemoveFromMap<Type, Type, WrapType<bool>, M>,
+            M);
     }
 }

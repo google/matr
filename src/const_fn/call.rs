@@ -15,7 +15,7 @@
 use internal::*;
 
 pub const fn call_const_fn<Out, Args, F: Expr<ConstFn<Out, Args>>>(args: Args) -> Out {
-    return <AsConstFn<Out, Args, F> as ConstFnTrait<Out, Args>>::apply(args);
+    return <<AsConstFn<Out, Args, F> as ConstFnTraitWrapper<Out, Args>>::Fn as ConstFnTrait<Out, Args>>::apply(args);
 }
 
 mod internal {
@@ -28,6 +28,10 @@ mod tests {
     use super::internal::*;
 
     meta!{
+        struct Add42ImplWrapper: ConstFnTraitWrapper<i32, i32> {
+            type Fn = Add42Impl;
+        }
+
         struct Add42Impl: const ConstFnTrait<i32, i32> {
             fn apply(n: i32) -> i32 {
                 return n + 42;
@@ -35,7 +39,7 @@ mod tests {
         }
 
         struct Add42Value: ConstFnValue<i32, i32> {
-            type Impl = Add42Impl;
+            type Impl = Add42ImplWrapper;
         }
 
         struct Add42: Expr<ConstFn<i32, i32>> {

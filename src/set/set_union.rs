@@ -44,40 +44,40 @@ mod tests {
 
     #[test]
     fn is_empty_set_and_empty_set() {
-        assert_type_set_eq!(SetUnion<Type, EmptySet<Type>, EmptySet<Type>>, EmptySet<Type>);
+        meta_assert_eq!(Set<Type>, SetUnion<Type, EmptySet<Type>, EmptySet<Type>>, EmptySet<Type>);
     }
 
     #[test]
     fn is_non_empty_set_and_empty_set() {
         type S = AddToSet<Type, WrapType<i32>, EmptySet<Type>>;
-        assert_type_set_eq!(SetUnion<Type, S, EmptySet<Type>>, S);
+        meta_assert_eq!(Set<Type>, SetUnion<Type, S, EmptySet<Type>>, S);
     }
 
     #[test]
     fn is_empty_set_and_non_empty_set() {
         type S = AddToSet<Type, WrapType<i32>, EmptySet<Type>>;
-        assert_type_set_eq!(SetUnion<Type, EmptySet<Type>, S>, S);
+        meta_assert_eq!(Set<Type>, SetUnion<Type, EmptySet<Type>, S>, S);
     }
 
     #[test]
     fn union_subset() {
         type S1 = AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<f64>, EmptySet<Type>>>;
         type S2 = AddToSet<Type, WrapType<u32>, AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<u64>, AddToSet<Type, WrapType<f64>, EmptySet<Type>>>>>;
-        assert_type_set_eq!(SetUnion<Type, S1, S2>, S2);
+        meta_assert_eq!(Set<Type>, SetUnion<Type, S1, S2>, S2);
     }
 
     #[test]
     fn union_superset() {
         type S1 = AddToSet<Type, WrapType<u32>, AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<u64>, AddToSet<Type, WrapType<f64>, EmptySet<Type>>>>>;
         type S2 = AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<f64>, EmptySet<Type>>>;
-        assert_type_set_eq!(SetUnion<Type, S1, S2>, S1);
+        meta_assert_eq!(Set<Type>, SetUnion<Type, S1, S2>, S1);
     }
 
     #[test]
     fn union_general() {
         type S1 = AddToSet<Type, WrapType<u32>, AddToSet<Type, WrapType<i32>, EmptySet<Type>>>;
         type S2 = AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<f64>, EmptySet<Type>>>;
-        type S3 = AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<f64>, AddToSet<Type, WrapType<f64>, EmptySet<Type>>>>;
-        assert_type_set_eq!(SetUnion<Type, S1, S2>, S3);
+        type S3 = AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<f64>, AddToSet<Type, WrapType<u32>, EmptySet<Type>>>>;
+        meta_assert_eq!(Set<Type>, SetUnion<Type, S1, S2>, S3);
     }
 }

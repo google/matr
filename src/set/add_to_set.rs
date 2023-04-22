@@ -40,13 +40,13 @@ mod tests {
     fn add_commutative() {
         type S1 = AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<u64>, EmptySet<Type>>>;
         type S2 = AddToSet<Type, WrapType<u64>, AddToSet<Type, WrapType<i32>, EmptySet<Type>>>;
-        assert_type_set_eq!(S1, S2);
+        meta_assert_eq!(Set<Type>, S1, S2);
     }
 
     #[test]
     fn add_idempotent() {
         type S1 = AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<u64>, EmptySet<Type>>>;
         type S2 = AddToSet<Type, WrapType<u64>, AddToSet<Type, WrapType<i32>, S1>>;
-        assert_type_set_eq!(S1, S2);
+        meta_assert_eq!(Set<Type>, S1, S2);
     }
 }

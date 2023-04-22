@@ -73,10 +73,10 @@ mod tests {
 
     #[test]
     fn empty_map_and_empty_map() {
-        type ResultM = MapCommonKeysWithDifferentValue<Type, Type, EmptyMap<Type, Type>, EmptyMap<Type, Type>>;
-        assert_type_eq!(
-            ToTypeTripleNestedTuple<MapToList<Type, Pair<Type, Type>, ResultM>>,
-            WrapType<()>);
+        meta_assert_eq!(
+            Map<Type, Pair<Type, Type>>,
+            MapCommonKeysWithDifferentValue<Type, Type, EmptyMap<Type, Type>, EmptyMap<Type, Type>>,
+            EmptyMap<Type, Pair<Type, Type>>);
     }
 
     #[test]
@@ -84,10 +84,10 @@ mod tests {
         type M = type_map!{
             i32: u32
         };
-        type ResultM = MapCommonKeysWithDifferentValue<Type, Type, M, EmptyMap<Type, Type>>;
-        assert_type_eq!(
-            ToTypeTripleNestedTuple<MapToList<Type, Pair<Type, Type>, ResultM>>,
-            WrapType<()>);
+        meta_assert_eq!(
+            Map<Type, Pair<Type, Type>>,
+            MapCommonKeysWithDifferentValue<Type, Type, M, EmptyMap<Type, Type>>,
+            EmptyMap<Type, Pair<Type, Type>>);
     }
 
     #[test]
@@ -95,10 +95,10 @@ mod tests {
         type M = type_map!{
             i32: u32
         };
-        type ResultM = MapCommonKeysWithDifferentValue<Type, Type, EmptyMap<Type, Type>, M>;
-        assert_type_eq!(
-            ToTypeTripleNestedTuple<MapToList<Type, Pair<Type, Type>, ResultM>>,
-            WrapType<()>);
+        meta_assert_eq!(
+            Map<Type, Pair<Type, Type>>,
+            MapCommonKeysWithDifferentValue<Type, Type, EmptyMap<Type, Type>, M>,
+            EmptyMap<Type, Pair<Type, Type>>);
     }
 
     // #[test]
@@ -114,9 +114,9 @@ mod tests {
     //         f64: (f64,),
     //     };
     //     type ResultM = MapCommonKeysWithDifferentValue<Type, Type, M1, M2>;
-    //     assert_type_eq!(GetFirst<Type, Type, MapGet<Type, Pair<Type, Type>, WrapType<f64>, ResultM>>, WrapType<(u64,)>);
-    //     assert_type_eq!(GetSecond<Type, Type, MapGet<Type, Pair<Type, Type>, WrapType<f64>, ResultM>>, WrapType<(f64,)>);
-    //     assert_type_eq!(
+    //     meta_assert_eq!(GetFirst<Type, Type, MapGet<Type, Pair<Type, Type>, WrapType<f64>, ResultM>>, WrapType<(u64,)>);
+    //     meta_assert_eq!(GetSecond<Type, Type, MapGet<Type, Pair<Type, Type>, WrapType<f64>, ResultM>>, WrapType<(f64,)>);
+    //     meta_assert_eq!(
     //         ToTypeTripleNestedTuple<MapToList<Type, Pair<Type, Type>, ResultM>>,
     //         WrapType<((f64, ((u64,), (f64,))), ())>);
     // }
