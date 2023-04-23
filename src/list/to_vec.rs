@@ -29,7 +29,7 @@ mod internal {
             F: Functor1<K, RuntimeFn<OutT, ()>>
         >: Expr<RuntimeFn<Vec<OutT>, ()>> =
             VisitList<K, RuntimeFn<Vec<OutT>, ()>, L, ToReversedVecVisitor<K, OutT, F>>;
-        
+
         pub struct ToReversedVecVisitor<
             K: Kind,
             OutT,

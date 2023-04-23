@@ -27,10 +27,6 @@ impl KindWithDefault for Type {
     type Default = WrapType<()>;
 }
 
-pub trait TypeValue {
-    type UnconstrainedImpl;
-}
-
 impl EqualityComparableKind for Type {
     type Eq<X: Expr<Type>, Y: Expr<Type>> = IsEqualToType<X, Y>;
 }
@@ -47,20 +43,23 @@ impl<T> Expr<Type> for WrapType<T> {
     type Eval = WrapType<T>;
 }
 
-impl<T> TypeValue for WrapType<T> {
-    type UnconstrainedImpl = T;
-}
-
-impl<T: TypeValue> Value<Type> for T {
-    type UnconstrainedImpl = <T as TypeValue>::UnconstrainedImpl;
-}
-
 // These have to be public because otherwise Rust would complain that "can't leak private type".
 // But they should never be explicitly referenced elsewhere.
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
 
+    pub trait TypeValue {
+        type UnconstrainedImpl;
+    }
+
+    impl<T> TypeValue for WrapType<T> {
+        type UnconstrainedImpl = T;
+    }
+
+    impl<T: TypeValue> Value<Type> for T {
+        type UnconstrainedImpl = <T as TypeValue>::UnconstrainedImpl;
+    }
     pub struct IsEqualToTypeImplHelper<X, Y> {
         x: PhantomData<X>,
         y: PhantomData<Y>,
