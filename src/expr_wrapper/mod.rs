@@ -25,18 +25,15 @@ pub trait ExprWrapperValue<K: Kind> {
     type UnconstrainedImpl;
 }
 
-pub struct WrapExpr<K: Kind, E: Expr<K>> {
-    k: PhantomData<K>,
-    e: PhantomData<E>,
+meta!{
+    pub struct WrapExpr<
+        K: Kind,
+        E: Expr<K>
+    >: Expr<ExprWrapper<K>> {
+        type Eval = WrapExprValue<K, E>;
+    }
 }
 
-impl<K: Kind, E: Expr<K>> Expr<ExprWrapper<K>> for WrapExpr<K, E> {
-    type Eval = WrapExpr<K, E>;
-}
-
-impl<K: Kind, E: Expr<K>> ExprWrapperValue<K> for WrapExpr<K, E> {
-    type UnconstrainedImpl = E;
-}
 
 impl<K: Kind, E: ExprWrapperValue<K>> Value<ExprWrapper<K>> for E {
     type UnconstrainedImpl = <E as ExprWrapperValue<K>>::UnconstrainedImpl;
@@ -63,4 +60,13 @@ impl<K: KindWithDefault, E: Expr<ExprWrapper<K>>> AsWrappedExprTrait<K> for AsWr
 // But they should never be explicitly referenced elsewhere.
 mod internal {
     pub use crate::*;
+
+    meta!{
+        pub struct WrapExprValue<
+            K: Kind,
+            E: Expr<K>
+        >: ExprWrapperValue<K> {
+            type UnconstrainedImpl = E;
+        }
+    }
 }

@@ -46,15 +46,14 @@ pub trait ResultVisitor<K: Kind, ResultK: Kind> {
     type VisitErr<E>: Expr<ResultK>;
 }
 
-pub struct VisitResult<K: Kind, OutK: Kind, R: Expr<Result<K>>, V: ResultVisitor<K, OutK>> {
-    k: PhantomData<K>,
-    out_k: PhantomData<OutK>,
-    r: PhantomData<R>,
-    v: PhantomData<V>,
-}
-
-impl<K: Kind, OutK: Kind, R: Expr<Result<K>>, V: ResultVisitor<K, OutK>> Expr<OutK> for VisitResult<K, OutK, R, V> {
-    type Eval = <<AsResult<K, R> as ResultTrait<K>>::Visit<OutK, V> as Expr<OutK>>::Eval;
+meta!{
+    pub type VisitResult<
+        K: Kind,
+        OutK: Kind,
+        R: Expr<Result<K>>,
+        V: ResultVisitor<K, OutK>
+    >: Expr<OutK> =
+        <AsResult<K, R> as ResultTrait<K>>::Visit<OutK, V>;
 }
 
 impl<K: EqualityComparableKind> EqualityComparableKind for Result<K> {

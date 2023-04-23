@@ -19,7 +19,6 @@ pub fn to_vec<K: Kind, L: Expr<List<K>>, OutT, F: Functor1<K, RuntimeFn<OutT, ()
 }
 
 mod internal {
-    use std::marker::PhantomData;
     pub use super::super::internal::*;
 
     meta!{
@@ -87,21 +86,19 @@ mod internal {
         >: RuntimeFnValue<Vec<OutT>, ()> {
             type Impl = AddToVecImpl<K, Elem, OutT, F, TailVec>;
         }
-    }
 
-    pub struct AddToVecImpl<K: Kind, Elem: Expr<K>, OutT, F: Functor1<K, RuntimeFn<OutT, ()>>, TailVec: Expr<RuntimeFn<Vec<OutT>, ()>>> {
-        k: PhantomData<K>,
-        elem: PhantomData<Elem>,
-        out_t: PhantomData<OutT>,
-        f: PhantomData<F>,
-        tail_vec: PhantomData<TailVec>,
-    }
-
-    impl<K: Kind, Elem: Expr<K>, OutT, F: Functor1<K, RuntimeFn<OutT, ()>>, TailVec: Expr<RuntimeFn<Vec<OutT>, ()>>> RuntimeFnTrait<Vec<OutT>, ()> for AddToVecImpl<K, Elem, OutT, F, TailVec> {
-        fn apply(_: ()) -> Vec<OutT> {
-            let mut v = call_runtime_fn::<Vec<OutT>, (), TailVec>(());
-            v.push(call_runtime_fn::<OutT, (), F::Apply<Elem>>(()));
-            return v;
+        pub struct AddToVecImpl<
+            K: Kind,
+            Elem: Expr<K>,
+            OutT,
+            F: Functor1<K, RuntimeFn<OutT, ()>>,
+            TailVec: Expr<RuntimeFn<Vec<OutT>, ()>>
+        >: RuntimeFnTrait<Vec<OutT>, ()> {
+            fn apply(_: ()) -> Vec<OutT> {
+                let mut v = call_runtime_fn::<Vec<OutT>, (), TailVec>(());
+                v.push(call_runtime_fn::<OutT, (), F::Apply<Elem>>(()));
+                return v;
+            }
         }
     }
 }
