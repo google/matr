@@ -42,28 +42,29 @@ impl<Result, Args, U: RuntimeFnValue<Result, Args>> Value<RuntimeFn<Result, Args
     type UnconstrainedImpl = <U as RuntimeFnValue<Result, Args>>::Impl;
 }
 
-pub struct AsRuntimeFn<Result, Args, Fn: Expr<RuntimeFn<Result, Args>>> {
-    result: PhantomData<Result>,
-    args: PhantomData<Args>,
-    f: PhantomData<Fn>,
-}
-
-impl<Result, Args, Fn: Expr<RuntimeFn<Result, Args>>> RuntimeFnTrait<Result, Args> for AsRuntimeFn<Result, Args, Fn> {
-    default fn apply(_: Args) -> Result {
-        panic!("AsRuntimeFn was called on a Value<RuntimeFn<...>> that does not implement RuntimeFnTrait")
-    }
-}
-
-impl<Result, Args, Fn: Expr<RuntimeFn<Result, Args>>> RuntimeFnTrait<Result, Args> for AsRuntimeFn<Result, Args, Fn>
-    where <<Fn as Expr<RuntimeFn<Result, Args>>>::Eval as Value<RuntimeFn<Result, Args>>>::UnconstrainedImpl: RuntimeFnTrait<Result, Args> {
-    fn apply(args: Args) -> Result {
-        return <<<Fn as Expr<RuntimeFn<Result, Args>>>::Eval as Value<RuntimeFn<Result, Args>>>::UnconstrainedImpl as RuntimeFnTrait<Result, Args>>::apply(args);
-    }
-}
-
 // The contents of this module have to be "pub" because otherwise Rust would complain that
 // "can't leak private type". The wrapping non-pub mod ensures that these are never explicitly
 // referenced outside.
 mod internal {
+    use std::marker::PhantomData;
     pub use crate::*;
+
+    pub struct AsRuntimeFn<Result, Args, Fn: Expr<RuntimeFn<Result, Args>>> {
+        result: PhantomData<Result>,
+        args: PhantomData<Args>,
+        f: PhantomData<Fn>,
+    }
+
+    impl<Result, Args, Fn: Expr<RuntimeFn<Result, Args>>> RuntimeFnTrait<Result, Args> for AsRuntimeFn<Result, Args, Fn> {
+        default fn apply(_: Args) -> Result {
+            panic!("AsRuntimeFn was called on a Value<RuntimeFn<...>> that does not implement RuntimeFnTrait")
+        }
+    }
+
+    impl<Result, Args, Fn: Expr<RuntimeFn<Result, Args>>> RuntimeFnTrait<Result, Args> for AsRuntimeFn<Result, Args, Fn>
+        where <<Fn as Expr<RuntimeFn<Result, Args>>>::Eval as Value<RuntimeFn<Result, Args>>>::UnconstrainedImpl: RuntimeFnTrait<Result, Args> {
+        fn apply(args: Args) -> Result {
+            return <<<Fn as Expr<RuntimeFn<Result, Args>>>::Eval as Value<RuntimeFn<Result, Args>>>::UnconstrainedImpl as RuntimeFnTrait<Result, Args>>::apply(args);
+        }
+    }
 }

@@ -22,24 +22,14 @@ mod internal {
     pub use super::super::internal::*;
 
     meta!{
-        pub struct ToReversedVec<
+        pub type ToReversedVec<
             K: Kind,
             L: Expr<List<K>>,
             OutT,
             F: Functor1<K, RuntimeFn<OutT, ()>>
-        >: Expr<RuntimeFn<Vec<OutT>, ()>> {
-            type Eval = ToReversedVecValue<K, L, OutT, F>;
-        }
-
-        pub struct ToReversedVecValue<
-            K: Kind,
-            L: Expr<List<K>>,
-            OutT,
-            F: Functor1<K, RuntimeFn<OutT, ()>>
-        >: RuntimeFnValue<Vec<OutT>, ()> {
-            type Impl = AsRuntimeFn<Vec<OutT>, (), <AsList<K, L> as ListTrait<K>>::Visit<RuntimeFn<Vec<OutT>, ()>, ToReversedVecVisitor<K, OutT, F>>>;
-        }
-
+        >: Expr<RuntimeFn<Vec<OutT>, ()>> =
+            VisitList<K, RuntimeFn<Vec<OutT>, ()>, L, ToReversedVecVisitor<K, OutT, F>>;
+        
         pub struct ToReversedVecVisitor<
             K: Kind,
             OutT,
