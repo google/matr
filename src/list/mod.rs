@@ -60,7 +60,7 @@ impl<K: Kind> KindWithDefault for List<K> {
     type Default = EmptyList<K>;
 }
 
-impl<K: EqualityComparableKind> KindWithDebugForm for List<K> {
+impl<K: KindWithDefault + EqualityComparableKind + KindWithDebugForm> KindWithDebugForm for List<K> {
     type DebugForm<L: Expr<List<K>>> = VisitList<K, ExprWrapper<List<K>>, L, ToListDebugFormVisitor<K>>;
 }
 
@@ -109,10 +109,11 @@ mod internal {
     }
 
     meta!{
-        pub struct ToListDebugFormVisitor<K: Kind>: ListVisitor<K, ExprWrapper<List<K>>> {
+        pub struct ToListDebugFormVisitor<K: KindWithDefault + KindWithDebugForm>: ListVisitor<K, ExprWrapper<List<K>>> {
             type VisitEmptyList = WrapExpr<List<K>, EmptyList<K>>;
-            type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> = WrapExpr<List<K>, Cons<K, Elem,
-                <AsWrappedExpr<List<K>, VisitList<K, ExprWrapper<List<K>>, Tail, ToListDebugFormVisitor<K>>> as AsWrappedExprTrait<List<K>>>::Get
+            type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> = WrapExpr<List<K>, Cons<K,
+                <UnwrapExpr<K, K::DebugForm<Elem>> as UnwrapExprTrait<K>>::Get,
+                <UnwrapExpr<List<K>, VisitList<K, ExprWrapper<List<K>>, Tail, ToListDebugFormVisitor<K>>> as UnwrapExprTrait<List<K>>>::Get
             >>;
         }
 

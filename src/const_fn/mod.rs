@@ -51,26 +51,27 @@ impl<Result, Args, U: ConstFnValue<Result, Args>> Value<ConstFn<Result, Args>> f
     type UnconstrainedImpl = <U as ConstFnValue<Result, Args>>::Impl;
 }
 
-pub struct AsConstFn<Result, Args, Fn: Expr<ConstFn<Result, Args>>> {
-    result: PhantomData<Result>,
-    args: PhantomData<Args>,
-    f: PhantomData<Fn>,
-}
-
-impl<Result, Args, Fn: Expr<ConstFn<Result, Args>>> ConstFnTraitWrapper<Result, Args> for AsConstFn<Result, Args, Fn> {
-    default type Fn = PanicWithAsConstFnError<Result, Args, Fn>;
-}
-
-impl<Result, Args, Fn: Expr<ConstFn<Result, Args>>> ConstFnTraitWrapper<Result, Args> for AsConstFn<Result, Args, Fn>
-    where <<Fn as Expr<ConstFn<Result, Args>>>::Eval as Value<ConstFn<Result, Args>>>::UnconstrainedImpl: ConstFnTraitWrapper<Result, Args> {
-    type Fn = <<<Fn as Expr<ConstFn<Result, Args>>>::Eval as Value<ConstFn<Result, Args>>>::UnconstrainedImpl as ConstFnTraitWrapper<Result, Args>>::Fn;
-}
-
 // The contents of this module have to be "pub" because otherwise Rust would complain that
 // "can't leak private type". The wrapping non-pub mod ensures that these are never explicitly
 // referenced outside.
 mod internal {
+    use std::marker::PhantomData;
     pub use crate::*;
+
+    pub struct AsConstFn<Result, Args, Fn: Expr<ConstFn<Result, Args>>> {
+        result: PhantomData<Result>,
+        args: PhantomData<Args>,
+        f: PhantomData<Fn>,
+    }
+
+    impl<Result, Args, Fn: Expr<ConstFn<Result, Args>>> ConstFnTraitWrapper<Result, Args> for AsConstFn<Result, Args, Fn> {
+        default type Fn = PanicWithAsConstFnError<Result, Args, Fn>;
+    }
+
+    impl<Result, Args, Fn: Expr<ConstFn<Result, Args>>> ConstFnTraitWrapper<Result, Args> for AsConstFn<Result, Args, Fn>
+        where <<Fn as Expr<ConstFn<Result, Args>>>::Eval as Value<ConstFn<Result, Args>>>::UnconstrainedImpl: ConstFnTraitWrapper<Result, Args> {
+        type Fn = <<<Fn as Expr<ConstFn<Result, Args>>>::Eval as Value<ConstFn<Result, Args>>>::UnconstrainedImpl as ConstFnTraitWrapper<Result, Args>>::Fn;
+    }
 
     // This is extracted as a separate function so that the build error message shows the expr, value
     // and impl that caused the error, to simplify debugging.

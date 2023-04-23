@@ -17,8 +17,8 @@ macro_rules! meta_assert_eq {
     ($K:ty, $X:ty, $Y:ty) => {{
         const EQ: bool = $crate::to_bool::<$crate::Equals<$K, $X, $Y>>();
         const _: () = $crate::assertions::internal::check_equal::<
-            <AsWrappedExpr<$K, <$K as $crate::KindWithDebugForm>::DebugForm<$X>> as AsWrappedExprTrait<$K>>::Get,
-            <AsWrappedExpr<$K, <$K as $crate::KindWithDebugForm>::DebugForm<$Y>> as AsWrappedExprTrait<$K>>::Get
+            <UnwrapExpr<$K, <$K as $crate::KindWithDebugForm>::DebugForm<$X>> as UnwrapExprTrait<$K>>::Get,
+            <UnwrapExpr<$K, <$K as $crate::KindWithDebugForm>::DebugForm<$Y>> as UnwrapExprTrait<$K>>::Get
         >(EQ);
     }};
 }
@@ -29,8 +29,8 @@ macro_rules! meta_assert_not_eq {
     ($K:ty, $X:ty, $Y:ty) => {{
         const EQ: bool = $crate::to_bool::<$crate::Equals<$K, $X, $Y>>();
         const _: () = $crate::assertions::internal::check_not_equal::<
-            <AsWrappedExpr<$K, <$K as $crate::KindWithDebugForm>::DebugForm<$X>> as AsWrappedExprTrait<$K>>::Get,
-            <AsWrappedExpr<$K, <$K as $crate::KindWithDebugForm>::DebugForm<$Y>> as AsWrappedExprTrait<$K>>::Get
+            <UnwrapExpr<$K, <$K as $crate::KindWithDebugForm>::DebugForm<$X>> as UnwrapExprTrait<$K>>::Get,
+            <UnwrapExpr<$K, <$K as $crate::KindWithDebugForm>::DebugForm<$Y>> as UnwrapExprTrait<$K>>::Get
         >(EQ);
     }};
 }

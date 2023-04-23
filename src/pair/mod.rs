@@ -38,6 +38,13 @@ impl<FirstK: KindWithDefault, SecondK: KindWithDefault> KindWithDefault for Pair
     type Default = ConsPair<FirstK, SecondK, FirstK::Default, SecondK::Default>;
 }
 
+impl<FirstK: KindWithDefault + KindWithDebugForm, SecondK: KindWithDefault + KindWithDebugForm> KindWithDebugForm for Pair<FirstK, SecondK> {
+    type DebugForm<E: Expr<Self>> = WrapExpr<Pair<FirstK, SecondK>, ConsPair<FirstK, SecondK,
+        <UnwrapExpr<FirstK, FirstK::DebugForm<GetFirst<FirstK, SecondK, E>>> as UnwrapExprTrait<FirstK>>::Get,
+        <UnwrapExpr<SecondK, SecondK::DebugForm<GetSecond<FirstK, SecondK, E>>> as UnwrapExprTrait<SecondK>>::Get
+    >>;
+}
+
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;

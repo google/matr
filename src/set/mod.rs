@@ -55,7 +55,7 @@ impl<K: EqualityComparableKind> KindWithDefault for Set<K> {
     type Default = EmptySet<K>;
 }
 
-impl<K: EqualityComparableKind> KindWithDebugForm for Set<K> {
+impl<K: KindWithDefault + EqualityComparableKind + KindWithDebugForm> KindWithDebugForm for Set<K> {
     type DebugForm<S: Expr<Set<K>>> =
         VisitSet<K, ExprWrapper<Set<K>>, S, ToSetDebugFormVisitor<K>>;
 }
@@ -80,11 +80,12 @@ mod internal {
     pub use crate::*;
 
     meta!{
-        pub struct ToSetDebugFormVisitor<K: EqualityComparableKind>: SetVisitor<K, ExprWrapper<Set<K>>> {
+        pub struct ToSetDebugFormVisitor<K: KindWithDefault + EqualityComparableKind + KindWithDebugForm>: SetVisitor<K, ExprWrapper<Set<K>>> {
             type VisitEmptySet = WrapExpr<Set<K>, EmptySet<K>>;
             type VisitCons<Elem: Expr<K>, Tail: Expr<Set<K>>> =
-                WrapExpr<Set<K>, AddToSet<K, Elem,
-                    <AsWrappedExpr<Set<K>, VisitSet<K, ExprWrapper<Set<K>>, Tail, ToSetDebugFormVisitor<K>>> as AsWrappedExprTrait<Set<K>>>::Get
+                WrapExpr<Set<K>, AddToSet<K,
+                    <UnwrapExpr<K, K::DebugForm<Elem>> as UnwrapExprTrait<K>>::Get,
+                    <UnwrapExpr<Set<K>, VisitSet<K, ExprWrapper<Set<K>>, Tail, ToSetDebugFormVisitor<K>>> as UnwrapExprTrait<Set<K>>>::Get
                 >>;
         }
 

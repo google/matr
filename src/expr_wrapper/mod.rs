@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+mod unwrap_expr;
+
+pub use unwrap_expr::*;
+
 use std::marker::PhantomData;
 use internal::*;
 
@@ -34,26 +38,8 @@ meta!{
     }
 }
 
-
 impl<K: Kind, E: ExprWrapperValue<K>> Value<ExprWrapper<K>> for E {
     type UnconstrainedImpl = <E as ExprWrapperValue<K>>::UnconstrainedImpl;
-}
-
-pub trait AsWrappedExprTrait<K: KindWithDefault> {
-    type Get: Expr<K>;
-}
-
-pub struct AsWrappedExpr<K: KindWithDefault, E: Expr<ExprWrapper<K>>> {
-    k: PhantomData<K>,
-    e: PhantomData<E>,
-}
-
-impl<K: KindWithDefault, E: Expr<ExprWrapper<K>>> AsWrappedExprTrait<K> for AsWrappedExpr<K, E> {
-    default type Get = K::Default;
-}
-
-impl<K: KindWithDefault, E: Expr<ExprWrapper<K>>> AsWrappedExprTrait<K> for AsWrappedExpr<K, E> where <<E as Expr<ExprWrapper<K>>>::Eval as Value<ExprWrapper<K>>>::UnconstrainedImpl: Expr<K> {
-    type Get = <<E as Expr<ExprWrapper<K>>>::Eval as Value<ExprWrapper<K>>>::UnconstrainedImpl;
 }
 
 // These have to be public because otherwise Rust would complain that "can't leak private type".
