@@ -25,6 +25,13 @@ pub struct ExprWrapper<K: Kind + ?Sized> {
 
 impl<K: Kind + ?Sized> Kind for ExprWrapper<K> {}
 
+impl<K: KindWithDefault> EqualityComparableKind for ExprWrapper<K> {
+    type Eq<X: Expr<ExprWrapper<K>>, Y: Expr<ExprWrapper<K>>> = Equals<Type,
+        WrapType<<UnwrapExpr<K, X> as UnwrapExprTrait<K>>::Get>,
+        WrapType<<UnwrapExpr<K, Y> as UnwrapExprTrait<K>>::Get>
+    >;
+}
+
 pub trait ExprWrapperValue<K: Kind> {
     type UnconstrainedImpl;
 }
