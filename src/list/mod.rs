@@ -112,8 +112,8 @@ mod internal {
         pub struct ToListDebugFormVisitor<K: KindWithDefault + KindWithDebugForm>: ListVisitor<K, ExprWrapper<List<K>>> {
             type VisitEmptyList = WrapExpr<List<K>, EmptyList<K>>;
             type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> = WrapExpr<List<K>, Cons<K,
-                <UnwrapExpr<K, K::DebugForm<Elem>> as UnwrapExprTrait<K>>::Get,
-                <UnwrapExpr<List<K>, VisitList<K, ExprWrapper<List<K>>, Tail, ToListDebugFormVisitor<K>>> as UnwrapExprTrait<List<K>>>::Get
+                UnwrapExpr<K, K::DebugForm<Elem>>,
+                UnwrapExpr<List<K>, VisitList<K, ExprWrapper<List<K>>, Tail, ToListDebugFormVisitor<K>>>
             >>;
         }
 

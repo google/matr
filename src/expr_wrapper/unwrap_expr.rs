@@ -12,26 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub trait UnwrapExprTrait<K: KindWithDefault> {
-    type Get: Expr<K>;
-}
-
-pub struct UnwrapExpr<K: KindWithDefault, E: Expr<ExprWrapper<K>>> {
-    k: PhantomData<K>,
-    e: PhantomData<E>,
-}
-
-impl<K: KindWithDefault, E: Expr<ExprWrapper<K>>> UnwrapExprTrait<K> for UnwrapExpr<K, E> {
-    default type Get = K::Default;
-}
-
-impl<K: KindWithDefault, E: Expr<ExprWrapper<K>>> UnwrapExprTrait<K> for UnwrapExpr<K, E> where <<E as Expr<ExprWrapper<K>>>::Eval as Value<ExprWrapper<K>>>::UnconstrainedImpl: Expr<K> {
-    type Get = <<E as Expr<ExprWrapper<K>>>::Eval as Value<ExprWrapper<K>>>::UnconstrainedImpl;
-}
+// Intended to be used with:
+// K: Kind
+// E: Expr<ExprWrapper<K>>
+// Then UnwrapExpr<K, E>: Expr<K>
+pub type UnwrapExpr<K, E> = <UnwrapExprHelper<K, E> as UnwrapExprTrait<K>>::Get;
 
 mod internal {
+    use std::marker::PhantomData;
     pub use crate::*;
+
+    pub trait UnwrapExprTrait<K: KindWithDefault> {
+        type Get: Expr<K>;
+    }
+
+    pub struct UnwrapExprHelper<K: KindWithDefault, E: Expr<ExprWrapper<K>>> {
+        k: PhantomData<K>,
+        e: PhantomData<E>,
+    }
+
+    impl<K: KindWithDefault, E: Expr<ExprWrapper<K>>> UnwrapExprTrait<K> for UnwrapExprHelper<K, E> {
+        default type Get = K::Default;
+    }
+
+    impl<K: KindWithDefault, E: Expr<ExprWrapper<K>>> UnwrapExprTrait<K> for UnwrapExprHelper<K, E> where <<E as Expr<ExprWrapper<K>>>::Eval as Value<ExprWrapper<K>>>::UnconstrainedImpl: Expr<K> {
+        type Get = <<E as Expr<ExprWrapper<K>>>::Eval as Value<ExprWrapper<K>>>::UnconstrainedImpl;
+    }
 }

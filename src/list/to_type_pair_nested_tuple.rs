@@ -30,10 +30,10 @@ mod internal {
             type VisitEmptyList = WrapType<()>;
             type VisitCons<Elem: Expr<Pair<Type, Type>>, Tail: Expr<List<Pair<Type, Type>>>> = WrapType<(
                 (
-                    <GetType<GetFirst<Type, Type, Elem>> as GetTypeTrait>::Get,
-                    <GetType<GetSecond<Type, Type, Elem>> as GetTypeTrait>::Get,
+                    UnwrapType<GetFirst<Type, Type, Elem>>,
+                    UnwrapType<GetSecond<Type, Type, Elem>>,
                 ),
-                <GetType<ToTypePairNestedTuple<Tail>> as GetTypeTrait>::Get
+                UnwrapType<ToTypePairNestedTuple<Tail>>
             )>;
         }
     }

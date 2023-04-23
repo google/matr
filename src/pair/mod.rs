@@ -40,8 +40,8 @@ impl<FirstK: KindWithDefault, SecondK: KindWithDefault> KindWithDefault for Pair
 
 impl<FirstK: KindWithDefault + KindWithDebugForm, SecondK: KindWithDefault + KindWithDebugForm> KindWithDebugForm for Pair<FirstK, SecondK> {
     type DebugForm<E: Expr<Self>> = WrapExpr<Pair<FirstK, SecondK>, ConsPair<FirstK, SecondK,
-        <UnwrapExpr<FirstK, FirstK::DebugForm<GetFirst<FirstK, SecondK, E>>> as UnwrapExprTrait<FirstK>>::Get,
-        <UnwrapExpr<SecondK, SecondK::DebugForm<GetSecond<FirstK, SecondK, E>>> as UnwrapExprTrait<SecondK>>::Get
+        UnwrapExpr<FirstK, FirstK::DebugForm<GetFirst<FirstK, SecondK, E>>>,
+        UnwrapExpr<SecondK, SecondK::DebugForm<GetSecond<FirstK, SecondK, E>>>
     >>;
 }
 

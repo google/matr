@@ -29,8 +29,8 @@ mod internal {
         pub struct ToTypeNestedTupleVisitor: ListVisitor<Type, Type> {
             type VisitEmptyList = WrapType<()>;
             type VisitCons<Elem: Expr<Type>, Tail: Expr<List<Type>>> = WrapType<(
-                <GetType<Elem> as GetTypeTrait>::Get,
-                <GetType<ToTypeNestedTuple<Tail>> as GetTypeTrait>::Get
+                UnwrapType<Elem>,
+                UnwrapType<ToTypeNestedTuple<Tail>>
             )>;
         }
     }

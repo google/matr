@@ -78,7 +78,7 @@ mod internal {
             type VisitOk<V: Expr<K>> = WrapExpr<
                 Result<K>,
                 Ok<K,
-                    <UnwrapExpr<K, K::DebugForm<V>> as UnwrapExprTrait<K>>::Get
+                    UnwrapExpr<K, K::DebugForm<V>>
                 >
             >;
         }

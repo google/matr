@@ -12,21 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-use std::marker::PhantomData;
 use internal::*;
 
-pub struct GetType<E: Expr<Type>> {
-    e: PhantomData<E>,
-}
-
-pub trait GetTypeTrait {
-    type Get;
-}
-
-impl<E: Expr<Type>> GetTypeTrait for GetType<E> {
-    type Get = <E::Eval as Value<Type>>::UnconstrainedImpl;
-}
+// Intended to be used with:
+// E: Expr<Type>
+// Then UnwrapType<E> is the type that E evaluates to.
+pub type UnwrapType<E> = <UnwrapTypeHelper<E> as UnwrapTypeTrait>::Get;
 
 mod internal {
+    use std::marker::PhantomData;
     pub use super::super::internal::*;
+
+    pub struct UnwrapTypeHelper<E: Expr<Type>> {
+        e: PhantomData<E>,
+    }
+
+    pub trait UnwrapTypeTrait {
+        type Get;
+    }
+
+    impl<E: Expr<Type>> UnwrapTypeTrait for UnwrapTypeHelper<E> {
+        type Get = <E::Eval as Value<Type>>::UnconstrainedImpl;
+    }
+
 }

@@ -84,8 +84,8 @@ mod internal {
             type VisitEmptySet = WrapExpr<Set<K>, EmptySet<K>>;
             type VisitCons<Elem: Expr<K>, Tail: Expr<Set<K>>> =
                 WrapExpr<Set<K>, AddToSet<K,
-                    <UnwrapExpr<K, K::DebugForm<Elem>> as UnwrapExprTrait<K>>::Get,
-                    <UnwrapExpr<Set<K>, VisitSet<K, ExprWrapper<Set<K>>, Tail, ToSetDebugFormVisitor<K>>> as UnwrapExprTrait<Set<K>>>::Get
+                    UnwrapExpr<K, K::DebugForm<Elem>>,
+                    UnwrapExpr<Set<K>, VisitSet<K, ExprWrapper<Set<K>>, Tail, ToSetDebugFormVisitor<K>>>
                 >>;
         }
 

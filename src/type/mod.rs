@@ -36,7 +36,7 @@ impl EqualityComparableKind for Type {
 }
 
 impl KindWithDebugForm for Type {
-    type DebugForm<T: Expr<Type>> = WrapExpr<Type, WrapType<<GetType<T> as GetTypeTrait>::Get>>;
+    type DebugForm<T: Expr<Type>> = WrapExpr<Type, WrapType<UnwrapType<T>>>;
 }
 
 pub struct WrapType<T> {

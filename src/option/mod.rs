@@ -92,7 +92,7 @@ mod internal {
         pub struct ToOptionDebugFormVisitor<K: KindWithDefault + KindWithDebugForm>: OptionVisitor<K, ExprWrapper<Option<K>>> {
             type VisitNone = WrapExpr<Option<K>, None<K>>;
             type VisitSome<X: Expr<K>> = WrapExpr<Option<K>, Some<K,
-                <UnwrapExpr<K, K::DebugForm<X>> as UnwrapExprTrait<K>>::Get
+                UnwrapExpr<K, K::DebugForm<X>>
             >>;
         }
 

@@ -89,9 +89,9 @@ mod internal {
             type VisitEmptyMap = WrapExpr<Map<K, V>, EmptyMap<K, V>>;
             type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> =
                 WrapExpr<Map<K, V>, Put<K, V,
-                    <UnwrapExpr<K, K::DebugForm<Key>> as UnwrapExprTrait<K>>::Get,
-                    <UnwrapExpr<V, V::DebugForm<Value>> as UnwrapExprTrait<V>>::Get,
-                    <UnwrapExpr<Map<K, V>, VisitMap<K, V, ExprWrapper<Map<K, V>>, Tail, ToMapDebugFormVisitor<K, V>>> as UnwrapExprTrait<Map<K, V>>>::Get
+                    UnwrapExpr<K, K::DebugForm<Key>>,
+                    UnwrapExpr<V, V::DebugForm<Value>>,
+                    UnwrapExpr<Map<K, V>, VisitMap<K, V, ExprWrapper<Map<K, V>>, Tail, ToMapDebugFormVisitor<K, V>>>
                 >>;
         }
 
