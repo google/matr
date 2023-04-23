@@ -49,25 +49,25 @@ pub mod internal {
         }
     }
 }
-//
-// #[cfg(test)]
-// #[allow(dead_code)]
-// mod tests {
-//     use crate::*;
-//
-//     #[test]
-//     fn assert_type_eq() {
-//         meta_assert_eq!(Type, WrapType<i32>, WrapType<i32>);
-//     }
-//
-//     #[test]
-//     fn assert_type_equals() {
-//         meta_assert_eq!(Bool, Equals<Type, WrapType<i32>, WrapType<i32>>, True);
-//         meta_assert_eq!(Bool, Equals<Type, WrapType<i32>, WrapType<i64>>, False);
-//     }
-//
-//     #[test]
-//     fn assert_type_not_eq() {
-//         meta_assert_not_eq!(Type, WrapType<i32>, WrapType<f64>);
-//     }
-// }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn assert_type_eq() {
+        meta_assert_eq!(Type, WrapType<i32>, WrapType<i32>);
+    }
+
+    #[test]
+    fn assert_bool_equals() {
+        meta_assert_eq!(Bool, Equals<Type, WrapType<i32>, WrapType<i32>>, True);
+        meta_assert_eq!(Bool, Equals<Type, WrapType<i32>, WrapType<i64>>, False);
+    }
+
+    #[test]
+    fn assert_type_not_eq() {
+        meta_assert_not_eq!(Type, WrapType<i32>, WrapType<f64>);
+    }
+}
