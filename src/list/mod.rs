@@ -64,14 +64,6 @@ impl<K: KindWithDefault + EqualityComparableKind + KindWithDebugForm> KindWithDe
     type DebugForm<L: Expr<List<K>>> = VisitList<K, ExprWrapper<List<K>>, L, ToListDebugFormVisitor<K>>;
 }
 
-pub trait ListValue<K: Kind> {
-    type Impl: ListTrait<K>;
-}
-
-impl<K: Kind, U: ListValue<K>> Value<List<K>> for U {
-    type UnconstrainedImpl = <U as ListValue<K>>::Impl;
-}
-
 pub trait ListVisitor<ElemK: Kind, OutK: Kind> {
     type VisitEmptyList: Expr<OutK>;
     type VisitCons<Elem: Expr<ElemK>, Tail: Expr<List<ElemK>>>: Expr<OutK>;
@@ -90,6 +82,14 @@ meta!{
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
+
+    pub trait ListValue<K: Kind> {
+        type Impl: ListTrait<K>;
+    }
+
+    impl<K: Kind, U: ListValue<K>> Value<List<K>> for U {
+        type UnconstrainedImpl = <U as ListValue<K>>::Impl;
+    }
 
     pub struct AsList<K: Kind, L: Expr<List<K>>> {
         k: PhantomData<K>,
