@@ -53,3 +53,33 @@ mod internal {
         }
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use super::internal::*;
+
+    meta!{
+        pub struct ToUnsigned32ConstFn: const ConstFnTrait<u32, i32> {
+            fn apply(n: i32) -> u32 {
+                return n as u32
+            }
+        }
+    }
+
+    #[test]
+    fn ok() {
+        assert_eq!(
+            call_const_fn::<std::result::Result<u32, &'static str>, i32, ToResultConstFn<u32, i32, Ok<ConstFn<u32, i32>, WrapConstFn<u32, i32, ToUnsigned32ConstFn>>>>(42 as i32),
+            std::result::Result::Ok(42 as u32));
+    }
+
+    struct MyError {}
+
+    #[test]
+    fn error() {
+        assert_eq!(
+            call_const_fn::<std::result::Result<u32, &'static str>, i32, ToResultConstFn<u32, i32, Err<ConstFn<u32, i32>, MyError>>>(42 as i32),
+            std::result::Result::Err("error Result in ToResultConstFn"));
+    }
+}

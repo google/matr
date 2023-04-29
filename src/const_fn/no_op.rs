@@ -40,4 +40,3 @@ mod tests {
         call_const_fn::<(), (), NoOpConstFn>(());
     }
 }
-
