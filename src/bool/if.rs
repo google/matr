@@ -22,30 +22,12 @@ meta!{
         Else: Expr<ResultK>
     >: Expr<ResultK> =
         <AsBool<B> as BoolTrait>::Cond<ResultK, Then, Else>;
-
-    pub type IfResult<
-        ResultK: Kind,
-        B: Expr<Result<Bool>>,
-        Then: Expr<Result<ResultK>>,
-        Else: Expr<Result<ResultK>>
-    >: Expr<Result<ResultK>> =
-        AndThen<Bool, ResultK, B, IfResultImpl<ResultK, Then, Else>>;
 }
 
 // These have to be public because otherwise Rust would complain that "can't leak private type".
 // But they should never be explicitly referenced elsewhere.
 mod internal {
     pub use super::super::internal::*;
-
-    meta!{
-        pub struct IfResultImpl<
-            ResultK: Kind,
-            Then: Expr<Result<ResultK>>,
-            Else: Expr<Result<ResultK>>
-        >: Functor1<Bool, Result<ResultK>> {
-            type Apply<B: Expr<Bool>> = <AsBool<B> as BoolTrait>::Cond<Result<ResultK>, Then, Else>;
-        }
-    }
 }
 
 #[cfg(test)]
@@ -60,14 +42,8 @@ mod tests {
 
         meta_assert_eq!(Bool, If<Bool, False, False, True>, True);
         meta_assert_eq!(Bool, If<Bool, True, False, True>, False);
-    }
 
-    #[test]
-    fn if_result_function() {
-        meta_assert_eq!(Result<Type>, IfResult<Type, Ok<Bool, True>, Ok<Type, WrapType<u32>>, Ok<Type, WrapType<f64>>>, Ok<Type, WrapType<u32>>);
-        meta_assert_eq!(Result<Type>, IfResult<Type, Ok<Bool, False>, Ok<Type, WrapType<u32>>, Ok<Type, WrapType<f64>>>, Ok<Type, WrapType<f64>>);
-
-        meta_assert_eq!(Result<Bool>, IfResult<Bool, Ok<Bool, False>, Ok<Bool, False>, Ok<Bool, True>>, Ok<Bool, True>);
-        meta_assert_eq!(Result<Bool>, IfResult<Bool, Ok<Bool, True>, Ok<Bool, False>, Ok<Bool, True>>, Ok<Bool, False>);
+        meta_assert_eq!(Bool, If<Bool, False, LongRecursion<OneBillion>, False>, False);
+        meta_assert_eq!(Bool, If<Bool, True, False, LongRecursion<OneBillion>>, False);
     }
 }

@@ -19,6 +19,7 @@ mod r#if;
 mod not;
 mod or;
 mod to_bool;
+mod if_result;
 
 pub use and::*;
 pub use r#true::*;
@@ -27,6 +28,7 @@ pub use r#if::*;
 pub use not::*;
 pub use or::*;
 pub use to_bool::*;
+pub use if_result::*;
 
 use internal::*;
 

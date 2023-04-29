@@ -21,16 +21,17 @@ meta!{
     // so many times that any reasonable recursion steps maximum would be exceeded.
     pub type LongRecursion<
         N: Expr<USize>
-    >: Expr<Bool> = 
+    >: Expr<Bool> =
         IsEven<Sum<N, OneBillion>>;
 }
+
+pub type OneBillion = Multiply<Multiply<OneThousand, OneThousand>, OneThousand>;
 
 mod internal {
     pub use crate::*;
 
-    type Ten = Increment<Increment<Increment<Increment<Increment<Increment<Increment<Increment<Increment<Increment<Zero>>>>>>>>>>;
-    type OneThousand = Multiply<Multiply<Ten, Ten>, Ten>;
-    pub type OneBillion = Multiply<Multiply<OneThousand, OneThousand>, OneThousand>;
+    pub type Ten = Increment<Increment<Increment<Increment<Increment<Increment<Increment<Increment<Increment<Increment<Zero>>>>>>>>>>;
+    pub type OneThousand = Multiply<Multiply<Ten, Ten>, Ten>;
 }
 
 #[cfg(test)]
