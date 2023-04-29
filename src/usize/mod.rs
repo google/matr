@@ -42,6 +42,10 @@ impl KindWithDefault for USize {
     type Default = Zero;
 }
 
+impl KindWithDebugForm for USize {
+    type DebugForm<E: Expr<Self>> = VisitUSize<ExprWrapper<USize>, E, ToUSizeDebugFormVisitor>;
+}
+
 pub trait USizeVisitor<ResultK: Kind> {
     type VisitZero: Expr<ResultK>;
     type VisitIncrement<N: Expr<USize>>: Expr<ResultK>;
@@ -108,6 +112,11 @@ mod internal {
         >: USizeVisitor<Bool> {
             type VisitZero = False;
             type VisitIncrement<N: Expr<USize>> = <AsUSize<N> as USizeTrait>::Visit<Bool, USizeEqualsVisitor<Other>>;
+        }
+
+        pub struct ToUSizeDebugFormVisitor: USizeVisitor<ExprWrapper<USize>> {
+            type VisitZero = WrapExpr<USize, Zero>;
+            type VisitIncrement<N: Expr<USize>> = WrapExpr<USize, Increment<UnwrapExpr<USize, VisitUSize<ExprWrapper<USize>, N, ToUSizeDebugFormVisitor>>>>;
         }
     }
 }
