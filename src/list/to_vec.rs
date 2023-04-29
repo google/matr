@@ -14,7 +14,7 @@
 
 use internal::*;
 
-pub fn to_vec<K: Kind, L: Expr<List<K>>, OutT, F: Functor1<K, RuntimeFn<OutT, ()>>>() -> Vec<OutT> {
+pub fn to_vec<K: Kind, OutT, L: Expr<List<K>>, F: Functor1<K, RuntimeFn<OutT, ()>>>() -> Vec<OutT> {
     return call_runtime_fn::<Vec<OutT>, (), ToReversedVec<K, ReverseList<K, L>, OutT, F>>(());
 }
 
@@ -58,5 +58,42 @@ mod internal {
                 return v;
             }
         }
+    }
+}
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use std::any::type_name;
+    use crate::*;
+
+    meta!{
+        struct TypeToStr: Functor1<Type, RuntimeFn<&'static str, ()>> {
+            type Apply<X: Expr<Type>> = WrapRuntimeFn<&'static str, (), TypeToStrImpl<X>>;
+        }
+
+        struct TypeToStrImpl<
+            X: Expr<Type>
+        >: RuntimeFnTrait<&str, ()> {
+            fn apply(_: ()) -> &'static str {
+                type_name::<UnwrapType<X>>()
+            }
+        }
+    }
+
+    #[test]
+    fn empty_list_to_vec() {
+        let v = to_vec::<Type, &'static str, EmptyList<Type>, TypeToStr>();
+        assert_eq!(v, vec![""; 0]);
+    }
+
+    #[test]
+    fn list_to_vec() {
+        struct Foo {}
+        struct Bar {}
+
+        type L = Cons<Type, WrapType<Foo>, Cons<Type, WrapType<Bar>, EmptyList<Type>>>;
+        let v = to_vec::<Type, &'static str, L, TypeToStr>();
+        assert_eq!(v, vec!["matr::list::to_vec::tests::list_to_vec::Foo", "matr::list::to_vec::tests::list_to_vec::Bar"]);
     }
 }

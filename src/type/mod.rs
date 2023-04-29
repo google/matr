@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-mod get_type;
+mod unwrap_type;
 
-pub use get_type::*;
+pub use unwrap_type::*;
 
 use std::marker::PhantomData;
 use internal::*;

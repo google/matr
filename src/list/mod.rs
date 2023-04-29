@@ -25,7 +25,7 @@ mod to_type_nested_tuple;
 mod list_size;
 pub mod type_list;
 mod to_type_pair_nested_tuple;
-mod list;
+mod meta_list;
 mod to_type_triple_nested_tuple;
 
 pub use empty_list::*;
@@ -40,7 +40,7 @@ pub use remove_from_list::*;
 pub use to_type_nested_tuple::*;
 pub use list_size::*;
 pub use to_type_pair_nested_tuple::*;
-pub use list::*;
+pub use meta_list::*;
 pub use to_type_triple_nested_tuple::*;
 
 use std::marker::PhantomData;
@@ -147,5 +147,29 @@ mod internal {
             type VisitEmptyList = False;
             type VisitCons<Elem2: Expr<K>, Tail2: Expr<List<K>>> = And<Equals<K, Elem, Elem2>, Equals<List<K>, Tail, Tail2>>;
         }
+    }
+}
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn equals() {
+        meta_assert_eq!(List<Type>, type_list![], type_list![]);
+        meta_assert_eq!(List<Type>, type_list![i32, u64], type_list![i32, u64]);
+        meta_assert_not_eq!(List<Type>, type_list![], type_list![i32]);
+        meta_assert_not_eq!(List<Type>, type_list![i32, u64], type_list![u64, i32]);
+    }
+
+    #[test]
+    fn default() {
+        meta_assert_eq!(List<Type>, <List<Type> as KindWithDefault>::Default, type_list![]);
+    }
+
+    #[test]
+    fn debug_form() {
+        meta_assert_eq!(ExprWrapper<List<Bool>>, <List<Bool> as KindWithDebugForm>::DebugForm<Cons<Bool, And<True, False>, EmptyList<Bool>>>, WrapExpr<List<Bool>, Cons<Bool, False, EmptyList<Bool>>>);
     }
 }

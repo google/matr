@@ -15,7 +15,7 @@
 use internal::*;
 
 pub fn to_usize_vec<L: Expr<List<USize>>>() -> Vec<usize> {
-    return to_vec::<USize, L, usize, ToUsizeFunctor>();
+    return to_vec::<USize, usize, L, ToUsizeFunctor>();
 }
 
 mod internal {

@@ -14,7 +14,7 @@
 
 use internal::*;
 
-// Converts a List<Pair<Type, Pair<Type, Type>> into a tuple of the form (T0, (T1, (T2, ()))).
+// Converts a List<Pair<Type, Pair<Type, Type>> into a tuple of the form ((T0, U0, V0), ((T1, U1, V1), ((T2, U2, V2), ()))).
 meta!{
     pub type ToTypeTripleNestedTuple<
         L: Expr<List<Pair<Type, Pair<Type, Type>>>>
@@ -54,7 +54,7 @@ mod tests {
 
     #[test]
     fn list_to_type_triple_nested_tuple() {
-        type L = list!(<Pair<Type, Pair<Type, Type>>>[
+        type L = meta_list!(<Pair<Type, Pair<Type, Type>>>[
             ConsPair<Type, Pair<Type, Type>, WrapType<usize>, ConsPair<Type, Type, WrapType<isize>, WrapType<(isize,)>>>,
             ConsPair<Type, Pair<Type, Type>, WrapType<f32>, ConsPair<Type, Type, WrapType<f64>, WrapType<(f64,)>>>,
             ConsPair<Type, Pair<Type, Type>, WrapType<u64>, ConsPair<Type, Type, WrapType<i64>, WrapType<(i64,)>>>]);

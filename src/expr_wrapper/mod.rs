@@ -40,10 +40,6 @@ impl<K: KindWithDefault> KindWithDefault for ExprWrapper<K> {
     type Default = WrapExpr<K, K::Default>;
 }
 
-pub trait ExprWrapperValue<K: Kind> {
-    type UnconstrainedImpl;
-}
-
 meta!{
     pub struct WrapExpr<
         K: Kind,
@@ -53,14 +49,19 @@ meta!{
     }
 }
 
-impl<K: Kind, E: ExprWrapperValue<K>> Value<ExprWrapper<K>> for E {
-    type UnconstrainedImpl = <E as ExprWrapperValue<K>>::UnconstrainedImpl;
-}
 
 // These have to be public because otherwise Rust would complain that "can't leak private type".
 // But they should never be explicitly referenced elsewhere.
 mod internal {
     pub use crate::*;
+
+    pub trait ExprWrapperValue<K: Kind> {
+        type UnconstrainedImpl;
+    }
+
+    impl<K: Kind, E: ExprWrapperValue<K>> Value<ExprWrapper<K>> for E {
+        type UnconstrainedImpl = <E as ExprWrapperValue<K>>::UnconstrainedImpl;
+    }
 
     meta!{
         pub struct WrapExprValue<

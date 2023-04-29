@@ -24,3 +24,19 @@ macro_rules! type_list {
     };
 }
 pub use type_list;
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn empty_list() {
+        meta_assert_eq!(List<Type>, type_list![], EmptyList<Type>);
+    }
+
+    #[test]
+    fn list() {
+        meta_assert_eq!(List<Type>, type_list![i32, u32], Cons<Type, WrapType<i32>, Cons<Type, WrapType<u32>, EmptyList<Type>>>);
+    }
+}

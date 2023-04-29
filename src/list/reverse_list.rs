@@ -25,3 +25,20 @@ meta!{
 mod internal {
     pub use super::super::internal::*;
 }
+
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn empty_list() {
+        meta_assert_eq!(List<Type>, ReverseList<Type, EmptyList<Type>>, EmptyList<Type>);
+    }
+
+    #[test]
+    fn list() {
+        meta_assert_eq!(List<Type>, ReverseList<Type, type_list![i32, f32, usize]>, type_list![usize, f32, i32]);
+    }
+}

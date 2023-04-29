@@ -39,3 +39,29 @@ mod internal {
         }
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use std::marker::PhantomData;
+    use crate::*;
+
+    struct CalledVisitEmptyList {}
+
+    struct CalledVisitCons<Elem: Expr<Type>, Tail: Expr<List<Type>>> {
+        elem: PhantomData<Elem>,
+        tail: PhantomData<Tail>,
+    }
+
+    meta!{
+        struct MyVisitor : ListVisitor<Type, Type> {
+            type VisitEmptyList = WrapType<CalledVisitEmptyList>;
+            type VisitCons<Elem: Expr<Type>, Tail: Expr<List<Type>>> = WrapType<CalledVisitCons<Elem, Tail>>;
+        }
+    }
+
+    #[test]
+    fn visit() {
+        meta_assert_eq!(Type, VisitList<Type, Type, EmptyList<Type>, MyVisitor>, WrapType<CalledVisitEmptyList>);
+    }
+}
