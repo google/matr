@@ -31,46 +31,16 @@ mod internal {
             OutT: Eq + Hash,
             F: Functor1<K, RuntimeFn<OutT, ()>>
         >: SetVisitor<K, RuntimeFn<HashSet<OutT>, ()>> {
-            type VisitEmptySet = EmptyHashSet<OutT>;
-            type VisitCons<Elem: Expr<K>, Tail: Expr<Set<K>>> = AddToHashSet<K, Elem, OutT, F, VisitSet<K, RuntimeFn<HashSet<OutT>, ()>, Tail, ToHashSetVisitor<K, OutT, F>>>;
+            type VisitEmptySet = WrapRuntimeFn<HashSet<OutT>, (), EmptyHashSetImpl<OutT>>;
+            type VisitCons<Elem: Expr<K>, Tail: Expr<Set<K>>> = WrapRuntimeFn<HashSet<OutT>, (), AddToHashSetImpl<K, Elem, OutT, F, VisitSet<K, RuntimeFn<HashSet<OutT>, ()>, Tail, ToHashSetVisitor<K, OutT, F>>>>;
         }
-        
-        pub struct EmptyHashSet<OutT: Eq + Hash>: Expr<RuntimeFn<HashSet<OutT>, ()>> {
-            type Eval = EmptyHashSetValue<OutT>;
-        }
-        
-        pub struct EmptyHashSetValue<
-            OutT: Eq + Hash
-        >: RuntimeFnValue<HashSet<OutT>, ()> {
-            type Impl = EmptyHashSetImpl<OutT>;
-        }
-        
+
         pub struct EmptyHashSetImpl<
             OutT: Eq + Hash
         >: RuntimeFnTrait<HashSet<OutT>, ()> {
             fn apply(_: ()) -> HashSet<OutT> {
                 return HashSet::new();
             }
-        }
-        
-        pub struct AddToHashSet<
-            K: Kind, 
-            Elem: Expr<K>, 
-            OutT: Eq + Hash,
-            F: Functor1<K, RuntimeFn<OutT, ()>>, 
-            TailHashSet: Expr<RuntimeFn<HashSet<OutT>, ()>>
-        >: Expr<RuntimeFn<HashSet<OutT>, ()>> {
-            type Eval = AddToHashSetValue<K, Elem, OutT, F, TailHashSet>;
-        }
-        
-        pub struct AddToHashSetValue<
-            K: Kind,
-            Elem: Expr<K>, 
-            OutT: Eq + Hash, 
-            F: Functor1<K, RuntimeFn<OutT, ()>>, 
-            TailHashSet: Expr<RuntimeFn<HashSet<OutT>, ()>>
-        >: RuntimeFnValue<HashSet<OutT>, ()> {
-            type Impl = AddToHashSetImpl<K, Elem, OutT, F, TailHashSet>;
         }
         
         pub struct AddToHashSetImpl<

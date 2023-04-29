@@ -20,7 +20,11 @@ meta!{
         Args,
         E: Expr<Result<RuntimeFn<Out, Args>>>
     >: Expr<RuntimeFn<std::result::Result<Out, &'static str>, Args>> =
-        ResultOrValue<RuntimeFn<std::result::Result<Out, &'static str>, Args>, AndThen<RuntimeFn<Out, Args>, RuntimeFn<std::result::Result<Out, &'static str>, Args>, E, ToResultRuntimeFnAdapter<Out, Args>>, ToResultRuntimeFnError<Out, Args>>;
+        ResultOrValue<RuntimeFn<std::result::Result<Out, &'static str>, Args>,
+            AndThen<RuntimeFn<Out, Args>, RuntimeFn<std::result::Result<Out, &'static str>, Args>,
+                E,
+                ToResultRuntimeFnAdapter<Out, Args>>,
+            WrapRuntimeFn<std::result::Result<Out, &'static str>, Args, ToResultRuntimeFnErrorImpl<Out, Args>>>;
 }
 
 mod internal {
@@ -31,23 +35,8 @@ mod internal {
             Out,
             Args
         >: Functor1<RuntimeFn<Out, Args>, Result<RuntimeFn<std::result::Result<Out, &'static str>, Args>>> {
-            type Apply<X: Expr<RuntimeFn<Out, Args>>> = Ok<RuntimeFn<std::result::Result<Out, &'static str>, Args>, ToResultRuntimeFnAdapterExpr<Out, Args, X>>;
-        }
-
-        pub struct ToResultRuntimeFnAdapterExpr<
-            Out,
-            Args,
-            X: Expr<RuntimeFn<Out, Args>>
-        >: Expr<RuntimeFn<std::result::Result<Out, &'static str>, Args>> {
-            type Eval = ToResultRuntimeFnAdapterValue<Out, Args, X>;
-        }
-
-        pub struct ToResultRuntimeFnAdapterValue<
-            Out,
-            Args,
-            X: Expr<RuntimeFn<Out, Args>>
-        >: RuntimeFnValue<std::result::Result<Out, &'static str>, Args> {
-            type Impl = ToResultRuntimeFnAdapterImpl<Out, Args, X>;
+            type Apply<X: Expr<RuntimeFn<Out, Args>>> = Ok<RuntimeFn<std::result::Result<Out, &'static str>, Args>,
+                WrapRuntimeFn<std::result::Result<Out, &'static str>, Args, ToResultRuntimeFnAdapterImpl<Out, Args, X>>>;
         }
 
         pub struct ToResultRuntimeFnAdapterImpl<
@@ -58,20 +47,6 @@ mod internal {
             fn apply(args: Args) -> std::result::Result<Out, &'static str> {
                 return Ok(call_runtime_fn::<Out, Args, X>(args));
             }
-        }
-
-        pub struct ToResultRuntimeFnError<
-            Out,
-            Args
-        >: Expr<RuntimeFn<std::result::Result<Out, &'static str>, Args>> {
-            type Eval = ToResultRuntimeFnErrorValue<Out, Args>;
-        }
-
-        pub struct ToResultRuntimeFnErrorValue<
-            Out,
-            Args
-        >: RuntimeFnValue<std::result::Result<Out, &'static str>, Args> {
-            type Impl = ToResultRuntimeFnErrorImpl<Out, Args>;
         }
 
         pub struct ToResultRuntimeFnErrorImpl<Out, Args>: RuntimeFnTrait<std::result::Result<Out, &'static str>, Args> {

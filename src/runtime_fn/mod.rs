@@ -34,12 +34,14 @@ pub trait RuntimeFnTrait<Result, Args> {
     fn apply(args: Args) -> Result;
 }
 
-pub trait RuntimeFnValue<Result, Args> {
-    type Impl: RuntimeFnTrait<Result, Args>;
-}
-
-impl<Result, Args, U: RuntimeFnValue<Result, Args>> Value<RuntimeFn<Result, Args>> for U {
-    type UnconstrainedImpl = <U as RuntimeFnValue<Result, Args>>::Impl;
+meta!{
+    pub struct WrapRuntimeFn<
+        Result,
+        Args,
+        F: RuntimeFnTrait<Result, Args>
+    >: Expr<RuntimeFn<Result, Args>> {
+        type Eval = WrapRuntimeFnValue<Result, Args, F>;
+    }
 }
 
 // The contents of this module have to be "pub" because otherwise Rust would complain that
@@ -48,6 +50,24 @@ impl<Result, Args, U: RuntimeFnValue<Result, Args>> Value<RuntimeFn<Result, Args
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
+
+    pub trait RuntimeFnValue<Result, Args> {
+        type Impl: RuntimeFnTrait<Result, Args>;
+    }
+
+    impl<Result, Args, U: RuntimeFnValue<Result, Args>> Value<RuntimeFn<Result, Args>> for U {
+        type UnconstrainedImpl = <U as RuntimeFnValue<Result, Args>>::Impl;
+    }
+
+    meta!{
+        pub struct WrapRuntimeFnValue<
+            Result,
+            Args,
+            F: RuntimeFnTrait<Result, Args>
+        >: RuntimeFnValue<Result, Args> {
+            type Impl = F;
+        }
+    }
 
     pub struct AsRuntimeFn<Result, Args, Fn: Expr<RuntimeFn<Result, Args>>> {
         result: PhantomData<Result>,

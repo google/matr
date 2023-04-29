@@ -25,19 +25,7 @@ mod internal {
     
     meta!{
         pub struct ToUSizeHashSetFunctor: Functor1<USize, RuntimeFn<usize, ()>> {
-            type Apply<N: Expr<USize>> = ToUSizeConstFn<N>;
-        }
-        
-        pub struct ToUSizeConstFn<
-            N: Expr<USize>
-        >: Expr<RuntimeFn<usize, ()>> {
-            type Eval = ToUSizeConstFnValue<N>;
-        }
-        
-        pub struct ToUSizeConstFnValue<
-            N: Expr<USize>
-        >: RuntimeFnValue<usize, ()> {
-            type Impl = ToUSizeConstFnImpl<N>;
+            type Apply<N: Expr<USize>> = WrapRuntimeFn<usize, (), ToUSizeConstFnImpl<N>>;
         }
         
         pub struct ToUSizeConstFnImpl<

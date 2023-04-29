@@ -33,18 +33,10 @@ mod tests {
                 return n + 42;
             }
         }
-        
-        struct Add42Value: RuntimeFnValue<i32, i32> {
-            type Impl = Add42Impl;
-        }
-        
-        struct Add42: Expr<RuntimeFn<i32, i32>> {
-            type Eval = Add42Value;
-        }
     }
     
     #[test]
     fn call() {
-        assert_eq!(call_runtime_fn::<i32, i32, Add42>(1000), 1042);
+        assert_eq!(call_runtime_fn::<i32, i32, WrapRuntimeFn<i32, i32, Add42Impl>>(1000), 1042);
     }
 }

@@ -23,21 +23,9 @@ mod internal {
 
     meta!{
         pub struct ToUsizeFunctor: Functor1<USize, RuntimeFn<usize, ()>> {
-            type Apply<N: Expr<USize>> = ToUSize<N>;
+            type Apply<N: Expr<USize>> = WrapRuntimeFn<usize, (), ToUSizeImpl<N>>;
         }
-
-        pub struct ToUSize<
-            N: Expr<USize>
-        >: Expr<RuntimeFn<usize, ()>> {
-            type Eval = ToUSizeValue<N>;
-        }
-
-        pub struct ToUSizeValue<
-            N: Expr<USize>
-        >: RuntimeFnValue<usize, ()> {
-            type Impl = ToUSizeImpl<N>;
-        }
-
+        
         pub struct ToUSizeImpl<
             N: Expr<USize>
         >: RuntimeFnTrait<usize, ()> {

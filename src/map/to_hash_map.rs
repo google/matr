@@ -35,22 +35,10 @@ mod internal {
             KeyF: Functor1<K, RuntimeFn<OutK, ()>>, 
             ValueF: Functor1<V, RuntimeFn<OutV, ()>>
         >: MapVisitor<K, V, RuntimeFn<HashMap<OutK, OutV>, ()>> {
-            type VisitEmptyMap = EmptyHashMap<OutK, OutV>;
-            type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> = AddToHashMap<K, V, ConsPair<K, V, Key, Value>, OutK, OutV, KeyF, ValueF, VisitMap<K, V, RuntimeFn<HashMap<OutK, OutV>, ()>, Tail, ToHashMapVisitor<K, V, OutK, OutV, KeyF, ValueF>>>;
-        }
-
-        pub struct EmptyHashMap<
-            OutK: Eq + Hash, 
-            OutV
-        >: Expr<RuntimeFn<HashMap<OutK, OutV>, ()>> {
-            type Eval = EmptyHashMapValue<OutK, OutV>;
-        }
-
-        pub struct EmptyHashMapValue<
-            OutK: Eq + Hash,
-            OutV
-        >: RuntimeFnValue<HashMap<OutK, OutV>, ()> {
-            type Impl = EmptyHashMapImpl<OutK, OutV>;
+            type VisitEmptyMap = WrapRuntimeFn<HashMap<OutK, OutV>, (), EmptyHashMapImpl<OutK, OutV>>;
+            type VisitEntry<Key: Expr<K>, Value: Expr<V>, Tail: Expr<Map<K, V>>> =
+                WrapRuntimeFn<HashMap<OutK, OutV>, (), 
+                    AddToHashMapImpl<K, V, ConsPair<K, V, Key, Value>, OutK, OutV, KeyF, ValueF, VisitMap<K, V, RuntimeFn<HashMap<OutK, OutV>, ()>, Tail, ToHashMapVisitor<K, V, OutK, OutV, KeyF, ValueF>>>>;
         }
 
         pub struct EmptyHashMapImpl<OutK: Eq + Hash, OutV>: RuntimeFnTrait<HashMap<OutK, OutV>, ()> {
@@ -59,32 +47,6 @@ mod internal {
             }
         }
 
-        pub struct AddToHashMap<
-            K: KindWithDefault,
-            V: KindWithDefault,
-            Elem: Expr<Pair<K, V>>,
-            OutK: Eq + Hash, 
-            OutV, 
-            KeyF: Functor1<K, RuntimeFn<OutK, ()>>,
-            ValueF: Functor1<V, RuntimeFn<OutV, ()>>, 
-            TailHashMap: Expr<RuntimeFn<HashMap<OutK, OutV>, ()>>
-        >: Expr<RuntimeFn<HashMap<OutK, OutV>, ()>> {
-            type Eval = AddToHashMapValue<K, V, Elem, OutK, OutV, KeyF, ValueF, TailHashMap>;
-        }
-
-        pub struct AddToHashMapValue<
-            K: KindWithDefault, 
-            V: KindWithDefault, 
-            Elem: Expr<Pair<K, V>>, 
-            OutK: Eq + Hash, 
-            OutV, 
-            KeyF: Functor1<K, RuntimeFn<OutK, ()>>, 
-            ValueF: Functor1<V, RuntimeFn<OutV, ()>>,
-            TailHashMap: Expr<RuntimeFn<HashMap<OutK, OutV>, ()>>
-        >: RuntimeFnValue<HashMap<OutK, OutV>, ()> {
-            type Impl = AddToHashMapImpl<K, V, Elem, OutK, OutV, KeyF, ValueF, TailHashMap>;
-        }
-        
         pub struct AddToHashMapImpl<
             K: KindWithDefault, 
             V: KindWithDefault, 

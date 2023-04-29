@@ -16,19 +16,14 @@ use crate::*;
 use internal::*;
 
 meta!{
-    pub struct NoOpRuntimeFn: Expr<RuntimeFn<(), ()>> {
-        type Eval = NoOpRuntimeFnValue;
-    }
+    pub type NoOpRuntimeFn: Expr<RuntimeFn<(), ()>> =
+        WrapRuntimeFn<(), (), NoOpRuntimeFnImpl>;
 }
 
 mod internal {
     use crate::*;
 
     meta!{
-        pub struct NoOpRuntimeFnValue: RuntimeFnValue<(), ()> {
-            type Impl = NoOpRuntimeFnImpl;
-        }
-
         pub struct NoOpRuntimeFnImpl: RuntimeFnTrait<(), ()> {
             fn apply(_: ()) -> () {}
         }

@@ -35,46 +35,14 @@ mod internal {
             OutT,
             F: Functor1<K, RuntimeFn<OutT, ()>>
         >: ListVisitor<K, RuntimeFn<Vec<OutT>, ()>> {
-            type VisitEmptyList = EmptyVec<OutT>;
-            type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> = AddToVec<K, Elem, OutT, F, ToReversedVec<K, Tail, OutT, F>>;
+            type VisitEmptyList = WrapRuntimeFn<Vec<OutT>, (), EmptyVec<OutT>>;
+            type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> = WrapRuntimeFn<Vec<OutT>, (), AddToVecImpl<K, Elem, OutT, F, ToReversedVec<K, Tail, OutT, F>>>;
         }
 
-        pub struct EmptyVec<
-            OutT
-        >: Expr<RuntimeFn<Vec<OutT>, ()>> {
-            type Eval = EmptyVecValue<OutT>;
-        }
-
-        pub struct EmptyVecValue<
-            OutT
-        >: RuntimeFnValue<Vec<OutT>, ()> {
-            type Impl = EmptyVecImpl<OutT>;
-        }
-
-        pub struct EmptyVecImpl<OutT>: RuntimeFnTrait<Vec<OutT>, ()> {
+        pub struct EmptyVec<OutT>: RuntimeFnTrait<Vec<OutT>, ()> {
             fn apply(_: ()) -> Vec<OutT> {
                 return vec![];
             }
-        }
-
-        pub struct AddToVec<
-            K: Kind,
-            Elem: Expr<K>,
-            OutT,
-            F: Functor1<K, RuntimeFn<OutT, ()>>,
-            TailVec: Expr<RuntimeFn<Vec<OutT>, ()>>
-        >: Expr<RuntimeFn<Vec<OutT>, ()>> {
-            type Eval = AddToVecValue<K, Elem, OutT, F, TailVec>;
-        }
-
-        pub struct AddToVecValue<
-            K: Kind,
-            Elem: Expr<K>,
-            OutT,
-            F: Functor1<K, RuntimeFn<OutT, ()>>,
-            TailVec: Expr<RuntimeFn<Vec<OutT>, ()>>
-        >: RuntimeFnValue<Vec<OutT>, ()> {
-            type Impl = AddToVecImpl<K, Elem, OutT, F, TailVec>;
         }
 
         pub struct AddToVecImpl<
