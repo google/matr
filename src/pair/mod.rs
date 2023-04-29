@@ -91,3 +91,27 @@ mod internal {
                 Equals<SecondK, GetSecond<FirstK, SecondK, X>, GetSecond<FirstK, SecondK, Y>>>;
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn equals() {
+        meta_assert_eq!(Pair<Type, Type>, ConsPair<Type, Type, WrapType<i32>, WrapType<i64>>, ConsPair<Type, Type, WrapType<i32>, WrapType<i64>>);
+        meta_assert_not_eq!(Pair<Type, Type>, ConsPair<Type, Type, WrapType<i32>, WrapType<i64>>, ConsPair<Type, Type, WrapType<i64>, WrapType<i32>>);
+    }
+
+    #[test]
+    fn default() {
+        meta_assert_eq!(Pair<Option<Type>, Option<Type>>, <Pair<Option<Type>, Option<Type>> as KindWithDefault>::Default, ConsPair<Option<Type>, Option<Type>, None<Type>, None<Type>>);
+    }
+
+    #[test]
+    fn debug_form() {
+        meta_assert_eq!(ExprWrapper<Pair<Bool, Bool>>,
+            <Pair<Bool, Bool> as KindWithDebugForm>::DebugForm<ConsPair<Bool, Bool, And<True, False>, Or<True, False>>>,
+            WrapExpr<Pair<Bool, Bool>, ConsPair<Bool, Bool, False, True>>);
+    }
+}

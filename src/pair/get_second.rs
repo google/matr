@@ -35,3 +35,16 @@ mod internal {
         }
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn get_second() {
+        meta_assert_eq!(Type,
+            GetSecond<Type, Type, ConsPair<Type, Type, WrapType<i32>, WrapType<i64>>>,
+            WrapType<i64>);
+    }
+}

@@ -32,3 +32,16 @@ mod internal {
         }
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn get_first() {
+        meta_assert_eq!(Type,
+            GetFirst<Type, Type, ConsPair<Type, Type, WrapType<i32>, WrapType<i64>>>,
+            WrapType<i32>);
+    }
+}
