@@ -44,3 +44,30 @@ mod internal {
         }
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use std::marker::PhantomData;
+    use crate::*;
+
+    struct CalledVisitErr<E> {
+        e: PhantomData<E>,
+    }
+
+    struct CalledVisitOk<Elem> {
+        elem: PhantomData<Elem>,
+    }
+
+    meta!{
+        struct MyVisitor : ResultVisitor<Type, Type> {
+            type VisitErr<E> = WrapType<CalledVisitErr<E>>;
+            type VisitOk<X: Expr<Type>> = WrapType<CalledVisitOk<UnwrapType<X>>>;
+        }
+    }
+
+    #[test]
+    fn visit() {
+        meta_assert_eq!(Type, VisitResult<Type, Type, Ok<Type, WrapType<i32>>, MyVisitor>, WrapType<CalledVisitOk<i32>>);
+    }
+}

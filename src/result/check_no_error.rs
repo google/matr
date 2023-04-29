@@ -36,3 +36,19 @@ mod internal {
         }
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    struct MyError {}
+
+    #[test]
+    fn check_no_error_test() {
+        // This does not compile (as expected).
+        // const _: () = check_no_error::<Type, Err<Type, MyError>>();
+
+        const _: () = check_no_error::<Type, Ok<Type, WrapType<i32>>>();
+    }
+}

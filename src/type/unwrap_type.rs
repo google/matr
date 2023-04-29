@@ -34,5 +34,4 @@ mod internal {
     impl<E: Expr<Type>> UnwrapTypeTrait for UnwrapTypeHelper<E> {
         type Get = <E::Eval as Value<Type>>::UnconstrainedImpl;
     }
-
 }

@@ -40,3 +40,17 @@ mod internal {
         }
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    struct MyError {}
+
+    #[test]
+    fn result_or_value() {
+        meta_assert_eq!(Type, ResultOrValue<Type, Err<Type, MyError>, WrapType<i32>>, WrapType<i32>);
+        meta_assert_eq!(Type, ResultOrValue<Type, Ok<Type, WrapType<usize>>, WrapType<i32>>, WrapType<usize>);
+    }
+}

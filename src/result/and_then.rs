@@ -41,3 +41,28 @@ mod internal {
         }
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    struct MyError {}
+
+    meta!{
+        struct ToPair: Functor1<Type, Result<Pair<Type, Type>>> {
+            type Apply<X: Expr<Type>> = Ok<Pair<Type, Type>, ConsPair<Type, Type, X, X>>;
+        }
+    }
+
+    #[test]
+    fn and_then() {
+        meta_assert_eq!(Result<Pair<Type, Type>>,
+            AndThen<Type, Pair<Type, Type>, Ok<Type, WrapType<i32>>, ToPair>,
+            Ok<Pair<Type, Type>, ConsPair<Type, Type, WrapType<i32>, WrapType<i32>>>);
+
+        meta_assert_eq!(Result<Pair<Type, Type>>,
+            AndThen<Type, Pair<Type, Type>, Err<Type, MyError>, ToPair>,
+            Err<Pair<Type, Type>, MyError>);
+    }
+}

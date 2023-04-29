@@ -18,7 +18,7 @@ mod err;
 mod check_no_error;
 mod and_then2;
 mod and_then;
-mod get_type_result;
+mod unwrap_type_result;
 
 pub use result_or_value::*;
 pub use ok::*;
@@ -26,7 +26,7 @@ pub use err::*;
 pub use check_no_error::*;
 pub use and_then2::*;
 pub use and_then::*;
-pub use get_type_result::*;
+pub use unwrap_type_result::*;
 
 use std::marker::PhantomData;
 use internal::*;
@@ -136,5 +136,32 @@ mod internal {
             type VisitOk<V: Expr<K>> = False;
             type VisitErr<E> = Equals<Type, WrapType<E>, WrapType<OtherE>>;
         }
+    }
+}
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    struct MyError {}
+
+    #[test]
+    fn equals() {
+        meta_assert_eq!(Result<Type>, Err<Type, MyError>, Err<Type, MyError>);
+        meta_assert_eq!(Result<Type>, Ok<Type, WrapType<i32>>, Ok<Type, WrapType<i32>>);
+        meta_assert_not_eq!(Result<Type>, Err<Type, MyError>, Ok<Type, WrapType<i32>>);
+        meta_assert_not_eq!(Result<Type>, Ok<Type, WrapType<i32>>, Ok<Type, WrapType<i64>>);
+    }
+
+    #[test]
+    fn default() {
+        meta_assert_eq!(Result<Type>, <Result<Type> as KindWithDefault>::Default, Ok<Type, WrapType<()>>);
+    }
+
+    #[test]
+    fn debug_form() {
+        meta_assert_eq!(ExprWrapper<Result<Bool>>, <Result<Bool> as KindWithDebugForm>::DebugForm<Err<Bool, MyError>>, WrapExpr<Result<Bool>, Err<Bool, MyError>>);
+        meta_assert_eq!(ExprWrapper<Result<Bool>>, <Result<Bool> as KindWithDebugForm>::DebugForm<Ok<Bool, And<True, False>>>, WrapExpr<Result<Bool>, Ok<Bool, False>>);
     }
 }
