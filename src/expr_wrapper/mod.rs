@@ -71,3 +71,25 @@ mod internal {
         }
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn equals() {
+        meta_assert_eq!(ExprWrapper<List<Type>>, WrapExpr<List<Type>, EmptyList<Type>>, WrapExpr<List<Type>, EmptyList<Type>>);
+        meta_assert_not_eq!(ExprWrapper<Bool>, WrapExpr<Bool, And<True, True>>, WrapExpr<Bool, True>);
+    }
+
+    #[test]
+    fn default() {
+        meta_assert_eq!(ExprWrapper<List<Type>>, <ExprWrapper<List<Type>> as KindWithDefault>::Default, WrapExpr<List<Type>, EmptyList<Type>>);
+    }
+
+    #[test]
+    fn debug_form() {
+        meta_assert_eq!(ExprWrapper<ExprWrapper<Type>>, <ExprWrapper<Type> as KindWithDebugForm>::DebugForm<WrapExpr<Type, WrapType<i32>>>, WrapExpr<ExprWrapper<Type>, WrapExpr<Type, WrapType<i32>>>);
+    }
+}

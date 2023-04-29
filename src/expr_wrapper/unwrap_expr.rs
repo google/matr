@@ -41,3 +41,16 @@ mod internal {
         type Get = <<E as Expr<ExprWrapper<K>>>::Eval as Value<ExprWrapper<K>>>::UnconstrainedImpl;
     }
 }
+
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn unwrap_expr() {
+        meta_assert_eq!(ExprWrapper<List<Type>>, WrapExpr<List<Type>, UnwrapExpr<List<Type>, WrapExpr<List<Type>, EmptyList<Type>>>>, WrapExpr<List<Type>, EmptyList<Type>>);
+        meta_assert_not_eq!(ExprWrapper<Bool>, WrapExpr<Bool, UnwrapExpr<Bool, WrapExpr<Bool, And<True, True>>>>, WrapExpr<Bool, True>);
+    }
+}
