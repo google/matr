@@ -39,3 +39,15 @@ mod internal {
         }
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn option_or_value() {
+        meta_assert_eq!(Type, OptionOrValue<Type, None<Type>, WrapType<i32>>, WrapType<i32>);
+        meta_assert_eq!(Type, OptionOrValue<Type, Some<Type, WrapType<usize>>, WrapType<i32>>, WrapType<usize>);
+    }
+}

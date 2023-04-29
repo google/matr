@@ -34,3 +34,15 @@ mod internal {
         }
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn is_none() {
+        meta_assert_eq!(Bool, IsNone<Type, None<Type>>, True);
+        meta_assert_eq!(Bool, IsNone<Type, Some<Type, WrapType<i32>>>, False);
+    }
+}

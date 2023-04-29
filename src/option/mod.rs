@@ -120,3 +120,28 @@ mod internal {
         }
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn equals() {
+        meta_assert_eq!(Option<Type>, None<Type>, None<Type>);
+        meta_assert_eq!(Option<Type>, Some<Type, WrapType<i32>>, Some<Type, WrapType<i32>>);
+        meta_assert_not_eq!(Option<Type>, None<Type>, Some<Type, WrapType<i32>>);
+        meta_assert_not_eq!(Option<Type>, Some<Type, WrapType<i32>>, Some<Type, WrapType<i64>>);
+    }
+
+    #[test]
+    fn default() {
+        meta_assert_eq!(Option<Type>, <Option<Type> as KindWithDefault>::Default, None<Type>);
+    }
+
+    #[test]
+    fn debug_form() {
+        meta_assert_eq!(ExprWrapper<Option<Bool>>, <Option<Bool> as KindWithDebugForm>::DebugForm<None<Bool>>, WrapExpr<Option<Bool>, None<Bool>>);
+        meta_assert_eq!(ExprWrapper<Option<Bool>>, <Option<Bool> as KindWithDebugForm>::DebugForm<Some<Bool, And<True, False>>>, WrapExpr<Option<Bool>, Some<Bool, False>>);
+    }
+}

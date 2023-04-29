@@ -39,3 +39,28 @@ mod internal {
         }
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use std::marker::PhantomData;
+    use crate::*;
+
+    struct CalledVisitNone {}
+
+    struct CalledVisitSome<Elem: Expr<Type>> {
+        elem: PhantomData<Elem>,
+    }
+
+    meta!{
+        struct MyVisitor : OptionVisitor<Type, Type> {
+            type VisitNone = WrapType<CalledVisitNone>;
+            type VisitSome<X: Expr<Type>> = WrapType<CalledVisitSome<X>>;
+        }
+    }
+
+    #[test]
+    fn visit() {
+        meta_assert_eq!(Type, VisitOption<Type, Type, None<Type>, MyVisitor>, WrapType<CalledVisitNone>);
+    }
+}
