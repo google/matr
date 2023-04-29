@@ -28,28 +28,16 @@ mod tests {
     use super::internal::*;
 
     meta!{
-        struct Add42ImplWrapper: ConstFnTraitWrapper<i32, i32> {
-            type Fn = Add42Impl;
-        }
-
         struct Add42Impl: const ConstFnTrait<i32, i32> {
             fn apply(n: i32) -> i32 {
                 return n + 42;
             }
         }
-
-        struct Add42Value: ConstFnValue<i32, i32> {
-            type Impl = Add42ImplWrapper;
-        }
-
-        struct Add42: Expr<ConstFn<i32, i32>> {
-            type Eval = Add42Value;
-        }
     }
 
     #[test]
     fn call() {
-        const N: i32 = call_const_fn::<i32, i32, Add42>(1000);
+        const N: i32 = call_const_fn::<i32, i32, WrapConstFn<i32, i32, Add42Impl>>(1000);
         assert_eq!(N, 1042);
     }
 }

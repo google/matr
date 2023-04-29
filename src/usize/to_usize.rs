@@ -23,7 +23,7 @@ pub const fn result_to_usize<N: Expr<Result<USize>>>() -> std::result::Result<us
                 ConstFn<std::result::Result<usize, &'static str>, ()>,
                 N,
                 ToUSizeFunctor>,
-            ToUSizeError
+            WrapConstFn<std::result::Result<usize, &'static str>, (), ToUSizeErrorImpl>
         >
     >(());
 }
@@ -36,18 +36,6 @@ mod internal {
     pub use super::super::internal::*;
 
     meta!{
-        pub struct ToUSizeError: Expr<ConstFn<std::result::Result<usize, &'static str>, ()>> {
-            type Eval = ToUSizeErrorValue;
-        }
-
-        pub struct ToUSizeErrorValue: ConstFnValue<std::result::Result<usize, &'static str>, ()> {
-            type Impl = ToUSizeErrorImplWrapper;
-        }
-
-        pub struct ToUSizeErrorImplWrapper: ConstFnTraitWrapper<std::result::Result<usize, &'static str>, ()> {
-            type Fn = ToUSizeErrorImpl;
-        }
-
         pub struct ToUSizeErrorImpl: const ConstFnTrait<std::result::Result<usize, &'static str>, ()> {
             fn apply(_: ()) -> std::result::Result<usize, &'static str> {
                 panic!("result_to_usize called on an error")
@@ -59,44 +47,14 @@ mod internal {
         }
 
         pub struct ToUSizeVisitor: USizeVisitor<ConstFn<usize, ()>> {
-            type VisitZero = ZeroValueConstFn;
-            type VisitIncrement<N: Expr<USize>> = IncValueConstFn<<AsUSize<N> as USizeTrait>::Visit<ConstFn<usize, ()>, ToUSizeVisitor>>;
-        }
-
-        pub struct ZeroValueConstFn: Expr<ConstFn<usize, ()>> {
-            type Eval = ZeroValueConstFnValue;
-        }
-
-        pub struct ZeroValueConstFnValue: ConstFnValue<usize, ()> {
-            type Impl = ZeroValueConstFnImplWrapper;
-        }
-
-        pub struct ZeroValueConstFnImplWrapper: ConstFnTraitWrapper<usize, ()> {
-            type Fn = ZeroValueConstFnImpl;
+            type VisitZero = WrapConstFn<usize, (), ZeroValueConstFnImpl>;
+            type VisitIncrement<N: Expr<USize>> = WrapConstFn<usize, (), IncValueConstFnImpl<<AsUSize<N> as USizeTrait>::Visit<ConstFn<usize, ()>, ToUSizeVisitor>>>;
         }
 
         pub struct ZeroValueConstFnImpl: const ConstFnTrait<usize, ()> {
             fn apply(_: ()) -> usize {
                 return 0;
             }
-        }
-
-        pub struct IncValueConstFn<
-            F: Expr<ConstFn<usize, ()>>
-        >: Expr<ConstFn<usize, ()>> {
-            type Eval = IncValueConstFnValue<F>;
-        }
-
-        pub struct IncValueConstFnValue<
-            F: Expr<ConstFn<usize, ()>>
-        >: ConstFnValue<usize, ()> {
-            type Impl = IncValueConstFnImplWrapper<F>;
-        }
-
-        pub struct IncValueConstFnImplWrapper<
-            F: Expr<ConstFn<usize, ()>>
-        >: ConstFnTraitWrapper<usize, ()> {
-            type Fn = IncValueConstFnImpl<F>;
         }
 
         pub struct IncValueConstFnImpl<

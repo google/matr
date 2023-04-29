@@ -15,43 +15,19 @@
 use internal::*;
 
 pub const fn to_bool<B: Expr<Bool>>() -> bool {
-    return call_const_fn::<bool, (), If<ConstFn<bool, ()>, B, ToTrueBoolConstFn, ToFalseBoolConstFn>>(());
+    return call_const_fn::<bool, (), If<ConstFn<bool, ()>, B, WrapConstFn<bool, (), ToTrueBoolConstFnImpl>, WrapConstFn<bool, (), ToFalseBoolConstFnImpl>>>(());
 }
 
 mod internal {
     pub use super::super::internal::*;
 
     meta! {
-        pub struct ToTrueBoolConstFn: Expr<ConstFn<bool, ()>> {
-            type Eval = ToTrueBoolConstFnValue;
-        }
-
-        pub struct ToTrueBoolConstFnValue: ConstFnValue<bool, ()> {
-            type Impl = ToTrueBoolConstFnImplWrapper;
-        }
-
-        pub struct ToFalseBoolConstFn: Expr<ConstFn<bool, ()>> {
-            type Eval = ToFalseBoolConstFnValue;
-        }
-
-        pub struct ToFalseBoolConstFnValue: ConstFnValue<bool, ()> {
-            type Impl = ToFalseBoolConstFnImplWrapper;
-        }
-
-        pub struct ToTrueBoolConstFnImplWrapper: ConstFnTraitWrapper<bool, ()> {
-            type Fn = ToTrueBoolConstFnImpl;
-        }
-
         pub struct ToTrueBoolConstFnImpl: const ConstFnTrait<bool, ()> {
             fn apply(_: ()) -> bool {
                 return true;
             }
         }
-
-        pub struct ToFalseBoolConstFnImplWrapper: ConstFnTraitWrapper<bool, ()> {
-            type Fn = ToFalseBoolConstFnImpl;
-        }
-
+        
         pub struct ToFalseBoolConstFnImpl: const ConstFnTrait<bool, ()> {
             fn apply(_: ()) -> bool {
                 return false;

@@ -35,20 +35,14 @@ pub trait ConstFnTrait<Result, Args> {
     fn apply(args: Args) -> Result;
 }
 
-// This wrapper is needed (rather than using ConstFnTrait as trait directly) so that we can
-// specialize based on whether ConstFnTraitWrapper is implemented or not.
-// Specializing on const traits doesn't seem to work ATM (as of Rust nightly 2023-04-20), if that
-// becomes supported then we can get rid of this.
-pub trait ConstFnTraitWrapper<Result, Args> {
-    type Fn: ~const ConstFnTrait<Result, Args>;
-}
-
-pub trait ConstFnValue<Result, Args> {
-    type Impl: ConstFnTraitWrapper<Result, Args>;
-}
-
-impl<Result, Args, U: ConstFnValue<Result, Args>> Value<ConstFn<Result, Args>> for U {
-    type UnconstrainedImpl = <U as ConstFnValue<Result, Args>>::Impl;
+meta!{
+    pub struct WrapConstFn<
+        Result,
+        Args,
+        F: ~const ConstFnTrait<Result, Args>
+    >: Expr<ConstFn<Result, Args>> {
+        type Eval = WrapConstFnValue<Result, Args, F>;
+    }
 }
 
 // The contents of this module have to be "pub" because otherwise Rust would complain that
@@ -79,7 +73,39 @@ mod internal {
         panic!("AsConstFn was called on a Value<ConstFn<...>> that does not implement const ConstFnTraitWrapper")
     }
 
+    pub trait ConstFnValue<Result, Args> {
+        type Impl: ConstFnTraitWrapper<Result, Args>;
+    }
+
+    impl<Result, Args, U: ConstFnValue<Result, Args>> Value<ConstFn<Result, Args>> for U {
+        type UnconstrainedImpl = <U as ConstFnValue<Result, Args>>::Impl;
+    }
+
+    // This wrapper is needed (rather than using ConstFnTrait as trait directly) so that we can
+    // specialize based on whether ConstFnTraitWrapper is implemented or not.
+    // Specializing on const traits doesn't seem to work ATM (as of Rust nightly 2023-04-20), if that
+    // becomes supported then we can get rid of this.
+    pub trait ConstFnTraitWrapper<Result, Args> {
+        type Fn: ~const ConstFnTrait<Result, Args>;
+    }
+
     meta!{
+        pub struct WrapConstFnValue<
+            Result,
+            Args,
+            F: ~const ConstFnTrait<Result, Args>
+        >: ConstFnValue<Result, Args> {
+            type Impl = WrapConstFnImpl<Result, Args, F>;
+        }
+
+        pub struct WrapConstFnImpl<
+            Result,
+            Args,
+            F: ~const ConstFnTrait<Result, Args>
+        >: ConstFnTraitWrapper<Result, Args> {
+            type Fn = F;
+        }
+
         pub struct PanicWithAsConstFnError<Result, Args, Fn: Expr<ConstFn<Result, Args>>>: const ConstFnTrait<Result, Args> {
             fn apply(_: Args) -> Result {
                 panic_with_as_const_fn_error::<

@@ -16,23 +16,14 @@ use crate::*;
 use internal::*;
 
 meta!{
-    pub struct NoOpConstFn: Expr<ConstFn<(), ()>> {
-        type Eval = NoOpConstFnValue;
-    }
+    pub type NoOpConstFn: Expr<ConstFn<(), ()>> =
+        WrapConstFn<(), (), NoOpConstFnImpl>;
 }
 
 mod internal {
     pub use crate::*;
 
     meta!{
-        pub struct NoOpConstFnValue: ConstFnValue<(), ()> {
-            type Impl = NoOpConstFnImplWrapper;
-        }
-        
-        pub struct NoOpConstFnImplWrapper: ConstFnTraitWrapper<(), ()> {
-            type Fn = NoOpConstFnImpl;
-        }
-        
         pub struct NoOpConstFnImpl: const ConstFnTrait<(), ()> {
             fn apply(_: ()) -> () {}
         }
