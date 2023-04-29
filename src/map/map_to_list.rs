@@ -26,3 +26,19 @@ meta!{
 mod internal {
     pub use super::super::internal::*;
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn map_to_list() {
+        meta_assert_eq!(List<Pair<Type, Type>>,
+            MapToList<Type, Type, type_map!{}>,
+            meta_list!(<Pair<Type, Type>>[]));
+        meta_assert_eq!(List<Pair<Type, Type>>,
+            MapToList<Type, Type, type_map!{i32: u32, i64: u64}>,
+            meta_list!(<Pair<Type, Type>>[ConsPair<Type, Type, WrapType<i32>, WrapType<u32>>, ConsPair<Type, Type, WrapType<i64>, WrapType<u64>>]));
+    }
+}

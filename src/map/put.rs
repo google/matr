@@ -34,10 +34,39 @@ mod internal {
     pub use super::super::internal::*;
 }
 
+
 #[cfg(test)]
 #[allow(dead_code)]
 mod tests {
+    use std::marker::PhantomData;
     use crate::*;
+
+    struct CalledVisitEmptyMap {}
+
+    struct CalledVisitEntry<Key, Value, Tail: Expr<Map<Type, Type>>> {
+        key: PhantomData<Key>,
+        value: PhantomData<Value>,
+        tail: PhantomData<Tail>,
+    }
+
+    meta!{
+        struct MyVisitor : MapVisitor<Type, Type, Type> {
+            type VisitEmptyMap = WrapType<CalledVisitEmptyMap>;
+            type VisitEntry<Key: Expr<Type>, Value: Expr<Type>, Tail: Expr<Map<Type, Type>>> = WrapType<CalledVisitEntry<UnwrapType<Key>, UnwrapType<Value>, UnwrapExpr<Map<Type, Type>, <Map<Type, Type> as KindWithDebugForm>::DebugForm<Tail>>>>;
+        }
+    }
+
+    #[test]
+    fn visit() {
+        meta_assert_eq!(Type,
+            VisitMap<Type, Type, Type,
+                Put<Type, Type, WrapType<i32>, WrapType<i64>, Put<Type, Type, WrapType<u32>, WrapType<u64>, EmptyMap<Type, Type>>>,
+                MyVisitor>,
+            WrapType<CalledVisitEntry<
+                i32,
+                i64,
+                Put<Type, Type, WrapType<u32>, WrapType<u64>, EmptyMap<Type, Type>>>>);
+    }
 
     #[test]
     fn put_commutative() {

@@ -36,3 +36,19 @@ mod internal {
         }
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn map_entry_set() {
+        meta_assert_eq!(Set<Pair<Type, Type>>,
+            MapEntrySet<Type, Type, type_map!{}>,
+            meta_set!(<Pair<Type, Type>>{}));
+        meta_assert_eq!(Set<Pair<Type, Type>>,
+            MapEntrySet<Type, Type, type_map!{i32: u32, i64: u64}>,
+            meta_set!(<Pair<Type, Type>>{ConsPair<Type, Type, WrapType<i32>, WrapType<u32>>, ConsPair<Type, Type, WrapType<i64>, WrapType<u64>>}));
+    }
+}

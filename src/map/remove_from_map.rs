@@ -52,9 +52,9 @@ mod tests {
     #[test]
     fn remove_from_empty_map() {
         meta_assert_eq!(
-            List<Type>,
-            RemoveFromList<Type, WrapType<f32>, EmptyList<Type>>,
-            EmptyList<Type>);
+            Map<Type, Type>,
+            RemoveFromMap<Type, Type, WrapType<f32>, EmptyMap<Type, Type>>,
+            EmptyMap<Type, Type>);
     }
 
     #[test]

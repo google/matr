@@ -36,3 +36,19 @@ mod internal {
         }
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn map_key_set() {
+        meta_assert_eq!(Set<Type>,
+            MapKeySet<Type, Type, type_map!{}>,
+            type_set!{});
+        meta_assert_eq!(Set<Type>,
+            MapKeySet<Type, Type, type_map!{i32: u32, i64: u64}>,
+            type_set!{i32, i64});
+    }
+}

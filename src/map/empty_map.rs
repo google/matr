@@ -25,3 +25,30 @@ meta!{
 mod internal {
     pub use super::super::internal::*;
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use std::marker::PhantomData;
+    use crate::*;
+
+    struct CalledVisitEmptyMap {}
+
+    struct CalledVisitEntry<Key: Expr<Type>, Value: Expr<Type>, Tail: Expr<Map<Type, Type>>> {
+        key: PhantomData<Key>,
+        value: PhantomData<Value>,
+        tail: PhantomData<Tail>,
+    }
+
+    meta!{
+        struct MyVisitor : MapVisitor<Type, Type, Type> {
+            type VisitEmptyMap = WrapType<CalledVisitEmptyMap>;
+            type VisitEntry<Key: Expr<Type>, Value: Expr<Type>, Tail: Expr<Map<Type, Type>>> = WrapType<CalledVisitEntry<Key, Value, Tail>>;
+        }
+    }
+
+    #[test]
+    fn visit() {
+        meta_assert_eq!(Type, VisitMap<Type, Type, Type, EmptyMap<Type, Type>, MyVisitor>, WrapType<CalledVisitEmptyMap>);
+    }
+}

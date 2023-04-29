@@ -24,6 +24,8 @@ mod list_to_set;
 mod to_hash_set;
 mod to_usize_hash_set;
 mod remove_from_set;
+pub mod meta_set;
+mod type_set;
 
 pub use empty_set::*;
 pub use add_to_set::*;
@@ -37,6 +39,7 @@ pub use list_to_set::*;
 pub use to_hash_set::*;
 pub use to_usize_hash_set::*;
 pub use remove_from_set::*;
+pub use type_set::*;
 
 use std::marker::PhantomData;
 use internal::*;

@@ -25,8 +25,8 @@ mod to_type_nested_tuple;
 mod list_size;
 pub mod type_list;
 mod to_type_pair_nested_tuple;
-mod meta_list;
 mod to_type_triple_nested_tuple;
+mod meta_list;
 
 pub use empty_list::*;
 pub use cons::*;
@@ -40,8 +40,9 @@ pub use remove_from_list::*;
 pub use to_type_nested_tuple::*;
 pub use list_size::*;
 pub use to_type_pair_nested_tuple::*;
-pub use meta_list::*;
+pub use crate::set::meta_set::*;
 pub use to_type_triple_nested_tuple::*;
+pub use meta_list::*;
 
 use std::marker::PhantomData;
 use internal::*;

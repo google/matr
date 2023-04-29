@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// E.g. type_map!({i32: u32, i64: u64}) expands to:
+// E.g. type_map!{i32: u32, i64: u64} expands to:
 // Put<Type, Type, WrapType<i32>, WrapType<u32>, Put<Type, Type, WrapType<i64>, WrapType<u64>, EmptyMap<Type, Type>>>
 #[macro_export]
 macro_rules! type_map {
@@ -27,3 +27,25 @@ macro_rules! type_map {
     };
 }
 pub use type_map;
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn empty_map() {
+        meta_assert_eq!(
+            Map<Type, Type>,
+            type_map!{},
+            EmptyMap<Type, Type>);
+    }
+
+    #[test]
+    fn map() {
+        meta_assert_eq!(
+            Map<Type, Type>,
+            type_map!{i32: u32},
+            Put<Type, Type, WrapType<i32>, WrapType<u32>, EmptyMap<Type, Type>>);
+    }
+}

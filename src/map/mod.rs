@@ -24,7 +24,7 @@ mod map_key_set;
 mod map_entry_set;
 mod map_remove_key_set;
 mod map_common_keys_with_different_value;
-pub mod map;
+pub mod meta_map;
 pub mod type_map;
 
 pub use empty_map::*;
@@ -39,7 +39,7 @@ pub use map_key_set::*;
 pub use map_entry_set::*;
 pub use map_remove_key_set::*;
 pub use map_common_keys_with_different_value::*;
-pub use map::*;
+pub use meta_map::*;
 pub use type_map::*;
 
 use std::marker::PhantomData;
@@ -183,5 +183,32 @@ mod internal {
                 Equals<Option<V>, MapGet<K, V, Key, CandidateSupermap>, Some<V, Value>>,
                 VisitMap<K, V, Bool, Tail, IsSubmapVisitor<K, V, CandidateSupermap>>>;
         }
+    }
+}
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn equals() {
+        meta_assert_eq!(Map<Type, Type>, type_map!{}, type_map![]);
+        meta_assert_eq!(Map<Type, Type>, type_map!{i32: u64}, type_map!{i32: u64});
+        meta_assert_eq!(Map<Type, Type>, type_map!{i32: i64, u32: u64}, type_map!{u32: u64, i32: i64});
+        meta_assert_not_eq!(Map<Type, Type>, type_map!{}, type_map!{i32: u64});
+        meta_assert_not_eq!(Map<Type, Type>, type_map!{i32: u64}, type_map!{u64: i32});
+    }
+
+    #[test]
+    fn default() {
+        meta_assert_eq!(Map<Type, Type>, <Map<Type, Type> as KindWithDefault>::Default, type_map!{});
+    }
+
+    #[test]
+    fn debug_form() {
+        meta_assert_eq!(ExprWrapper<Map<Type, Bool>>,
+            <Map<Type, Bool> as KindWithDebugForm>::DebugForm<Put<Type, Bool, WrapType<i32>, And<True, False>, EmptyMap<Type, Bool>>>,
+            WrapExpr<Map<Type, Bool>, Put<Type, Bool, WrapType<i32>, False, EmptyMap<Type, Bool>>>);
     }
 }
