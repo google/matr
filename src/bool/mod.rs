@@ -95,4 +95,15 @@ mod tests {
         meta_assert_eq!(Bool, Equals<Bool, False, True>, False);
         meta_assert_eq!(Bool, Equals<Bool, True, False>, False);
     }
+
+    #[test]
+    fn default() {
+        meta_assert_eq!(Bool, <Bool as KindWithDefault>::Default, False);
+    }
+
+    #[test]
+    fn debug_form() {
+        meta_assert_eq!(ExprWrapper<Bool>, <Bool as KindWithDebugForm>::DebugForm<True>, WrapExpr<Bool, True>);
+        meta_assert_eq!(ExprWrapper<Bool>, <Bool as KindWithDebugForm>::DebugForm<False>, WrapExpr<Bool, False>);
+    }
 }

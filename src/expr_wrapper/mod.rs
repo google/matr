@@ -32,6 +32,14 @@ impl<K: KindWithDefault> EqualityComparableKind for ExprWrapper<K> {
     >;
 }
 
+impl<K: KindWithDefault> KindWithDebugForm for ExprWrapper<K> {
+    type DebugForm<E: Expr<ExprWrapper<K>>> = WrapExpr<ExprWrapper<K>, WrapExpr<K, UnwrapExpr<K, E>>>;
+}
+
+impl<K: KindWithDefault> KindWithDefault for ExprWrapper<K> {
+    type Default = WrapExpr<K, K::Default>;
+}
+
 pub trait ExprWrapperValue<K: Kind> {
     type UnconstrainedImpl;
 }

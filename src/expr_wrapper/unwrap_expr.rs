@@ -15,7 +15,7 @@
 use internal::*;
 
 // Intended to be used with:
-// K: Kind
+// K: KindWithDefault
 // E: Expr<ExprWrapper<K>>
 // Then UnwrapExpr<K, E>: Expr<K>
 pub type UnwrapExpr<K, E> = <UnwrapExprHelper<K, E> as UnwrapExprTrait<K>>::Get;
