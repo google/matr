@@ -21,11 +21,22 @@ meta!{
 }
 
 mod internal {
-    use crate::*;
+    pub use crate::*;
 
     meta!{
         pub struct NoOpRuntimeFnImpl: RuntimeFnTrait<(), ()> {
             fn apply(_: ()) -> () {}
         }
+    }
+}
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use super::internal::*;
+
+    #[test]
+    fn no_op_runtime_fn() {
+        call_runtime_fn::<(), (), NoOpRuntimeFn>(());
     }
 }

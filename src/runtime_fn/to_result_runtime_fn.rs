@@ -56,3 +56,33 @@ mod internal {
         }
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use super::internal::*;
+
+    meta!{
+        pub struct ToUnsigned32RuntimeFn: RuntimeFnTrait<u32, i32> {
+            fn apply(n: i32) -> u32 {
+                return n as u32
+            }
+        }
+    }
+
+    #[test]
+    fn ok() {
+        assert_eq!(
+            call_runtime_fn::<std::result::Result<u32, &'static str>, i32, ToResultRuntimeFn<u32, i32, Ok<RuntimeFn<u32, i32>, WrapRuntimeFn<u32, i32, ToUnsigned32RuntimeFn>>>>(42 as i32),
+            std::result::Result::Ok(42 as u32));
+    }
+
+    struct MyError {}
+
+    #[test]
+    fn error() {
+        assert_eq!(
+            call_runtime_fn::<std::result::Result<u32, &'static str>, i32, ToResultRuntimeFn<u32, i32, Err<RuntimeFn<u32, i32>, MyError>>>(42 as i32),
+            std::result::Result::Err("error Result in ToResultRuntimeFn"));
+    }
+}
