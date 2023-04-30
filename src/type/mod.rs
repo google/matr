@@ -97,46 +97,21 @@ mod internal {
 #[cfg(test)]
 #[allow(dead_code)]
 mod tests {
-    use super::internal::*;
+    use crate::*;
 
     #[test]
-    fn is_equal_to_type() {
-        meta_assert_eq!(Bool, IsEqualToType<WrapType<i32>, WrapType<i32>>, True);
-        meta_assert_eq!(Bool, IsEqualToType<WrapType<i32>, WrapType<i64>>, False);
+    fn equals() {
+        meta_assert_eq!(Type, WrapType<i32>, WrapType<i32>);
+        meta_assert_not_eq!(Type, WrapType<i32>, WrapType<i64>);
+    }
+
+    #[test]
+    fn default() {
+        meta_assert_eq!(Type, <Type as KindWithDefault>::Default, WrapType<()>);
+    }
+
+    #[test]
+    fn debug_form() {
+        meta_assert_eq!(ExprWrapper<Type>, <Type as KindWithDebugForm>::DebugForm<WrapType<i32>>, WrapExpr<Type, WrapType<i32>>);
     }
 }
-
-//
-// impl EqualityComparableKind for TypeKind {
-//     type Eq<X: Value<Self>, Y: Value<Self>> = IsEqualToType<X, Y>;
-// }
-
-// pub struct TypeHolder<T> {
-//     value: PhantomData<T>,
-// }
-//
-// pub trait Type {
-//     type Unwrap;
-// }
-//
-// impl<T> Type for TypeHolder<T> {
-//     type Unwrap = T;
-// }
-//
-// pub struct AsType<T: Value<TypeKind>> {
-//     t: PhantomData<T>,
-// }
-//
-// impl<T: Value<TypeKind>> Type for AsType<T> {
-//     default type Unwrap = BottomValue;
-// }
-//
-// impl<T: Type> Type for AsType<T> {
-//     type Unwrap = T::Unwrap;
-// }
-
-// impl<T> Type for TypeHolder<T> {
-//     type Type = T;
-//     type IsEqualTo<U: Type> = <TypeHolderIsEqualTo<T, U> as TypeHolderIsEqualToTrait>::Result;
-// }
-

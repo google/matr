@@ -35,3 +35,14 @@ mod internal {
         type Get = <E::Eval as Value<Type>>::UnconstrainedImpl;
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn unwrap_type() {
+        meta_assert_eq!(Type, WrapType<UnwrapType<WrapType<i32>>>, WrapType<i32>);
+    }
+}
