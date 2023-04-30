@@ -208,7 +208,7 @@ mod tests {
     #[test]
     fn debug_form() {
         meta_assert_eq!(ExprWrapper<Map<Type, Bool>>,
-            <Map<Type, Bool> as KindWithDebugForm>::DebugForm<Put<Type, Bool, WrapType<i32>, And<True, False>, EmptyMap<Type, Bool>>>,
+            DebugForm<Map<Type, Bool>, Put<Type, Bool, WrapType<i32>, And<True, False>, EmptyMap<Type, Bool>>>,
             WrapExpr<Map<Type, Bool>, Put<Type, Bool, WrapType<i32>, False, EmptyMap<Type, Bool>>>);
     }
 }

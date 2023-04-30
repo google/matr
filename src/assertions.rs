@@ -17,8 +17,8 @@ macro_rules! meta_assert_eq {
     ($K:ty, $X:ty, $Y:ty) => {{
         const EQ: bool = $crate::to_bool::<$crate::Equals<$K, $X, $Y>>();
         const _: () = $crate::assertions::internal::check_equal::<
-            UnwrapExpr<$K, <$K as $crate::KindWithDebugForm>::DebugForm<$X>>,
-            UnwrapExpr<$K, <$K as $crate::KindWithDebugForm>::DebugForm<$Y>>
+            UnwrapExpr<$K, DebugForm<$K, $X>>,
+            UnwrapExpr<$K, DebugForm<$K, $Y>>
         >(EQ);
     }};
 }
@@ -29,8 +29,8 @@ macro_rules! meta_assert_not_eq {
     ($K:ty, $X:ty, $Y:ty) => {{
         const EQ: bool = $crate::to_bool::<$crate::Equals<$K, $X, $Y>>();
         const _: () = $crate::assertions::internal::check_not_equal::<
-            UnwrapExpr<$K, <$K as $crate::KindWithDebugForm>::DebugForm<$X>>,
-            UnwrapExpr<$K, <$K as $crate::KindWithDebugForm>::DebugForm<$Y>>
+            UnwrapExpr<$K, DebugForm<$K, $X>>,
+            UnwrapExpr<$K, DebugForm<$K, $Y>>
         >(EQ);
     }};
 }

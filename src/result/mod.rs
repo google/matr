@@ -161,7 +161,7 @@ mod tests {
 
     #[test]
     fn debug_form() {
-        meta_assert_eq!(ExprWrapper<Result<Bool>>, <Result<Bool> as KindWithDebugForm>::DebugForm<Err<Bool, MyError>>, WrapExpr<Result<Bool>, Err<Bool, MyError>>);
-        meta_assert_eq!(ExprWrapper<Result<Bool>>, <Result<Bool> as KindWithDebugForm>::DebugForm<Ok<Bool, And<True, False>>>, WrapExpr<Result<Bool>, Ok<Bool, False>>);
+        meta_assert_eq!(ExprWrapper<Result<Bool>>, DebugForm<Result<Bool>, Err<Bool, MyError>>, WrapExpr<Result<Bool>, Err<Bool, MyError>>);
+        meta_assert_eq!(ExprWrapper<Result<Bool>>, DebugForm<Result<Bool>, Ok<Bool, And<True, False>>>, WrapExpr<Result<Bool>, Ok<Bool, False>>);
     }
 }

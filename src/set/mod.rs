@@ -180,7 +180,7 @@ mod tests {
     #[test]
     fn debug_form() {
         meta_assert_eq!(ExprWrapper<Set<Bool>>,
-            <Set<Bool> as KindWithDebugForm>::DebugForm<AddToSet<Bool, And<True, False>, EmptySet<Bool>>>,
+            DebugForm<Set<Bool>, AddToSet<Bool, And<True, False>, EmptySet<Bool>>>,
             WrapExpr<Set<Bool>, AddToSet<Bool, False, EmptySet<Bool>>>);
     }
 }

@@ -111,7 +111,7 @@ mod tests {
     #[test]
     fn debug_form() {
         meta_assert_eq!(ExprWrapper<Pair<Bool, Bool>>,
-            <Pair<Bool, Bool> as KindWithDebugForm>::DebugForm<ConsPair<Bool, Bool, And<True, False>, Or<True, False>>>,
+            DebugForm<Pair<Bool, Bool>, ConsPair<Bool, Bool, And<True, False>, Or<True, False>>>,
             WrapExpr<Pair<Bool, Bool>, ConsPair<Bool, Bool, False, True>>);
     }
 }

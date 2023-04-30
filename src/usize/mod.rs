@@ -141,6 +141,6 @@ mod tests {
 
     #[test]
     fn debug_form() {
-        meta_assert_eq!(ExprWrapper<USize>, <USize as KindWithDebugForm>::DebugForm<Sum<Zero, Increment<Zero>>>, WrapExpr<USize, Increment<Zero>>);
+        meta_assert_eq!(ExprWrapper<USize>, DebugForm<USize, Sum<Zero, Increment<Zero>>>, WrapExpr<USize, Increment<Zero>>);
     }
 }

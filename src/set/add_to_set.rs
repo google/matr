@@ -48,7 +48,8 @@ mod tests {
     meta!{
         struct MyVisitor : SetVisitor<Type, Type> {
             type VisitEmptySet = WrapType<CalledVisitEmptySet>;
-            type VisitCons<X: Expr<Type>, Tail: Expr<Set<Type>>> = WrapType<CalledVisitCons<UnwrapType<X>, UnwrapExpr<Set<Type>, <Set<Type> as KindWithDebugForm>::DebugForm<Tail>>>>;
+            type VisitCons<X: Expr<Type>, Tail: Expr<Set<Type>>> =
+                WrapType<CalledVisitCons<UnwrapType<X>, UnwrapExpr<Set<Type>, DebugForm<Set<Type>, Tail>>>>;
         }
     }
 

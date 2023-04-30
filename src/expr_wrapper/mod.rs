@@ -91,6 +91,6 @@ mod tests {
 
     #[test]
     fn debug_form() {
-        meta_assert_eq!(ExprWrapper<ExprWrapper<Type>>, <ExprWrapper<Type> as KindWithDebugForm>::DebugForm<WrapExpr<Type, WrapType<i32>>>, WrapExpr<ExprWrapper<Type>, WrapExpr<Type, WrapType<i32>>>);
+        meta_assert_eq!(ExprWrapper<ExprWrapper<Type>>, DebugForm<ExprWrapper<Type>, WrapExpr<Type, WrapType<i32>>>, WrapExpr<ExprWrapper<Type>, WrapExpr<Type, WrapType<i32>>>);
     }
 }

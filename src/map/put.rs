@@ -51,7 +51,9 @@ mod tests {
     meta!{
         struct MyVisitor : MapVisitor<Type, Type, Type> {
             type VisitEmptyMap = WrapType<CalledVisitEmptyMap>;
-            type VisitEntry<Key: Expr<Type>, Value: Expr<Type>, Tail: Expr<Map<Type, Type>>> = WrapType<CalledVisitEntry<UnwrapType<Key>, UnwrapType<Value>, UnwrapExpr<Map<Type, Type>, <Map<Type, Type> as KindWithDebugForm>::DebugForm<Tail>>>>;
+            type VisitEntry<Key: Expr<Type>, Value: Expr<Type>, Tail: Expr<Map<Type, Type>>> =
+                WrapType<CalledVisitEntry<UnwrapType<Key>, UnwrapType<Value>, UnwrapExpr<Map<Type, Type>,
+                DebugForm<Map<Type, Type>, Tail>>>>;
         }
     }
 

@@ -20,3 +20,10 @@ pub trait KindWithDebugForm: Kind {
     // Used to show mismatches in assertions.
     type DebugForm<E: Expr<Self>>: Expr<ExprWrapper<Self>>;
 }
+
+meta!{
+    pub type DebugForm<
+        K: KindWithDebugForm,
+        E: Expr<K>
+    >: Expr<ExprWrapper<K>> = <K as KindWithDebugForm>::DebugForm<E>;
+}
