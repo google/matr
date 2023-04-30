@@ -16,7 +16,7 @@ use internal::*;
 
 meta!{
     pub struct False: Expr<Bool> {
-        type Eval = FalseValue;
+        type Eval = WrapBoolValue<FalseValue>;
     }
 }
 

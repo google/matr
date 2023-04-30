@@ -19,7 +19,7 @@ meta!{
         K: Kind, 
         E
     >: Expr<Result<K>> {
-        type Eval = ErrValue<K, E>;
+        type Eval = WrapResultValue<K, ErrValue<K, E>>;
     }
 }
 

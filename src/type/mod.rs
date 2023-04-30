@@ -40,7 +40,7 @@ pub struct WrapType<T> {
 }
 
 impl<T> Expr<Type> for WrapType<T> {
-    type Eval = WrapType<T>;
+    type Eval = WrapTypeValue<WrapType<T>>;
 }
 
 // These have to be public because otherwise Rust would complain that "can't leak private type".
@@ -48,6 +48,7 @@ impl<T> Expr<Type> for WrapType<T> {
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
+    use crate::bool::internal::WrapBoolValue;
 
     pub trait TypeValue {
         type UnconstrainedImpl;
@@ -57,9 +58,14 @@ mod internal {
         type UnconstrainedImpl = T;
     }
 
-    impl<T: TypeValue> Value<Type> for T {
-        type UnconstrainedImpl = <T as TypeValue>::UnconstrainedImpl;
+    meta!{
+        pub struct WrapTypeValue<
+            T: TypeValue
+        >: Value<Type> {
+            type UnconstrainedImpl = <T as TypeValue>::UnconstrainedImpl;
+        }
     }
+
     pub struct IsEqualToTypeImplHelper<X, Y> {
         x: PhantomData<X>,
         y: PhantomData<Y>,
@@ -89,7 +95,7 @@ mod internal {
             X: Expr<Type>,
             Y: Expr<Type>
         >: Expr<Bool> {
-            type Eval = IsEqualToTypeImpl<X::Eval, Y::Eval>;
+            type Eval = WrapBoolValue<IsEqualToTypeImpl<X::Eval, Y::Eval>>;
         }
     }
 }

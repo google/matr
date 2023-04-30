@@ -18,7 +18,7 @@ meta!{
     pub struct EmptyList<
         K: Kind
     >: Expr<List<K>> {
-        type Eval = EmptyListValue<K>;
+        type Eval = WrapListValue<K, EmptyListValue<K>>;
     }
 }
 

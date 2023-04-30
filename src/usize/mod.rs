@@ -68,8 +68,10 @@ mod internal {
         type Impl: USizeTrait;
     }
 
-    impl<U: USizeValue> Value<USize> for U {
-        type UnconstrainedImpl = <U as USizeValue>::Impl;
+    meta!{
+        pub struct WrapUSizeValue<U: USizeValue>: Value<USize> {
+            type UnconstrainedImpl = <U as USizeValue>::Impl;
+        }
     }
 
     pub struct AsUSize<N: Expr<USize>> {

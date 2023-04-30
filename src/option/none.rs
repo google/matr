@@ -18,7 +18,7 @@ meta!{
     pub struct None<
         K: Kind
     >: Expr<Option<K>> {
-        type Eval = NoneValue<K>;
+        type Eval = WrapOptionValue<K, NoneValue<K>>;
     }
 }
 

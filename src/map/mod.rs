@@ -100,7 +100,7 @@ mod internal {
             V: Kind, 
             L: Expr<List<Pair<K, V>>>
         >: Expr<Map<K, V>> {
-            type Eval = ListToMapUncheckedValue<K, V, L>;
+            type Eval = WrapMapValue<K, V, ListToMapUncheckedValue<K, V, L>>;
         }
 
         pub struct ListToMapUncheckedValue<
@@ -134,8 +134,14 @@ mod internal {
         type Impl: MapTrait<K, V>;
     }
 
-    impl<K: EqualityComparableKind, V: Kind, U: MapValue<K, V>> Value<Map<K, V>> for U {
-        type UnconstrainedImpl = <U as MapValue<K, V>>::Impl;
+    meta!{
+        pub struct WrapMapValue<
+            K: EqualityComparableKind,
+            V: Kind,
+            U: MapValue<K, V>
+        >: Value<Map<K, V>> {
+            type UnconstrainedImpl = <U as MapValue<K, V>>::Impl;
+        }
     }
 
     pub trait MapTrait<K: EqualityComparableKind, V: Kind> {

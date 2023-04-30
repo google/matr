@@ -16,7 +16,7 @@ use internal::*;
 
 meta!{
     pub struct True: Expr<Bool> {
-        type Eval = TrueValue;
+        type Eval = WrapBoolValue<TrueValue>;
     }
 }
 

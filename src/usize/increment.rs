@@ -18,7 +18,7 @@ meta!{
     pub struct Increment<
         N: Expr<USize>
     >: Expr<USize> {
-        type Eval = IncrementValue<N>;
+        type Eval = WrapUSizeValue<IncrementValue<N>>;
     }
 }
 

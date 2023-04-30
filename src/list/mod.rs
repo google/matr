@@ -88,8 +88,13 @@ mod internal {
         type Impl: ListTrait<K>;
     }
 
-    impl<K: Kind, U: ListValue<K>> Value<List<K>> for U {
-        type UnconstrainedImpl = <U as ListValue<K>>::Impl;
+    meta!{
+        pub struct WrapListValue<
+            K: Kind,
+            U: ListValue<K>
+        >: Value<List<K>> {
+            type UnconstrainedImpl = <U as ListValue<K>>::Impl;
+        }
     }
 
     pub struct AsList<K: Kind, L: Expr<List<K>>> {

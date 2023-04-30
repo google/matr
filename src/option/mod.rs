@@ -66,10 +66,15 @@ mod internal {
         type Impl: OptionTrait<K>;
     }
 
-    impl<K: Kind, X: OptionValue<K>> Value<Option<K>> for X {
-        type UnconstrainedImpl = <X as OptionValue<K>>::Impl;
+    meta!{
+        pub struct WrapOptionValue<
+            K: Kind, 
+            X: OptionValue<K>
+        >: Value<Option<K>> {
+            type UnconstrainedImpl = <X as OptionValue<K>>::Impl;
+        }
     }
-
+    
     pub struct AsOption<K: Kind, X: Expr<Option<K>>> {
         k: PhantomData<K>,
         x: PhantomData<X>,

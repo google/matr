@@ -88,10 +88,15 @@ mod internal {
         type Impl: ResultTrait<K>;
     }
 
-    impl<K: Kind, R: ResultValue<K>> Value<Result<K>> for R {
-        type UnconstrainedImpl = <R as ResultValue<K>>::Impl;
+    meta!{
+        pub struct WrapResultValue<
+            K: Kind, 
+            R: ResultValue<K>
+        >: Value<Result<K>> {
+            type UnconstrainedImpl = <R as ResultValue<K>>::Impl;
+        }
     }
-
+    
     pub trait ResultTrait<K: Kind> {
         type Visit<ResultK: Kind, V: ResultVisitor<K, ResultK>>: Expr<ResultK>;
     }

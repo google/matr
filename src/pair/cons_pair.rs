@@ -21,7 +21,7 @@ meta!{
         First: Expr<FirstK>,
         Second: Expr<SecondK>
     >: Expr<Pair<FirstK, SecondK>> {
-        type Eval = ConsPairValue<FirstK, SecondK, First, Second>;
+        type Eval = WrapPairValue<FirstK, SecondK, ConsPairValue<FirstK, SecondK, First, Second>>;
     }
 }
 

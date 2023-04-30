@@ -41,7 +41,7 @@ meta!{
         Args,
         F: ~const ConstFnTrait<Result, Args>
     >: Expr<ConstFn<Result, Args>> {
-        type Eval = WrapConstFnValue<Result, Args, F>;
+        type Eval = WrapConstFnValue<Result, Args, WrapConstFnImpl<Result, Args, F>>;
     }
 }
 
@@ -77,8 +77,14 @@ mod internal {
         type Impl: ConstFnTraitWrapper<Result, Args>;
     }
 
-    impl<Result, Args, U: ConstFnValue<Result, Args>> Value<ConstFn<Result, Args>> for U {
-        type UnconstrainedImpl = <U as ConstFnValue<Result, Args>>::Impl;
+    meta!{
+        pub struct WrapConstFnValue<
+            Result,
+            Args,
+            U: ConstFnValue<Result, Args>
+        >: Value<ConstFn<Result, Args>> {
+            type UnconstrainedImpl = <U as ConstFnValue<Result, Args>>::Impl;
+        }
     }
 
     // This wrapper is needed (rather than using ConstFnTrait as trait directly) so that we can
@@ -90,15 +96,15 @@ mod internal {
     }
 
     meta!{
-        pub struct WrapConstFnValue<
+        pub struct WrapConstFnImpl<
             Result,
             Args,
             F: ~const ConstFnTrait<Result, Args>
         >: ConstFnValue<Result, Args> {
-            type Impl = WrapConstFnImpl<Result, Args, F>;
+            type Impl = WrapConstFnTrait<Result, Args, F>;
         }
 
-        pub struct WrapConstFnImpl<
+        pub struct WrapConstFnTrait<
             Result,
             Args,
             F: ~const ConstFnTrait<Result, Args>

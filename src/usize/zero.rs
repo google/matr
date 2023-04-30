@@ -16,7 +16,7 @@ use internal::*;
 
 meta!{
     pub struct Zero: Expr<USize> {
-        type Eval = ZeroValue;
+        type Eval = WrapUSizeValue<ZeroValue>;
     }
 }
 

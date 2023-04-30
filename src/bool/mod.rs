@@ -61,11 +61,13 @@ pub(crate) mod internal {
     pub trait BoolValue {
         type Impl: BoolTrait;
     }
-
-    impl<B: BoolValue> Value<Bool> for B {
-        type UnconstrainedImpl = <B as BoolValue>::Impl;
+    
+    meta!{
+        pub struct WrapBoolValue<B: BoolValue>: Value<Bool> {
+            type UnconstrainedImpl = <B as BoolValue>::Impl;
+        }
     }
-
+    
     pub struct AsBool<B: Expr<Bool>> {
         b: PhantomData<B>,
     }

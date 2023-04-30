@@ -40,7 +40,7 @@ meta!{
         Args,
         F: RuntimeFnTrait<Result, Args>
     >: Expr<RuntimeFn<Result, Args>> {
-        type Eval = WrapRuntimeFnValue<Result, Args, F>;
+        type Eval = WrapRuntimeFnValue<Result, Args, WrapRuntimeFnTrait<Result, Args, F>>;
     }
 }
 
@@ -55,12 +55,16 @@ mod internal {
         type Impl: RuntimeFnTrait<Result, Args>;
     }
 
-    impl<Result, Args, U: RuntimeFnValue<Result, Args>> Value<RuntimeFn<Result, Args>> for U {
-        type UnconstrainedImpl = <U as RuntimeFnValue<Result, Args>>::Impl;
-    }
-
     meta!{
         pub struct WrapRuntimeFnValue<
+            Result,
+            Args,
+            U: RuntimeFnValue<Result, Args>
+        >: Value<RuntimeFn<Result, Args>> {
+            type UnconstrainedImpl = <U as RuntimeFnValue<Result, Args>>::Impl;
+        }
+
+        pub struct WrapRuntimeFnTrait<
             Result,
             Args,
             F: RuntimeFnTrait<Result, Args>

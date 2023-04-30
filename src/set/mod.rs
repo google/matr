@@ -105,7 +105,7 @@ mod internal {
             ElemK: EqualityComparableKind,
             L: Expr<List<ElemK>>
         >: Expr<Set<ElemK>> {
-            type Eval = ListToSetUncheckedValue<ElemK, L>;
+            type Eval = WrapSetValue<ElemK, ListToSetUncheckedValue<ElemK, L>>;
         }
 
         pub struct ListToSetUncheckedValue<
@@ -127,8 +127,13 @@ mod internal {
         type Impl: SetTrait<K>;
     }
 
-    impl<K: EqualityComparableKind, U: SetValue<K>> Value<Set<K>> for U {
-        type UnconstrainedImpl = <U as SetValue<K>>::Impl;
+    meta!{
+        pub struct WrapSetValue<
+            K: EqualityComparableKind,
+            U: SetValue<K>
+        >: Value<Set<K>> {
+            type UnconstrainedImpl = <U as SetValue<K>>::Impl;
+        }
     }
 
     pub trait SetTrait<K: EqualityComparableKind> {

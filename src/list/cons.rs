@@ -20,7 +20,7 @@ meta!{
         Elem: Expr<K>, 
         Tail: Expr<List<K>>
     >: Expr<List<K>> {
-        type Eval = ConsValue<K, Elem, Tail>;
+        type Eval = WrapListValue<K, ConsValue<K, Elem, Tail>>;
     }
 }
 

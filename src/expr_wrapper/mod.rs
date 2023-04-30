@@ -45,7 +45,7 @@ meta!{
         K: Kind,
         E: Expr<K>
     >: Expr<ExprWrapper<K>> {
-        type Eval = WrapExprValue<K, E>;
+        type Eval = WrapExprWrapperValue<K, WrapExprValue<K, E>>;
     }
 }
 
@@ -59,11 +59,14 @@ mod internal {
         type UnconstrainedImpl;
     }
 
-    impl<K: Kind, E: ExprWrapperValue<K>> Value<ExprWrapper<K>> for E {
-        type UnconstrainedImpl = <E as ExprWrapperValue<K>>::UnconstrainedImpl;
-    }
-
     meta!{
+        pub struct WrapExprWrapperValue<
+            K: Kind,
+            E: ExprWrapperValue<K>
+        >: Value<ExprWrapper<K>> {
+            type UnconstrainedImpl = <E as ExprWrapperValue<K>>::UnconstrainedImpl;
+        }
+
         pub struct WrapExprValue<
             K: Kind,
             E: Expr<K>

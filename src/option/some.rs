@@ -19,7 +19,7 @@ meta!{
         K: Kind,
         X: Expr<K>
     >: Expr<Option<K>> {
-        type Eval = SomeValue<K, X>;
+        type Eval = WrapOptionValue<K, SomeValue<K, X>>;
     }
 }
 

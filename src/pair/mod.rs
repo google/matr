@@ -53,8 +53,14 @@ mod internal {
         type Impl: PairTrait<FirstK, SecondK>;
     }
 
-    impl<FirstK: Kind, SecondK: Kind, U: PairValue<FirstK, SecondK>> Value<Pair<FirstK, SecondK>> for U {
-        type UnconstrainedImpl = <U as PairValue<FirstK, SecondK>>::Impl;
+    meta!{
+        pub struct WrapPairValue<
+            FirstK: Kind, 
+            SecondK: Kind, 
+            U: PairValue<FirstK, SecondK>
+        >: Value<Pair<FirstK, SecondK>> {
+            type UnconstrainedImpl = <U as PairValue<FirstK, SecondK>>::Impl;
+        }
     }
 
     pub struct AsPair<FirstK: Kind, SecondK: Kind, N: Expr<Pair<FirstK, SecondK>>> {
