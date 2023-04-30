@@ -37,12 +37,33 @@ mod internal {
 #[cfg(test)]
 #[allow(dead_code)]
 mod tests {
+    use std::marker::PhantomData;
     use crate::*;
 
     #[test]
     fn zero() {
         const N: usize = to_usize::<Zero>();
         assert_eq!(N, 0);
+    }
+
+    struct CalledVisitZero {}
+
+    struct CalledVisitIncrement<N: Expr<USize>> {
+        n: PhantomData<N>,
+    }
+
+    meta!{
+        struct MyVisitor : USizeVisitor<Type> {
+            type VisitZero = WrapType<CalledVisitZero>;
+            type VisitIncrement<N: Expr<USize>> = WrapType<CalledVisitIncrement<N>>;
+        }
+    }
+
+    #[test]
+    fn visit() {
+        meta_assert_eq!(Type,
+            VisitUSize<Type, Zero, MyVisitor>,
+            WrapType<CalledVisitZero>);
     }
 }
 

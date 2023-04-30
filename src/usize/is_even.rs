@@ -42,4 +42,22 @@ mod internal {
     }
 }
 
-// TODO: add tests.
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn is_even() {
+        meta_assert_eq!(Bool, IsEven<Zero>, True);
+        meta_assert_eq!(Bool, IsEven<Increment<Zero>>, False);
+        meta_assert_eq!(Bool, IsEven<Increment<Increment<Zero>>>, True);
+    }
+
+    #[test]
+    fn is_odd() {
+        meta_assert_eq!(Bool, IsOdd<Zero>, False);
+        meta_assert_eq!(Bool, IsOdd<Increment<Zero>>, True);
+        meta_assert_eq!(Bool, IsOdd<Increment<Increment<Zero>>>, False);
+    }
+}

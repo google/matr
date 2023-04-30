@@ -35,4 +35,18 @@ mod internal {
     }
 }
 
-// TODO: add tests
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn multiply() {
+        const N: usize = to_usize::<
+            Multiply<
+                Increment<Increment<Increment<Increment<Increment<Zero>>>>>,
+                Increment<Increment<Zero>>
+            >>();
+        assert_eq!(N, 10);
+    }
+}

@@ -120,3 +120,27 @@ mod internal {
         }
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn equals() {
+        meta_assert_eq!(USize, Zero, Zero);
+        meta_assert_eq!(USize, Increment<Zero>, Increment<Zero>);
+        meta_assert_not_eq!(USize, Zero, Increment<Zero>);
+        meta_assert_not_eq!(USize, Increment<Increment<Zero>>, Increment<Zero>);
+    }
+
+    #[test]
+    fn default() {
+        meta_assert_eq!(USize, <USize as KindWithDefault>::Default, Zero);
+    }
+
+    #[test]
+    fn debug_form() {
+        meta_assert_eq!(ExprWrapper<USize>, <USize as KindWithDebugForm>::DebugForm<Sum<Zero, Increment<Zero>>>, WrapExpr<USize, Increment<Zero>>);
+    }
+}
