@@ -32,3 +32,19 @@ mod internal {
         }
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn set_to_list() {
+        meta_assert_eq!(List<Type>,
+            SetToList<Type, type_set!{}>,
+            type_list![]);
+        meta_assert_eq!(List<Type>,
+            SetToList<Type, type_set!{i32, u32}>,
+            type_list![i32, u32]);
+    }
+}

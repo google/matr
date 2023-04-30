@@ -34,7 +34,6 @@ mod internal {
     pub use super::super::internal::*;
 }
 
-
 #[cfg(test)]
 #[allow(dead_code)]
 mod tests {

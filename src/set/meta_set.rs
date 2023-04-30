@@ -32,12 +32,12 @@ mod tests {
     use crate::*;
 
     #[test]
-    fn empty_list() {
+    fn empty_set() {
         meta_assert_eq!(Set<Type>, meta_set!(<Type>{}), EmptySet<Type>);
     }
 
     #[test]
-    fn list() {
+    fn set() {
         meta_assert_eq!(Set<Type>, meta_set!(<Type>{WrapType<i32>, WrapType<u32>}), AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<u32>, EmptySet<Type>>>);
     }
 }

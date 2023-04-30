@@ -16,7 +16,7 @@ use std::collections::HashSet;
 use std::hash::Hash;
 use internal::*;
 
-pub fn to_hash_set<K: EqualityComparableKind, S: Expr<Set<K>>, OutT: Eq + Hash, F: Functor1<K, RuntimeFn<OutT, ()>>>() -> HashSet<OutT> {
+pub fn to_hash_set<K: EqualityComparableKind, OutT: Eq + Hash, S: Expr<Set<K>>, F: Functor1<K, RuntimeFn<OutT, ()>>>() -> HashSet<OutT> {
     return call_runtime_fn::<HashSet<OutT>, (), VisitSet<K, RuntimeFn<HashSet<OutT>, ()>, S, ToHashSetVisitor<K, OutT, F>>>(());
 }
 
@@ -56,5 +56,46 @@ mod internal {
                 return s;
             }
         }
+    }
+}
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use std::any::type_name;
+    use std::collections::HashSet;
+    use crate::*;
+
+    meta!{
+        struct TypeToStr: Functor1<Type, RuntimeFn<&'static str, ()>> {
+            type Apply<X: Expr<Type>> = WrapRuntimeFn<&'static str, (), TypeToStrImpl<X>>;
+        }
+
+        struct TypeToStrImpl<
+            X: Expr<Type>
+        >: RuntimeFnTrait<&str, ()> {
+            fn apply(_: ()) -> &'static str {
+                type_name::<UnwrapType<X>>()
+            }
+        }
+    }
+
+    #[test]
+    fn empty_set_to_hash_set() {
+        let s = to_hash_set::<Type, &'static str, EmptySet<Type>, TypeToStr>();
+        assert_eq!(s, HashSet::new());
+    }
+
+    #[test]
+    fn set_to_hash_set() {
+        struct Foo {}
+        struct Bar {}
+
+        type S = type_set!{Foo, Bar};
+        let s = to_hash_set::<Type, &'static str, S, TypeToStr>();
+        assert_eq!(s, HashSet::from([
+            "matr::set::to_hash_set::tests::set_to_hash_set::Foo",
+            "matr::set::to_hash_set::tests::set_to_hash_set::Bar",
+        ]));
     }
 }

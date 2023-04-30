@@ -31,10 +31,37 @@ mod internal {
     pub use super::super::internal::*;
 }
 
+
 #[cfg(test)]
 #[allow(dead_code)]
 mod tests {
+    use std::marker::PhantomData;
     use crate::*;
+
+    struct CalledVisitEmptySet {}
+
+    struct CalledVisitCons<X, Tail: Expr<Set<Type>>> {
+        x: PhantomData<X>,
+        tail: PhantomData<Tail>,
+    }
+
+    meta!{
+        struct MyVisitor : SetVisitor<Type, Type> {
+            type VisitEmptySet = WrapType<CalledVisitEmptySet>;
+            type VisitCons<X: Expr<Type>, Tail: Expr<Set<Type>>> = WrapType<CalledVisitCons<UnwrapType<X>, UnwrapExpr<Set<Type>, <Set<Type> as KindWithDebugForm>::DebugForm<Tail>>>>;
+        }
+    }
+
+    #[test]
+    fn visit() {
+        meta_assert_eq!(Type,
+            VisitSet<Type, Type,
+                AddToSet<Type, WrapType<i32>, AddToSet<Type, WrapType<u32>, EmptySet<Type>>>,
+                MyVisitor>,
+            WrapType<CalledVisitCons<
+                i32,
+                AddToSet<Type, WrapType<u32>, EmptySet<Type>>>>);
+    }
 
     #[test]
     fn add_commutative() {

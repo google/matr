@@ -157,3 +157,30 @@ mod internal {
             And<IsSubset<K, X, Y>, IsSubset<K, Y, X>>;
     }
 }
+
+#[cfg(test)]
+#[allow(dead_code)]
+mod tests {
+    use crate::*;
+
+    #[test]
+    fn equals() {
+        meta_assert_eq!(Set<Type>, type_set!{}, type_set![]);
+        meta_assert_eq!(Set<Type>, type_set!{i32}, type_set!{i32});
+        meta_assert_eq!(Set<Type>, type_set!{i32, u32}, type_set!{u32, i32});
+        meta_assert_not_eq!(Set<Type>, type_set!{}, type_set!{i32});
+        meta_assert_not_eq!(Set<Type>, type_set!{i32}, type_set!{u64});
+    }
+
+    #[test]
+    fn default() {
+        meta_assert_eq!(Set<Type>, <Set<Type> as KindWithDefault>::Default, type_set!{});
+    }
+
+    #[test]
+    fn debug_form() {
+        meta_assert_eq!(ExprWrapper<Set<Bool>>,
+            <Set<Bool> as KindWithDebugForm>::DebugForm<AddToSet<Bool, And<True, False>, EmptySet<Bool>>>,
+            WrapExpr<Set<Bool>, AddToSet<Bool, False, EmptySet<Bool>>>);
+    }
+}
