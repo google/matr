@@ -21,6 +21,13 @@ pub use tuple_based_list_to_list::*;
 use std::marker::PhantomData;
 use internal::*;
 
+// This is conceptually similar to List<K>, but it represents the list as a nested tuple:
+// (T0, (T1, ..., () )...)
+// This can be useful to "encode" a metatype used as a type parameter in a way that's readable in
+// compile error messages, while at the same time being able to constrain the tuple type with a
+// trait (TupleBasedListTrait<K>) that guarantees the ability to reconstruct the List.
+// When K=Type, prefer using the more specific TupleBasedTypeList, that avoids the WrapType wrappers
+// too.
 pub struct TupleBasedList<K: Kind> {
     k: PhantomData<K>,
 }

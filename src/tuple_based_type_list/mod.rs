@@ -20,6 +20,13 @@ pub use tuple_based_type_list_to_list::*;
 
 use internal::*;
 
+// This is conceptually similar to List<Type>, but it represents the list as a nested tuple:
+// (T0, (T1, ..., () )...)
+// This can be useful to "encode" a metatype used as a type parameter in a way that's readable in
+// compile error messages, while at the same time being able to constrain the tuple type with a
+// trait (TupleBasedTypeListTrait) that guarantees the ability to reconstruct the List<Type>.
+// For lists of other meta-types (not Type), TupleBasedList<K> is a more general alternative (but
+// that results in more verbose types when K=Type).
 pub struct TupleBasedTypeList {}
 
 impl Kind for TupleBasedTypeList {}
