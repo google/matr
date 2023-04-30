@@ -16,7 +16,7 @@
 #![feature(specialization)]
 #![feature(const_trait_impl)]
 
-mod assertions;
+pub mod assertions;
 mod meta;
 
 mod bool;
