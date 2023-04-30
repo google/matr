@@ -156,7 +156,7 @@ mod tests {
 
     #[test]
     fn default() {
-        meta_assert_eq!(Result<Type>, <Result<Type> as KindWithDefault>::Default, Ok<Type, WrapType<()>>);
+        meta_assert_eq!(Result<Type>, Default<Result<Type>>, Ok<Type, WrapType<()>>);
     }
 
     #[test]

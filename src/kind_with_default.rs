@@ -17,3 +17,9 @@ use crate::*;
 pub trait KindWithDefault: Kind {
     type Default: Expr<Self>;
 }
+
+meta!{
+    pub type Default<
+        K: KindWithDefault
+    >: Expr<K> = <K as KindWithDefault>::Default;
+}

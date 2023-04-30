@@ -136,7 +136,7 @@ mod tests {
 
     #[test]
     fn default() {
-        meta_assert_eq!(USize, <USize as KindWithDefault>::Default, Zero);
+        meta_assert_eq!(USize, Default<USize>, Zero);
     }
 
     #[test]

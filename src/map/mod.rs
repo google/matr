@@ -202,7 +202,7 @@ mod tests {
 
     #[test]
     fn default() {
-        meta_assert_eq!(Map<Type, Type>, <Map<Type, Type> as KindWithDefault>::Default, type_map!{});
+        meta_assert_eq!(Map<Type, Type>, Default<Map<Type, Type>>, type_map!{});
     }
 
     #[test]

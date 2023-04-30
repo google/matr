@@ -174,7 +174,7 @@ mod tests {
 
     #[test]
     fn default() {
-        meta_assert_eq!(Set<Type>, <Set<Type> as KindWithDefault>::Default, type_set!{});
+        meta_assert_eq!(Set<Type>, Default<Set<Type>>, type_set!{});
     }
 
     #[test]

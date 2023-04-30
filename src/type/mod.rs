@@ -107,7 +107,7 @@ mod tests {
 
     #[test]
     fn default() {
-        meta_assert_eq!(Type, <Type as KindWithDefault>::Default, WrapType<()>);
+        meta_assert_eq!(Type, Default<Type>, WrapType<()>);
     }
 
     #[test]

@@ -105,7 +105,8 @@ mod tests {
 
     #[test]
     fn default() {
-        meta_assert_eq!(Pair<Option<Type>, Option<Type>>, <Pair<Option<Type>, Option<Type>> as KindWithDefault>::Default, ConsPair<Option<Type>, Option<Type>, None<Type>, None<Type>>);
+        meta_assert_eq!(Pair<Option<Type>, Option<Type>>,
+            Default<Pair<Option<Type>, Option<Type>>>, ConsPair<Option<Type>, Option<Type>, None<Type>, None<Type>>);
     }
 
     #[test]

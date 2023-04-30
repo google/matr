@@ -136,7 +136,7 @@ mod tests {
 
     #[test]
     fn default() {
-        meta_assert_eq!(Option<Type>, <Option<Type> as KindWithDefault>::Default, None<Type>);
+        meta_assert_eq!(Option<Type>, Default<Option<Type>>, None<Type>);
     }
 
     #[test]

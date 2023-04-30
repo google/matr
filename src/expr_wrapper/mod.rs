@@ -86,7 +86,7 @@ mod tests {
 
     #[test]
     fn default() {
-        meta_assert_eq!(ExprWrapper<List<Type>>, <ExprWrapper<List<Type>> as KindWithDefault>::Default, WrapExpr<List<Type>, EmptyList<Type>>);
+        meta_assert_eq!(ExprWrapper<List<Type>>, Default<ExprWrapper<List<Type>>>, WrapExpr<List<Type>, EmptyList<Type>>);
     }
 
     #[test]

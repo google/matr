@@ -100,7 +100,7 @@ mod tests {
 
     #[test]
     fn default() {
-        meta_assert_eq!(Bool, <Bool as KindWithDefault>::Default, False);
+        meta_assert_eq!(Bool, Default<Bool>, False);
     }
 
     #[test]

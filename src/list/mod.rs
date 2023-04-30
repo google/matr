@@ -166,7 +166,7 @@ mod tests {
 
     #[test]
     fn default() {
-        meta_assert_eq!(List<Type>, <List<Type> as KindWithDefault>::Default, type_list![]);
+        meta_assert_eq!(List<Type>, Default<List<Type>>, type_list![]);
     }
 
     #[test]
