@@ -17,10 +17,10 @@
 #[macro_export]
 macro_rules! type_list {
     () => {
-        $crate::EmptyList<$crate::Type>
+        $crate::list::EmptyList<$crate::r#type::Type>
     };
     ($X:ty $( ,$Y:ty )*) => {
-        $crate::Cons<$crate::Type, $crate::WrapType<$X>, type_list![$($Y),*]>
+        $crate::list::Cons<$crate::r#type::Type, $crate::r#type::WrapType<$X>, type_list![$($Y),*]>
     };
 }
 pub use type_list;
@@ -29,6 +29,8 @@ pub use type_list;
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
 
     #[test]
     fn empty_list() {

@@ -13,6 +13,8 @@
 // limitations under the License.
 
 use internal::*;
+use crate::list::*;
+use crate::pair::*;
 
 meta!{
     pub type ListToMap<
@@ -25,7 +27,7 @@ meta!{
 
 mod internal {
     pub use super::super::internal::*;
-    
+
     meta!{
         pub struct ListToMapVisitor<
             K: KindWithDefault + EqualityComparableKind, 
@@ -41,6 +43,9 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
+    use crate::pair::*;
 
     #[test]
     fn list_to_map() {

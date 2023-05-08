@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use internal::*;
+use crate::const_fn::*;
 
 // Use this at top-level when evaluating an Expr<Result<...>>, in conjunction with
 // GetTypeResult or GetConstFn (for the same expression).
@@ -22,7 +23,8 @@ pub const fn check_no_error<K: Kind, V: Expr<Result<K>>>() {
 
 mod internal {
     pub use super::super::internal::*;
-    
+    use crate::const_fn::*;
+
     meta!{
         pub struct PanickingConstFnImpl<E>: const ConstFnTrait<(), ()> {
             fn apply(_: ()) -> () {
@@ -40,7 +42,8 @@ mod internal {
 #[cfg(test)]
 #[allow(dead_code)]
 mod tests {
-    use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
 
     struct MyError {}
 

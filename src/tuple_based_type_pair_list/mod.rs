@@ -19,6 +19,9 @@ pub use list_to_tuple_based_type_pair_list::*;
 pub use tuple_based_type_pair_list_to_list::*;
 
 use internal::*;
+use crate::expr_wrapper::*;
+use crate::pair::*;
+use crate::r#type::*;
 
 // This is conceptually similar to List<Pair<Type, Type>>, but it represents the list as a nested tuple:
 // ((T0, U0), ((T1, U1), ..., () )...)
@@ -86,6 +89,8 @@ impl<HeadFirst, HeadSecond, Tail: TupleBasedTypePairListTrait> TupleBasedTypePai
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
+    pub use super::*;
+    use crate::bool::*;
 
     pub trait TupleBasedTypePairListValue {
         type Impl: TupleBasedTypePairListOuterTrait;
@@ -154,7 +159,7 @@ mod internal {
 
         pub struct IsTupleBasedTypePairListEmpty: TupleBasedTypePairListVisitor<Bool> {
             type VisitEmptyTupleBasedTypePairList = True;
-            type VisitCons<Elem: Expr<Pair<Type, Type>>, Tail: Expr<crate::TupleBasedTypePairList>> = False;
+            type VisitCons<Elem: Expr<Pair<Type, Type>>, Tail: Expr<TupleBasedTypePairList>> = False;
         }
 
         pub struct TupleBasedTypePairListEqualsCons<
@@ -171,6 +176,7 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::*;
 
     #[test]
     fn equals() {

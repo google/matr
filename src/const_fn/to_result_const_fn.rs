@@ -14,6 +14,7 @@
 
 use std::marker::Destruct;
 use internal::*;
+use crate::result::*;
 
 meta!{
     pub type ToResultConstFn<
@@ -34,6 +35,7 @@ meta!{
 mod internal {
     use std::marker::Destruct;
     pub use super::super::internal::*;
+    use crate::result::*;
 
     meta!{
         pub struct ToResultConstFnAdapter<Out, Args>: Functor1<ConstFn<Out, Args>, Result<ConstFn<std::result::Result<Out, &'static str>, Args>>> {
@@ -57,7 +59,9 @@ mod internal {
 #[cfg(test)]
 #[allow(dead_code)]
 mod tests {
-    use super::internal::*;
+    use crate::*;
+    use super::super::*;
+    use crate::result::*;
 
     meta!{
         pub struct ToUnsigned32ConstFn: const ConstFnTrait<u32, i32> {

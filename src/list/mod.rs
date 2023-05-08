@@ -46,6 +46,7 @@ pub use meta_list::*;
 
 use std::marker::PhantomData;
 use internal::*;
+use crate::expr_wrapper::*;
 
 pub struct List<K: Kind> {
     k: PhantomData<K>,
@@ -83,6 +84,9 @@ meta!{
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
+    pub use super::*;
+    pub use super::super::*;
+    use crate::bool::*;
 
     pub trait ListValue<K: Kind> {
         type Impl: ListTrait<K>;
@@ -142,7 +146,7 @@ mod internal {
             K: EqualityComparableKind
         >: ListVisitor<K, Bool> {
             type VisitEmptyList = True;
-            type VisitCons<Elem: Expr<K>, Tail: Expr<crate::List<K>>> = False;
+            type VisitCons<Elem: Expr<K>, Tail: Expr<List<K>>> = False;
         }
 
         pub struct ListEqualsCons<
@@ -160,6 +164,9 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::*;
+    use crate::bool::*;
+    use crate::r#type::*;
 
     #[test]
     fn equals() {

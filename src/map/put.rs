@@ -13,6 +13,9 @@
 // limitations under the License.
 
 use internal::*;
+use crate::bool::*;
+use crate::list::*;
+use crate::pair::*;
 
 meta!{
     pub type Put<
@@ -39,6 +42,9 @@ mod internal {
 mod tests {
     use std::marker::PhantomData;
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
+    use crate::expr_wrapper::*;
 
     struct CalledVisitEmptyMap {}
 

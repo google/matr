@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use internal::*;
+use crate::const_fn::*;
 
 pub const fn to_bool<B: Expr<Bool>>() -> bool {
     return call_const_fn::<bool, (), If<ConstFn<bool, ()>, B, WrapConstFn<bool, (), ToTrueBoolConstFnImpl>, WrapConstFn<bool, (), ToFalseBoolConstFnImpl>>>(());
@@ -20,6 +21,7 @@ pub const fn to_bool<B: Expr<Bool>>() -> bool {
 
 mod internal {
     pub use super::super::internal::*;
+    use crate::const_fn::*;
 
     meta! {
         pub struct ToTrueBoolConstFnImpl: const ConstFnTrait<bool, ()> {
@@ -40,6 +42,7 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
 
     #[test]
     fn to_bool_false() {

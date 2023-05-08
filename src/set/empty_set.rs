@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use internal::*;
+use crate::list::*;
 
 meta!{
     pub type EmptySet<K: EqualityComparableKind>: Expr<Set<K>> =
@@ -28,6 +29,8 @@ mod internal {
 mod tests {
     use std::marker::PhantomData;
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
 
     struct CalledVisitEmptySet {}
 

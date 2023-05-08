@@ -39,6 +39,7 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
 
     #[test]
     fn multiply() {

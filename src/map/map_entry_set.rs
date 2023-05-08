@@ -13,6 +13,8 @@
 // limitations under the License.
 
 use internal::*;
+use crate::set::*;
+use crate::pair::*;
 
 meta!{
     pub type MapEntrySet<
@@ -25,6 +27,7 @@ meta!{
 
 mod internal {
     pub use super::super::internal::*;
+    use crate::set::*;
 
     meta!{
         pub struct MapEntrySetVisitor<
@@ -41,6 +44,10 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
+    use crate::set::*;
+    use crate::pair::*;
 
     #[test]
     fn map_entry_set() {

@@ -30,6 +30,8 @@ pub use unwrap_type_result::*;
 
 use std::marker::PhantomData;
 use internal::*;
+use crate::bool::*;
+use crate::expr_wrapper::*;
 
 pub struct Result<K: Kind> {
     k: PhantomData<K>,
@@ -69,6 +71,8 @@ impl<K: KindWithDebugForm + KindWithDefault> KindWithDebugForm for Result<K> {
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
+    pub use super::*;
+    use crate::r#type::*;
 
     meta!{
         pub struct ResultDebugFormVisitor<
@@ -148,6 +152,8 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use crate::r#type::*;
+    use crate::result::*;
 
     struct MyError {}
 

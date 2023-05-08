@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use internal::*;
+use crate::bool::*;
 
 meta!{
     pub type IsInMap<
@@ -26,7 +27,8 @@ meta!{
 
 mod internal {
     pub use super::super::internal::*;
-    
+    use crate::bool::*;
+
     meta!{
         pub struct IsInMapVisitor<
             K: EqualityComparableKind + KindWithDefault,
@@ -43,6 +45,10 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::usize::*;
+    use crate::bool::*;
+    use crate::r#type::*;
 
     type N0 = Zero;
     type N1 = Increment<N0>;

@@ -31,7 +31,8 @@ mod internal {
 #[cfg(test)]
 #[allow(dead_code)]
 mod tests {
-    use crate::*;
+    use super::super::*;
+    use crate::usize::*;
 
     type N0 = Zero;
     type N1 = Increment<N0>;

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use internal::*;
+use crate::result::*;
 
 meta!{
     pub type IfResult<
@@ -28,6 +29,7 @@ meta!{
 // But they should never be explicitly referenced elsewhere.
 mod internal {
     pub use super::super::internal::*;
+    use crate::result::*;
 
     meta!{
         pub struct IfResultImpl<
@@ -44,6 +46,10 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
+    use crate::result::*;
+    use crate::usize::*;
 
     #[test]
     fn ok() {

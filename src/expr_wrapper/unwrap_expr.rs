@@ -23,6 +23,7 @@ pub type UnwrapExpr<K, E> = <UnwrapExprHelper<K, E> as UnwrapExprTrait<K>>::Get;
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
+    use crate::expr_wrapper::*;
 
     pub trait UnwrapExprTrait<K: KindWithDefault> {
         type Get: Expr<K>;
@@ -47,6 +48,9 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::list::*;
+    use crate::bool::*;
 
     #[test]
     fn unwrap_expr() {

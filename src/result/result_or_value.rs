@@ -45,6 +45,8 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use crate::r#type::*;
+    use super::super::*;
 
     struct MyError {}
 

@@ -13,6 +13,8 @@
 // limitations under the License.
 
 use internal::*;
+use crate::list::*;
+use crate::pair::*;
 
 meta!{
     pub type MapToList<
@@ -31,6 +33,10 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
+    use crate::list::*;
+    use crate::pair::*;
 
     #[test]
     fn map_to_list() {

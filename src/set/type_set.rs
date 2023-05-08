@@ -17,10 +17,10 @@
 #[macro_export]
 macro_rules! type_set {
     () => {
-        $crate::EmptySet<$crate::Type>
+        $crate::set::EmptySet<$crate::r#type::Type>
     };
     ($X:ty $( ,$Y:ty )*) => {
-        $crate::AddToSet<$crate::Type, $crate::WrapType<$X>, type_set![$($Y),*]>
+        $crate::set::AddToSet<$crate::r#type::Type, $crate::r#type::WrapType<$X>, type_set![$($Y),*]>
     };
 }
 pub use type_set;
@@ -29,6 +29,8 @@ pub use type_set;
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
 
     #[test]
     fn empty_set() {

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use internal::*;
+use crate::bool::*;
 
 meta!{
     pub type IsInList<
@@ -25,6 +26,7 @@ meta!{
 
 mod internal {
     pub use super::super::internal::*;
+    use crate::bool::*;
 
     meta!{
         pub struct IsInListVisitor<
@@ -41,6 +43,9 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::bool::*;
+    use crate::r#type::*;
 
     #[test]
     fn is_in_empty_list() {

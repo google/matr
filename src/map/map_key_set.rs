@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use internal::*;
+use crate::set::*;
 
 meta!{
     pub type MapKeySet<
@@ -25,7 +26,8 @@ meta!{
 
 mod internal {
     pub use super::super::internal::*;
-    
+    use crate::set::*;
+
     meta!{
         pub struct MapKeySetVisitor<
             K: KindWithDefault + EqualityComparableKind, 
@@ -41,6 +43,9 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::set::*;
+    use crate::r#type::*;
 
     #[test]
     fn map_key_set() {

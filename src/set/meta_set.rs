@@ -18,10 +18,10 @@
 #[macro_export]
 macro_rules! meta_set {
     (<$T: ty>{}) => {
-        $crate::EmptySet<$T>
+        $crate::set::EmptySet<$T>
     };
     (<$T: ty>{$Head:ty $(, $Tail:ty)*}) => {
-        $crate::AddToSet<$T, $Head, $crate::meta_set!(<$T>{$($Tail),*})>
+        $crate::set::AddToSet<$T, $Head, $crate::meta_set!(<$T>{$($Tail),*})>
     };
 }
 pub use meta_set;
@@ -30,6 +30,8 @@ pub use meta_set;
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
 
     #[test]
     fn empty_set() {

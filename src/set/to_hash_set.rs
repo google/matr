@@ -15,6 +15,7 @@
 use std::collections::HashSet;
 use std::hash::Hash;
 use internal::*;
+use crate::runtime_fn::*;
 
 pub fn to_hash_set<K: EqualityComparableKind, OutT: Eq + Hash, S: Expr<Set<K>>, F: Functor1<K, RuntimeFn<OutT, ()>>>() -> HashSet<OutT> {
     return call_runtime_fn::<HashSet<OutT>, (), VisitSet<K, RuntimeFn<HashSet<OutT>, ()>, S, ToHashSetVisitor<K, OutT, F>>>(());
@@ -24,7 +25,8 @@ mod internal {
     use std::collections::HashSet;
     use std::hash::Hash;
     pub use super::super::internal::*;
-    
+    use crate::runtime_fn::*;
+
     meta!{
         pub struct ToHashSetVisitor<
             K: EqualityComparableKind, 
@@ -65,7 +67,10 @@ mod tests {
     use std::any::type_name;
     use std::collections::HashSet;
     use crate::*;
-
+    use super::super::*;
+    use crate::r#type::*;
+    use crate::runtime_fn::*;
+    
     meta!{
         struct TypeToStr: Functor1<Type, RuntimeFn<&'static str, ()>> {
             type Apply<X: Expr<Type>> = WrapRuntimeFn<&'static str, (), TypeToStrImpl<X>>;

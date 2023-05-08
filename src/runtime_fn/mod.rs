@@ -50,6 +50,7 @@ meta!{
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
+    pub use super::*;
 
     pub trait RuntimeFnValue<Result, Args> {
         type Impl: RuntimeFnTrait<Result, Args>;

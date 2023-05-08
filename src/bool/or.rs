@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use super::internal::*;
+use crate::result::*;
 
 meta!{
     pub type Or<
@@ -32,6 +33,8 @@ meta!{
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::usize::*;
 
     #[test]
     fn or() {

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use internal::*;
+use crate::list::*;
 
 meta!{
     pub type ListToTupleBasedList<
@@ -24,7 +25,8 @@ meta!{
 
 mod internal {
     pub use super::super::internal::*;
-    
+    use crate::list::*;
+
     meta!{
         pub struct ListToTupleBasedListVisitor<K: EqualityComparableKind>: ListVisitor<K, TupleBasedList<K>> {
             type VisitEmptyList = WrapTupleBasedList<K, ()>;
@@ -37,6 +39,8 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
 
     #[test]
     fn list_to_tuple_based_list() {

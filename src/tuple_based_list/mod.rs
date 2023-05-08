@@ -20,6 +20,7 @@ pub use tuple_based_list_to_list::*;
 
 use std::marker::PhantomData;
 use internal::*;
+use crate::expr_wrapper::*;
 
 // This is conceptually similar to List<K>, but it represents the list as a nested tuple:
 // (T0, (T1, ..., () )...)
@@ -91,6 +92,8 @@ impl<K: Kind, Head: Expr<K>, Tail: TupleBasedListTrait<K>> TupleBasedListTrait<K
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
+    pub use super::*;
+    use crate::bool::*;
 
     pub trait TupleBasedListValue<K: Kind> {
         type Impl: TupleBasedListOuterTrait<K>;
@@ -164,7 +167,7 @@ mod internal {
             K: EqualityComparableKind
         >: TupleBasedListVisitor<K, Bool> {
             type VisitEmptyTupleBasedList = True;
-            type VisitCons<Elem: Expr<K>, Tail: Expr<crate::TupleBasedList<K>>> = False;
+            type VisitCons<Elem: Expr<K>, Tail: Expr<TupleBasedList<K>>> = False;
         }
 
         pub struct TupleBasedListEqualsCons<
@@ -182,6 +185,9 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::*;
+    use crate::r#type::*;
+    use crate::bool::*;
 
     #[test]
     fn equals() {

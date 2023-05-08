@@ -13,6 +13,8 @@
 // limitations under the License.
 
 use internal::*;
+use crate::pair::*;
+use crate::r#type::*;
 
 // Converts a List<Pair<Type, Pair<Type, Type>> into a tuple of the form ((T0, U0, V0), ((T1, U1, V1), ((T2, U2, V2), ()))).
 meta!{
@@ -24,7 +26,9 @@ meta!{
 
 mod internal {
     pub use super::super::internal::*;
-    
+    use crate::pair::*;
+    use crate::r#type::*;
+
     meta!{
         pub struct ToTypeTripleNestedTupleVisitor: ListVisitor<Pair<Type, Pair<Type, Type>>, Type> {
             type VisitEmptyList = WrapType<()>;
@@ -46,7 +50,10 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
-
+    use super::super::*;
+    use crate::pair::*;
+    use crate::r#type::*;
+    
     #[test]
     fn empty_list_to_type_triple_nested_tuple() {
         meta_assert_eq!(Type, ToTypeTripleNestedTuple<EmptyList<Pair<Type, Pair<Type, Type>>>>, WrapType<()>);

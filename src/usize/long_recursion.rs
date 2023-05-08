@@ -13,6 +13,8 @@
 // limitations under the License.
 
 use internal::*;
+use crate::usize::*;
+use crate::bool::*;
 
 meta!{
     // An Expr<K> that, when evaluated, causes a compilation error due to exceeding the maximum
@@ -29,6 +31,7 @@ pub type OneBillion = Multiply<Multiply<OneThousand, OneThousand>, OneThousand>;
 
 mod internal {
     pub use crate::*;
+    use crate::usize::*;
 
     pub type Ten = Increment<Increment<Increment<Increment<Increment<Increment<Increment<Increment<Increment<Increment<Zero>>>>>>>>>>;
     pub type OneThousand = Multiply<Multiply<Ten, Ten>, Ten>;
@@ -39,6 +42,7 @@ mod internal {
 #[allow(unused_imports)]
 mod tests {
     use crate::*;
+    use super::super::*;
 
     #[test]
     fn long_recursion() {

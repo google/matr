@@ -18,6 +18,7 @@ pub use unwrap_expr::*;
 
 use std::marker::PhantomData;
 use internal::*;
+use crate::r#type::*;
 
 pub struct ExprWrapper<K: Kind + ?Sized> {
     k: PhantomData<K>,
@@ -54,6 +55,7 @@ meta!{
 // But they should never be explicitly referenced elsewhere.
 mod internal {
     pub use crate::*;
+    pub use super::*;
 
     pub trait ExprWrapperValue<K: Kind> {
         type UnconstrainedImpl;
@@ -80,6 +82,10 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use crate::list::*;
+    use crate::r#type::*;
+    use crate::expr_wrapper::*;
+    use crate::bool::*;
 
     #[test]
     fn equals() {

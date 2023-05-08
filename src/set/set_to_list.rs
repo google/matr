@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use internal::*;
+use crate::list::*;
 
 meta!{
     pub type SetToList<
@@ -37,6 +38,8 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
 
     #[test]
     fn set_to_list() {

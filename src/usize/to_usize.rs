@@ -13,6 +13,8 @@
 // limitations under the License.
 
 use internal::*;
+use crate::const_fn::*;
+use crate::result::*;
 
 pub const fn result_to_usize<N: Expr<Result<USize>>>() -> std::result::Result<usize, &'static str> {
     return call_const_fn::<std::result::Result<usize, &'static str>, (),
@@ -34,6 +36,8 @@ pub const fn to_usize<N: Expr<USize>>() -> usize {
 
 mod internal {
     pub use super::super::internal::*;
+    use crate::const_fn::*;
+    use crate::result::*;
 
     meta!{
         pub struct ToUSizeErrorImpl: const ConstFnTrait<std::result::Result<usize, &'static str>, ()> {
@@ -71,7 +75,9 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
-
+    use super::super::*;
+    use crate::result::*;
+    
     #[test]
     fn result_to_usize_test() {
         const N: std::result::Result<usize, &'static str> = result_to_usize::<Ok<USize, Increment<Increment<Increment<Zero>>>>>();

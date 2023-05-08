@@ -29,7 +29,8 @@ mod internal {
 #[cfg(test)]
 #[allow(dead_code)]
 mod tests {
-    use super::internal::*;
+    use crate::usize::*;
+    use super::super::*;
 
     #[test]
     fn and() {

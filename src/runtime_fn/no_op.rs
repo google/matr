@@ -14,6 +14,7 @@
 
 use crate::*;
 use internal::*;
+use crate::runtime_fn::*;
 
 meta!{
     pub type NoOpRuntimeFn: Expr<RuntimeFn<(), ()>> =
@@ -21,7 +22,7 @@ meta!{
 }
 
 mod internal {
-    pub use crate::*;
+    pub use super::super::internal::*;
 
     meta!{
         pub struct NoOpRuntimeFnImpl: RuntimeFnTrait<(), ()> {
@@ -33,7 +34,7 @@ mod internal {
 #[cfg(test)]
 #[allow(dead_code)]
 mod tests {
-    use super::internal::*;
+    use super::super::*;
 
     #[test]
     fn no_op_runtime_fn() {

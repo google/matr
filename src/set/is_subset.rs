@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use internal::*;
+use crate::bool::*;
 
 meta!{
     pub type IsSubset<
@@ -25,7 +26,8 @@ meta!{
 
 mod internal {
     pub use super::super::internal::*;
-    
+    use crate::bool::*;
+
     meta!{
         pub struct IsSubsetVisitor<
             K: EqualityComparableKind,
@@ -41,6 +43,9 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
+    use crate::bool::*;
 
     #[test]
     fn is_empty_set_in_empty_set() {

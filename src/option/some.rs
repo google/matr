@@ -48,6 +48,8 @@ mod internal {
 mod tests {
     use std::marker::PhantomData;
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
 
     struct CalledVisitNone {}
 

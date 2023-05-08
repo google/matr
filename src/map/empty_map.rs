@@ -13,6 +13,8 @@
 // limitations under the License.
 
 use internal::*;
+use crate::list::*;
+use crate::pair::*;
 
 meta!{
     pub type EmptyMap<
@@ -31,6 +33,8 @@ mod internal {
 mod tests {
     use std::marker::PhantomData;
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
 
     struct CalledVisitEmptyMap {}
 

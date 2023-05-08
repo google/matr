@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use internal::*;
+use crate::usize::*;
 
 pub fn to_usize_vec<L: Expr<List<USize>>>() -> Vec<usize> {
     return to_vec::<USize, usize, L, ToUsizeFunctor>();
@@ -20,6 +21,8 @@ pub fn to_usize_vec<L: Expr<List<USize>>>() -> Vec<usize> {
 
 mod internal {
     pub use super::super::internal::*;
+    use crate::usize::*;
+    use crate::runtime_fn::*;
 
     meta!{
         pub struct ToUsizeFunctor: Functor1<USize, RuntimeFn<usize, ()>> {
@@ -39,7 +42,8 @@ mod internal {
 #[cfg(test)]
 #[allow(dead_code)]
 mod tests {
-    use crate::*;
+    use super::super::*;
+    use crate::usize::*;
 
     #[test]
     fn empty_list_to_usize_vec() {

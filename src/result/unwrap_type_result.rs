@@ -23,6 +23,7 @@ pub type UnwrapTypeResult<E> = <UnwrapTypeResultHelper<E> as UnwrapTypeResultTra
 
 mod internal {
     pub use super::super::internal::*;
+    use crate::r#type::*;
 
     pub trait UnwrapTypeResultTrait {
         type Get;
@@ -39,6 +40,8 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
 
     struct MyError {}
 

@@ -29,6 +29,7 @@ pub use to_usize::*;
 pub use long_recursion::*;
 
 use internal::*;
+use crate::expr_wrapper::*;
 
 pub struct USize {}
 
@@ -63,6 +64,8 @@ meta!{
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
+    pub use super::*;
+    use crate::bool::*;
 
     pub trait USizeValue {
         type Impl: USizeTrait;
@@ -127,6 +130,7 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use crate::usize::*;
 
     #[test]
     fn equals() {

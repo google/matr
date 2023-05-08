@@ -43,6 +43,8 @@ pub use type_set::*;
 
 use std::marker::PhantomData;
 use internal::*;
+use crate::list::*;
+use crate::expr_wrapper::*;
 
 pub struct Set<K: EqualityComparableKind> {
     k: PhantomData<K>,
@@ -81,6 +83,8 @@ meta!{
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
+    pub use super::*;
+    use crate::bool::*;
 
     meta!{
         pub struct ToSetDebugFormVisitor<K: KindWithDefault + EqualityComparableKind + KindWithDebugForm>: SetVisitor<K, ExprWrapper<Set<K>>> {
@@ -167,6 +171,9 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use crate::set::*;
+    use crate::bool::*;
+    use crate::r#type::*;
 
     #[test]
     fn equals() {

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use crate::*;
+use crate::bool::*;
 
 pub trait EqualityComparableKind: Kind {
     type Eq<X: Expr<Self>, Y: Expr<Self>>: Expr<Bool>;
@@ -31,6 +32,8 @@ meta!{
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use crate::bool::*;
+    use crate::r#type::*;
 
     #[test]
     fn equals_types() {

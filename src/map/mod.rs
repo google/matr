@@ -44,6 +44,9 @@ pub use type_map::*;
 
 use std::marker::PhantomData;
 use internal::*;
+use crate::expr_wrapper::*;
+use crate::list::*;
+use crate::pair::*;
 
 pub struct Map<K: EqualityComparableKind, V: Kind> {
     k: PhantomData<K>,
@@ -83,7 +86,10 @@ meta!{
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
-    
+    pub use super::*;
+    use crate::bool::*;
+    use crate::option::*;
+
     meta!{
         pub struct ToMapDebugFormVisitor<K: KindWithDefault + EqualityComparableKind + KindWithDebugForm, V: KindWithDefault + EqualityComparableKind + KindWithDebugForm>: MapVisitor<K, V, ExprWrapper<Map<K, V>>> {
             type VisitEmptyMap = WrapExpr<Map<K, V>, EmptyMap<K, V>>;
@@ -196,6 +202,9 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::*;
+    use crate::r#type::*;
+    use crate::bool::*;
 
     #[test]
     fn equals() {

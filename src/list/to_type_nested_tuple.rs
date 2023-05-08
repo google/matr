@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use internal::*;
+use crate::r#type::*;
 
 // Converts a List<Type> into a tuple of the form (T0, (T1, (T2, ()))).
 meta!{
@@ -24,6 +25,7 @@ meta!{
 
 mod internal {
     pub use super::super::internal::*;
+    use crate::r#type::*;
 
     meta!{
         pub struct ToTypeNestedTupleVisitor: ListVisitor<Type, Type> {
@@ -40,6 +42,8 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
 
     #[test]
     fn empty_list_to_type_nested_tuple() {

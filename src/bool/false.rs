@@ -40,6 +40,8 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::usize::*;
 
     #[test]
     fn false_literal() {

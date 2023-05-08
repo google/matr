@@ -51,6 +51,7 @@ meta!{
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
+    pub use super::*;
 
     pub struct AsConstFn<Result, Args, Fn: Expr<ConstFn<Result, Args>>> {
         result: PhantomData<Result>,

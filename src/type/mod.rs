@@ -18,6 +18,7 @@ pub use unwrap_type::*;
 
 use std::marker::PhantomData;
 use internal::*;
+use crate::expr_wrapper::*;
 
 pub struct Type {}
 
@@ -48,7 +49,9 @@ impl<T> Expr<Type> for WrapType<T> {
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
+    pub use super::*;
     use crate::bool::internal::WrapBoolValue;
+    use crate::bool::*;
 
     pub trait TypeValue {
         type UnconstrainedImpl;
@@ -104,6 +107,7 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use crate::r#type::*;
 
     #[test]
     fn equals() {

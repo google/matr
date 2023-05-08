@@ -25,6 +25,7 @@ meta!{
 
 mod internal {
     pub use super::super::internal::*;
+    use crate::bool::*;
 
     meta!{
         pub struct RemoveFromListVisitor<
@@ -46,6 +47,8 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
 
     #[test]
     fn remove_from_empty_list() {

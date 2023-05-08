@@ -13,6 +13,8 @@
 // limitations under the License.
 
 use internal::*;
+use crate::bool::*;
+use crate::list::*;
 
 meta!{
     pub type AddToSet<
@@ -37,6 +39,9 @@ mod internal {
 mod tests {
     use std::marker::PhantomData;
     use crate::*;
+    use super::super::*;
+    use crate::expr_wrapper::*;
+    use crate::r#type::*;
 
     struct CalledVisitEmptySet {}
 

@@ -13,6 +13,8 @@
 // limitations under the License.
 
 use internal::*;
+use crate::list::*;
+use crate::r#type::*;
 
 meta!{
     pub type TupleBasedTypeListToList<
@@ -23,6 +25,7 @@ meta!{
 
 mod internal {
     pub use super::super::internal::*;
+    use crate::list::*;
 
     meta!{
         pub struct TupleBasedTypeListToListVisitor: TupleBasedTypeListVisitor<List<Type>> {
@@ -36,6 +39,8 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::list::*;
 
     #[test]
     fn tuple_based_list_to_list() {

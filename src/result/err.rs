@@ -44,6 +44,8 @@ mod internal {
 mod tests {
     use std::marker::PhantomData;
     use crate::*;
+    use crate::r#type::*;
+    use super::super::*;
 
     struct CalledVisitErr<E> {
         e: PhantomData<E>,

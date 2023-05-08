@@ -19,6 +19,8 @@ pub use list_to_tuple_based_type_list::*;
 pub use tuple_based_type_list_to_list::*;
 
 use internal::*;
+use crate::expr_wrapper::*;
+use crate::r#type::*;
 
 // This is conceptually similar to List<Type>, but it represents the list as a nested tuple:
 // (T0, (T1, ..., () )...)
@@ -85,6 +87,8 @@ impl<Head, Tail: TupleBasedTypeListTrait> TupleBasedTypeListTrait for (Head, Tai
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
+    pub use super::*;
+    use crate::bool::*;
 
     pub trait TupleBasedTypeListValue {
         type Impl: TupleBasedTypeListOuterTrait;
@@ -150,7 +154,7 @@ mod internal {
 
         pub struct IsTupleBasedTypeListEmpty: TupleBasedTypeListVisitor<Bool> {
             type VisitEmptyTupleBasedTypeList = True;
-            type VisitCons<Elem: Expr<Type>, Tail: Expr<crate::TupleBasedTypeList>> = False;
+            type VisitCons<Elem: Expr<Type>, Tail: Expr<TupleBasedTypeList>> = False;
         }
 
         pub struct TupleBasedTypeListEqualsCons<
@@ -167,6 +171,7 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::*;
 
     #[test]
     fn equals() {

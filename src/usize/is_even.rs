@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use internal::*;
+use crate::bool::*;
 
 meta!{
     pub type IsEven<
@@ -28,7 +29,8 @@ meta!{
 
 mod internal {
     pub use super::super::internal::*;
-    
+    use crate::bool::*;
+
     meta!{
         pub struct IsEvenVisitor: USizeVisitor<Bool> {
             type VisitZero = True;
@@ -46,7 +48,9 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
-
+    use super::super::*;
+    use crate::bool::*;
+    
     #[test]
     fn is_even() {
         meta_assert_eq!(Bool, IsEven<Zero>, True);

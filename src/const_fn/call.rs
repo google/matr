@@ -25,7 +25,8 @@ mod internal {
 #[cfg(test)]
 #[allow(dead_code)]
 mod tests {
-    use super::internal::*;
+    use crate::*;
+    use super::super::*;
 
     meta!{
         struct Add42Impl: const ConstFnTrait<i32, i32> {

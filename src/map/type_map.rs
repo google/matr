@@ -17,13 +17,13 @@
 #[macro_export]
 macro_rules! type_map {
     {} => {
-        $crate::EmptyMap<$crate::Type, $crate::Type>
+        $crate::map::EmptyMap<$crate::r#type::Type, $crate::r#type::Type>
     };
     {$K1:ty : $V1:ty $( ,$Ks:ty : $Vs: ty )*} => {
-        $crate::Put<$crate::Type, $crate::Type, $crate::WrapType<$K1>, $crate::WrapType<$V1>, $crate::type_map!{$($Ks: $Vs),*}>
+        $crate::map::Put<$crate::r#type::Type, $crate::r#type::Type, $crate::r#type::WrapType<$K1>, $crate::r#type::WrapType<$V1>, $crate::type_map!{$($Ks: $Vs),*}>
     };
     {$K1:ty : $V1:ty $( ,$Ks:ty : $Vs: ty )* ,} => {
-        $crate::Put<$crate::Type, $crate::Type, $crate::WrapType<$K1>, $crate::WrapType<$V1>, $crate::type_map!{$($Ks: $Vs),*}>
+        $crate::map::Put<$crate::r#type::Type, $crate::r#type::Type, $crate::r#type::WrapType<$K1>, $crate::r#type::WrapType<$V1>, $crate::type_map!{$($Ks: $Vs),*}>
     };
 }
 pub use type_map;
@@ -32,6 +32,8 @@ pub use type_map;
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
 
     #[test]
     fn empty_map() {

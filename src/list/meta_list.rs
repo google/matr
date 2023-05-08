@@ -18,10 +18,10 @@
 #[macro_export]
 macro_rules! meta_list {
     (<$T: ty>[]) => {
-        $crate::EmptyList<$T>
+        $crate::list::EmptyList<$T>
     };
     (<$T: ty>[$Head:ty $(, $Tail:ty)*]) => {
-        $crate::Cons<$T, $Head, $crate::meta_list!(<$T>[$($Tail),*])>
+        $crate::list::Cons<$T, $Head, $crate::meta_list!(<$T>[$($Tail),*])>
     };
 }
 pub use meta_list;
@@ -30,6 +30,8 @@ pub use meta_list;
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
 
     #[test]
     fn empty_list() {

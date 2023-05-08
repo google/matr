@@ -15,6 +15,7 @@
 use std::collections::HashMap;
 use std::hash::Hash;
 use internal::*;
+use crate::runtime_fn::*;
 
 pub fn to_hash_map<K: EqualityComparableKind + KindWithDefault, V: KindWithDefault, OutK: Eq + Hash, OutV, M: Expr<Map<K, V>>, KeyF: Functor1<K, RuntimeFn<OutK, ()>>, ValueF: Functor1<V, RuntimeFn<OutV, ()>>>() -> HashMap<OutK, OutV> {
     return call_runtime_fn::<HashMap<OutK, OutV>, (),
@@ -25,7 +26,8 @@ mod internal {
     use std::collections::HashMap;
     use std::hash::Hash;
     pub use super::super::internal::*;
-    
+    use crate::runtime_fn::*;
+
     meta!{
         pub struct ToHashMapVisitor<
             K: KindWithDefault + EqualityComparableKind, 
@@ -75,6 +77,9 @@ mod tests {
     use std::any::type_name;
     use std::collections::HashMap;
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
+    use crate::runtime_fn::*;
 
     meta!{
         struct TypeToStr: Functor1<Type, RuntimeFn<&'static str, ()>> {

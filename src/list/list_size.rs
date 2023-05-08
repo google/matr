@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use internal::*;
+use crate::usize::*;
 
 meta!{
     pub type ListSize<
@@ -24,6 +25,7 @@ meta!{
 
 mod internal {
     pub use super::super::internal::*;
+    use crate::usize::*;
 
     meta!{
         pub struct ListSizeVisitor<
@@ -39,6 +41,9 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
+    use crate::usize::*;
 
     #[test]
     fn empty_list() {

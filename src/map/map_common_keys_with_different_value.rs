@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use internal::*;
+use crate::pair::*;
 
 meta!{
     pub type MapCommonKeysWithDifferentValue<
@@ -26,7 +27,9 @@ meta!{
 
 mod internal {
     pub use super::super::internal::*;
-    
+    use crate::option::*;
+    use crate::bool::*;
+
     meta!{
         pub struct MapCommonKeysWithDifferentValueVisitor<
             K: KindWithDefault + EqualityComparableKind,
@@ -70,6 +73,9 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
+    use crate::pair::*;
 
     #[test]
     fn empty_map_and_empty_map() {

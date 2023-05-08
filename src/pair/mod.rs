@@ -22,6 +22,7 @@ pub use cons_pair::*;
 
 use std::marker::PhantomData;
 use internal::*;
+use crate::expr_wrapper::*;
 
 pub struct Pair<FirstK: Kind, SecondK: Kind> {
     first_k: PhantomData<FirstK>,
@@ -48,6 +49,8 @@ impl<FirstK: KindWithDefault + KindWithDebugForm, SecondK: KindWithDefault + Kin
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
+    pub use super::*;
+    use crate::bool::*;
 
     pub trait PairValue<FirstK: Kind, SecondK: Kind> {
         type Impl: PairTrait<FirstK, SecondK>;
@@ -102,6 +105,10 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use crate::bool::*;
+    use crate::option::*;
+    use crate::pair::*;
+    use crate::r#type::*;
 
     #[test]
     fn equals() {

@@ -31,6 +31,7 @@ pub use to_bool::*;
 pub use if_result::*;
 
 use internal::*;
+use crate::expr_wrapper::*;
 
 pub struct Bool {}
 
@@ -53,6 +54,7 @@ impl KindWithDebugForm for Bool {
 pub(crate) mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
+    pub use super::*;
 
     pub trait BoolTrait {
         type Cond<ResultK: Kind, IfTrue: Expr<ResultK>, IfFalse: Expr<ResultK>>: Expr<ResultK>;
@@ -85,6 +87,7 @@ pub(crate) mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use crate::bool::*;
 
     #[test]
     fn as_bool() {

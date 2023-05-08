@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use internal::*;
+use crate::result::*;
 
 meta!{
     pub type ToResultRuntimeFn<
@@ -29,6 +30,7 @@ meta!{
 
 mod internal {
     pub use super::super::internal::*;
+    use crate::result::*;
 
     meta!{
         pub struct ToResultRuntimeFnAdapter<
@@ -60,8 +62,10 @@ mod internal {
 #[cfg(test)]
 #[allow(dead_code)]
 mod tests {
-    use super::internal::*;
-
+    use crate::*;
+    use super::super::*;
+    use crate::result::*;
+    
     meta!{
         pub struct ToUnsigned32RuntimeFn: RuntimeFnTrait<u32, i32> {
             fn apply(n: i32) -> u32 {

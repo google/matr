@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use crate::*;
+use super::*;
 
 meta!{
     pub type Not<
@@ -25,6 +26,7 @@ meta!{
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
 
     #[test]
     fn test_not() {

@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use internal::*;
+use crate::set::*;
 
 meta!{
     pub type MapRemoveKeySet<
@@ -26,7 +27,9 @@ meta!{
 
 mod internal {
     pub use super::super::internal::*;
-    
+    use crate::bool::*;
+    use crate::set::*;
+
     meta!{
         pub struct MapRemoveKeySetVisitor<
             K: KindWithDefault + EqualityComparableKind, 
@@ -50,6 +53,9 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
+    use crate::set::*;
 
     #[test]
     fn empty_map_and_empty_set() {

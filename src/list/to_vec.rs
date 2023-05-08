@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use internal::*;
+use crate::runtime_fn::*;
 
 pub fn to_vec<K: Kind, OutT, L: Expr<List<K>>, F: Functor1<K, RuntimeFn<OutT, ()>>>() -> Vec<OutT> {
     return call_runtime_fn::<Vec<OutT>, (), ToReversedVec<K, ReverseList<K, L>, OutT, F>>(());
@@ -20,6 +21,7 @@ pub fn to_vec<K: Kind, OutT, L: Expr<List<K>>, F: Functor1<K, RuntimeFn<OutT, ()
 
 mod internal {
     pub use super::super::internal::*;
+    use crate::runtime_fn::*;
 
     meta!{
         pub type ToReversedVec<
@@ -66,6 +68,9 @@ mod internal {
 mod tests {
     use std::any::type_name;
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
+    use crate::runtime_fn::*;
 
     meta!{
         struct TypeToStr: Functor1<Type, RuntimeFn<&'static str, ()>> {

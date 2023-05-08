@@ -18,10 +18,10 @@
 #[macro_export]
 macro_rules! meta_map {
     (<$K: ty, $V: ty>{}) => {
-        $crate::EmptyMap<$K, $V>
+        $crate::map::EmptyMap<$K, $V>
     };
     (<$K: ty, $V: ty>{$K1:ty : $V1:ty $( ,$Ks:ty : $Vs: ty )*}) => {
-        $crate::Put<$K, $V, $K1, $V1, $crate::meta_map!(<$K, $V>{$($Ks: $Vs),*})>
+        $crate::map::Put<$K, $V, $K1, $V1, $crate::meta_map!(<$K, $V>{$($Ks: $Vs),*})>
     };
 }
 pub use meta_map;
@@ -30,6 +30,8 @@ pub use meta_map;
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::super::*;
+    use crate::r#type::*;
 
     #[test]
     fn empty_map() {

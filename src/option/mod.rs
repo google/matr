@@ -24,6 +24,7 @@ pub use option_or_value::*;
 
 use std::marker::PhantomData;
 use internal::*;
+use crate::expr_wrapper::*;
 
 pub struct Option<K: Kind> {
     k: PhantomData<K>,
@@ -61,6 +62,8 @@ meta!{
 mod internal {
     use std::marker::PhantomData;
     pub use crate::*;
+    pub use super::*;
+    use crate::bool::*;
 
     pub trait OptionValue<K: Kind> {
         type Impl: OptionTrait<K>;
@@ -130,6 +133,9 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use super::*;
+    use crate::r#type::*;
+    use crate::bool::*;
 
     #[test]
     fn equals() {

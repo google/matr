@@ -14,6 +14,7 @@
 
 use crate::*;
 use internal::*;
+use crate::const_fn::*;
 
 meta!{
     pub type NoOpConstFn: Expr<ConstFn<(), ()>> =
@@ -22,6 +23,7 @@ meta!{
 
 mod internal {
     pub use crate::*;
+    use crate::const_fn::*;
 
     meta!{
         pub struct NoOpConstFnImpl: const ConstFnTrait<(), ()> {
@@ -33,7 +35,7 @@ mod internal {
 #[cfg(test)]
 #[allow(dead_code)]
 mod tests {
-    use super::internal::*;
+    use super::super::*;
 
     #[test]
     fn no_op_const_fn() {

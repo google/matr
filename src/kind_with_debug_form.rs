@@ -13,6 +13,7 @@
 // limitations under the License.
 
 use crate::*;
+use crate::expr_wrapper::*;
 
 pub trait KindWithDebugForm: Kind {
     // A wrapped Expr equivalent to the given expression but fully-evaluated and composed only of

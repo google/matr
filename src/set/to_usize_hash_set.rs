@@ -14,6 +14,7 @@
 
 use std::collections::HashSet;
 use internal::*;
+use crate::usize::*;
 
 pub fn to_usize_hash_set<S: Expr<Set<USize>>>() -> HashSet<usize> {
     return to_hash_set::<USize, usize, S, ToUSizeHashSetFunctor>();
@@ -21,7 +22,9 @@ pub fn to_usize_hash_set<S: Expr<Set<USize>>>() -> HashSet<usize> {
 
 mod internal {
     pub use super::super::internal::*;
-    
+    use crate::runtime_fn::*;
+    use crate::usize::*;
+
     meta!{
         pub struct ToUSizeHashSetFunctor: Functor1<USize, RuntimeFn<usize, ()>> {
             type Apply<N: Expr<USize>> = WrapRuntimeFn<usize, (), ToUSizeConstFnImpl<N>>;
@@ -41,7 +44,8 @@ mod internal {
 #[allow(dead_code)]
 mod tests {
     use std::collections::HashSet;
-    use crate::*;
+    use super::super::*;
+    use crate::usize::*;
 
     #[test]
     fn empty_set_to_usize_hash_set() {

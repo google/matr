@@ -15,10 +15,10 @@
 #[macro_export]
 macro_rules! meta_assert_eq {
     ($K:ty, $X:ty, $Y:ty) => {{
-        const EQ: bool = $crate::to_bool::<$crate::Equals<$K, $X, $Y>>();
+        const EQ: bool = $crate::bool::to_bool::<$crate::Equals<$K, $X, $Y>>();
         const _: () = $crate::assertions::internal::check_equal::<
-            $crate::UnwrapExpr<$K, $crate::DebugForm<$K, $X>>,
-            $crate::UnwrapExpr<$K, $crate::DebugForm<$K, $Y>>
+            $crate::expr_wrapper::UnwrapExpr<$K, $crate::DebugForm<$K, $X>>,
+            $crate::expr_wrapper::UnwrapExpr<$K, $crate::DebugForm<$K, $Y>>
         >(EQ);
     }};
 }
@@ -27,10 +27,10 @@ pub use meta_assert_eq;
 #[macro_export]
 macro_rules! meta_assert_not_eq {
     ($K:ty, $X:ty, $Y:ty) => {{
-        const EQ: bool = $crate::to_bool::<$crate::Equals<$K, $X, $Y>>();
+        const EQ: bool = $crate::bool::to_bool::<$crate::Equals<$K, $X, $Y>>();
         const _: () = $crate::assertions::internal::check_not_equal::<
-            $crate::UnwrapExpr<$K, $crate::DebugForm<$K, $X>>,
-            $crate::UnwrapExpr<$K, $crate::DebugForm<$K, $Y>>
+            $crate::expr_wrapper::UnwrapExpr<$K, $crate::DebugForm<$K, $X>>,
+            $crate::expr_wrapper::UnwrapExpr<$K, $crate::DebugForm<$K, $Y>>
         >(EQ);
     }};
 }
@@ -54,6 +54,8 @@ pub mod internal {
 #[allow(dead_code)]
 mod tests {
     use crate::*;
+    use crate::r#type::*;
+    use crate::bool::*;
 
     #[test]
     fn assert_type_eq() {
