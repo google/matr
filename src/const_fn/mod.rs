@@ -35,11 +35,11 @@ pub const trait ConstFnTrait<Result, Args> {
 }
 
 meta!{
-    pub const struct WrapConstFn<
+    pub struct WrapConstFn<
         Result,
         Args,
         F: [const] ConstFnTrait<Result, Args>
-    >: Expr<ConstFn<Result, Args>> {
+    >: const Expr<ConstFn<Result, Args>> {
         type Eval = WrapConstFnValue<Result, Args, WrapConstFnImpl<Result, Args, F>>;
     }
 }
@@ -96,23 +96,23 @@ mod internal {
     }
 
     meta!{
-        pub const struct WrapConstFnImpl<
+        pub struct WrapConstFnImpl<
             Result,
             Args,
             F: [const] ConstFnTrait<Result, Args>
-        >: ConstFnValue<Result, Args> {
+        >: const ConstFnValue<Result, Args> {
             type Impl = WrapConstFnTrait<Result, Args, F>;
         }
 
-        pub const struct WrapConstFnTrait<
+        pub struct WrapConstFnTrait<
             Result,
             Args,
             F: [const] ConstFnTrait<Result, Args>
-        >: ConstFnTraitWrapper<Result, Args> {
+        >: const ConstFnTraitWrapper<Result, Args> {
             type Fn = F;
         }
 
-        pub const struct PanicWithAsConstFnError<Result, Args, Fn: Expr<ConstFn<Result, Args>>>: ConstFnTrait<Result, Args> {
+        pub struct PanicWithAsConstFnError<Result, Args, Fn: Expr<ConstFn<Result, Args>>>: const ConstFnTrait<Result, Args> {
             fn apply(_: Args) -> Result {
                 panic_with_as_const_fn_error::<
                     Result,

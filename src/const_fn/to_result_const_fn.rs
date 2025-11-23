@@ -17,11 +17,11 @@ use internal::*;
 use crate::result::*;
 
 meta!{
-    pub const type ToResultConstFn<
+    pub type ToResultConstFn<
         Out,
         Args: [const] Destruct,
         E: Expr<Result<ConstFn<Out, Args>>>
-    >: Expr<ConstFn<std::result::Result<Out, &'static str>, Args>> =
+    >: const Expr<ConstFn<std::result::Result<Out, &'static str>, Args>> =
         ResultOrValue<
             ConstFn<std::result::Result<Out, &'static str>, Args>,
             AndThen<
@@ -43,13 +43,13 @@ use std::marker::Destruct;
             type Apply<X: Expr<ConstFn<Out, Args>>> = Ok<ConstFn<std::result::Result<Out, &'static str>, Args>, WrapConstFn<std::result::Result<Out, &'static str>, Args, ToResultConstFnAdapterImpl<Out, Args, X>>>;
         }
 
-        pub const struct ToResultConstFnAdapterImpl<Out, Args, X: Expr<ConstFn<Out, Args>>>: ConstFnTrait<std::result::Result<Out, &'static str>, Args> {
+        pub struct ToResultConstFnAdapterImpl<Out, Args, X: Expr<ConstFn<Out, Args>>>: const ConstFnTrait<std::result::Result<Out, &'static str>, Args> {
             fn apply(args: Args) -> std::result::Result<Out, &'static str> {
                 return Ok(call_const_fn::<Out, Args, X>(args));
             }
         }
 
-        pub const struct ToResultConstFnErrorImpl<Out, Args: [const] Destruct>: ConstFnTrait<std::result::Result<Out, &'static str>, Args> {
+        pub struct ToResultConstFnErrorImpl<Out, Args: [const] Destruct>: const ConstFnTrait<std::result::Result<Out, &'static str>, Args> {
             fn apply(args: Args) -> std::result::Result<Out, &'static str> {
                 mem::forget(args);
                 return Err("error Result in ToResultConstFn")

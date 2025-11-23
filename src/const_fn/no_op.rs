@@ -26,7 +26,7 @@ mod internal {
     use crate::const_fn::*;
 
     meta!{
-        pub const struct NoOpConstFnImpl: ConstFnTrait<(), ()> {
+        pub struct NoOpConstFnImpl: const ConstFnTrait<(), ()> {
             fn apply(_: ()) -> () {}
         }
     }

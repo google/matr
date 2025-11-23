@@ -78,9 +78,11 @@
 // add a space between the two `>`s).
 
 #[macro_export]
-macro_rules! meta_with_parsed_toplevel_const {
+macro_rules! meta {
+    {} => {};
+
     {
-        $Vis:vis ($($ToplevelConst:ident)?) type $Fn:ident $(<
+        $Vis:vis type $Fn:ident $(<
             $(
                 $Args:ident $(:
                     $([$Arg1Bound1Const:ident])? $($Arg1Bound1Idents:ident $(<$Arg1Bound1IdentsTypeArg1:ty $(, $Arg1Bound1IdentsTypeArgs:ty)* >)?)::*
@@ -92,8 +94,8 @@ macro_rules! meta_with_parsed_toplevel_const {
         >)?: $($ExprIdent:ident)::+ <$ReturnK:ty> = $Body:ty;
         $($Tail:tt)*
     } => {
-        meta_with_parsed_toplevel_const!{
-            $Vis ($($ToplevelConst)*) struct $Fn $(<
+        meta!{
+            $Vis struct $Fn $(<
                 $(
                     $Args $(:
                         $([$Arg1Bound1Const])* $($Arg1Bound1Idents $(<$Arg1Bound1IdentsTypeArg1 $(, $Arg1Bound1IdentsTypeArgs)* >)?)::*
@@ -109,8 +111,39 @@ macro_rules! meta_with_parsed_toplevel_const {
         }
     };
 
+    // Variant with const
     {
-        $Vis:vis ($($ToplevelConst:ident)?) struct $Fn:ident $(<
+        $Vis:vis type $Fn:ident $(<
+            $(
+                $Args:ident $(:
+                    $([$Arg1Bound1Const:ident])? $($Arg1Bound1Idents:ident $(<$Arg1Bound1IdentsTypeArg1:ty $(, $Arg1Bound1IdentsTypeArgs:ty)* >)?)::*
+                    $(+
+                        $([$Arg1BoundsConst:ident])? $($Arg1BoundsIdents:ident $(<$Arg1BoundsIdentsTypeArg1:ty $(, $Arg1BoundsIdentsTypeArgs:ty)* >)?)::*
+                    )*
+                )?
+            ),*
+        >)?: const $($ExprIdent:ident)::+ <$ReturnK:ty> = $Body:ty;
+        $($Tail:tt)*
+    } => {
+        meta!{
+            $Vis struct $Fn $(<
+                $(
+                    $Args $(:
+                        $([$Arg1Bound1Const])* $($Arg1Bound1Idents $(<$Arg1Bound1IdentsTypeArg1 $(, $Arg1Bound1IdentsTypeArgs)* >)?)::*
+                        $(+
+                            $([$Arg1BoundsConst])* $($Arg1BoundsIdents $(<$Arg1BoundsIdentsTypeArg1 $(, $Arg1BoundsIdentsTypeArgs)* >)?)::*
+                        )*
+                    )*
+                ),*
+            >)*: const $($ExprIdent)::* <$ReturnK> {
+                type Eval = <$Body as $($ExprIdent)::*<$ReturnK> >::Eval;
+            }
+            $($Tail)*
+        }
+    };
+
+    {
+        $Vis:vis struct $Fn:ident $(<
             $(
                 $Args:ident $(:
                     $([$Arg1Bound1Const:ident])? $($Arg1Bound1Idents:ident $(<$Arg1Bound1IdentsTypeArg1:ty $(, $Arg1Bound1IdentsTypeArgs:ty)* >)?)::*
@@ -143,7 +176,7 @@ macro_rules! meta_with_parsed_toplevel_const {
             )*
         }
 
-        $($ToplevelConst)* impl $(<
+        impl $(<
             $(
                 $Args $(:
                     $([$Arg1Bound1Const])* $($Arg1Bound1Idents $(<$Arg1Bound1IdentsTypeArg1 $(, $Arg1Bound1IdentsTypeArgs)* >)?)::*
@@ -160,19 +193,58 @@ macro_rules! meta_with_parsed_toplevel_const {
             $($Tail)*
         }
     };
-}
 
-#[macro_export]
-macro_rules! meta {
-    {} => {};
+    // Variant with const
+    {
+        $Vis:vis struct $Fn:ident $(<
+            $(
+                $Args:ident $(:
+                    $([$Arg1Bound1Const:ident])? $($Arg1Bound1Idents:ident $(<$Arg1Bound1IdentsTypeArg1:ty $(, $Arg1Bound1IdentsTypeArgs:ty)* >)?)::*
+                    $(+
+                        $([$Arg1BoundsConst:ident])? $($Arg1BoundsIdents:ident $(<$Arg1BoundsIdentsTypeArg1:ty $(, $Arg1BoundsIdentsTypeArgs:ty)* >)?)::*
+                    )*
+                )?
+            ),*
+        // Semantically `$ReturnIdents1:ident $($ReturnIdents2:ident)?` is really
+        // `$($ConstQualifier:ident)? $ReturnIdents:ident` but Rust doesn't support matching that
+        // directly.
+        >)?: const $($ReturnIdents1:ident $($ReturnIdents2:ident)? $(<$($ReturnIdentsTypeArgs:ty),*>)?)::* {
+            $($Body:tt)*
+        }
+        $($Tail:tt)*
+    } => {
+        #[allow(non_snake_case)]
+        $Vis struct $Fn $(<
+                $(
+                    $Args $(:
+                        $($Arg1Bound1Idents $(<$Arg1Bound1IdentsTypeArg1 $(, $Arg1Bound1IdentsTypeArgs)* >)?)::*
+                        $(+
+                            $($Arg1BoundsIdents $(<$Arg1BoundsIdentsTypeArg1 $(, $Arg1BoundsIdentsTypeArgs)* >)?)::*
+                        )*
+                    )*
+                ),*
+        >)* {
+            $(
+                $($Args: std::marker::PhantomData<$Args>),*
+            )*
+        }
 
-    // Helper rules to parse the optional "const". Then in meta_with_parsed_toplevel_const we can assume that the "const" (if any) is always in parentheses.
-    {$Vis:vis const type $($Tail:tt)*} => {meta_with_parsed_toplevel_const!{$Vis (const) type $($Tail)*} };
-    {$Vis:vis type $($Tail:tt)*} => {meta_with_parsed_toplevel_const!{$Vis () type $($Tail)*} };
+        const impl $(<
+            $(
+                $Args $(:
+                    $([$Arg1Bound1Const])* $($Arg1Bound1Idents $(<$Arg1Bound1IdentsTypeArg1 $(, $Arg1Bound1IdentsTypeArgs)* >)?)::*
+                    $(+
+                        $([$Arg1BoundsConst])* $($Arg1BoundsIdents $(<$Arg1BoundsIdentsTypeArg1 $(, $Arg1BoundsIdentsTypeArgs)* >)?)::*
+                    )*
+                )*
+            ),*
+        >)* $($ReturnIdents1 $($ReturnIdents2)* $(<$($ReturnIdentsTypeArgs),*>)*)::* for $Fn $(<$($Args),*>)* {
+            $($Body)*
+        }
 
-    // Helper rules to parse the optional "const". Then in meta_with_parsed_toplevel_const we can assume that the "const" (if any) is always in parentheses.
-    {$Vis:vis const struct $($Tail:tt)*} => {meta_with_parsed_toplevel_const!{$Vis (const) struct $($Tail)*} };
-    {$Vis:vis struct $($Tail:tt)*} => {meta_with_parsed_toplevel_const!{$Vis () struct $($Tail)*} };
-
+        meta! {
+            $($Tail)*
+        }
+    };
 }
 pub use meta;
