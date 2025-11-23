@@ -47,7 +47,7 @@ impl KindWithDebugForm for USize {
     type DebugForm<E: Expr<Self>> = VisitUSize<ExprWrapper<USize>, E, ToUSizeDebugFormVisitor>;
 }
 
-pub trait USizeVisitor<ResultK: Kind> {
+pub const trait USizeVisitor<ResultK: Kind> {
     type VisitZero: Expr<ResultK>;
     type VisitIncrement<N: Expr<USize>>: Expr<ResultK>;
 }
@@ -67,7 +67,7 @@ mod internal {
     pub use super::*;
     use crate::bool::*;
 
-    pub trait USizeValue {
+    pub const trait USizeValue {
         type Impl: USizeTrait;
     }
 
@@ -89,7 +89,7 @@ mod internal {
         type Visit<ResultK: Kind, V: USizeVisitor<ResultK>> = <<<N as Expr<USize>>::Eval as Value<USize>>::UnconstrainedImpl as USizeTrait>::Visit<ResultK, V>;
     }
 
-    pub trait USizeTrait {
+    pub const trait USizeTrait {
         type Visit<ResultK: Kind, V: USizeVisitor<ResultK>>: Expr<ResultK>;
     }
 

@@ -14,6 +14,6 @@
 
 use crate::*;
 
-pub trait Expr<K: Kind + ?Sized> {
+pub const trait Expr<K: Kind + ?Sized> {
     type Eval: Value<K>;
 }

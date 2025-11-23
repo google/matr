@@ -76,29 +76,29 @@
 // single token and a compilation error will be reported.
 // To avoid this it's recommended to indent the declarations as in the examples shown (or at least
 // add a space between the two `>`s).
+
 #[macro_export]
-macro_rules! meta {
-    {} => {};
+macro_rules! meta_with_parsed_toplevel_const {
     {
-        $Vis:vis type $Fn:ident $(<
+        $Vis:vis ($($ToplevelConst:ident)?) type $Fn:ident $(<
             $(
                 $Args:ident $(:
-                    $(~$Arg1Bound1Const:ident)? $($Arg1Bound1Idents:ident $(<$Arg1Bound1IdentsTypeArg1:ty $(, $Arg1Bound1IdentsTypeArgs:ty)* >)?)::*
+                    $([$Arg1Bound1Const:ident])? $($Arg1Bound1Idents:ident $(<$Arg1Bound1IdentsTypeArg1:ty $(, $Arg1Bound1IdentsTypeArgs:ty)* >)?)::*
                     $(+
-                        $(~$Arg1BoundsConst:ident)? $($Arg1BoundsIdents:ident $(<$Arg1BoundsIdentsTypeArg1:ty $(, $Arg1BoundsIdentsTypeArgs:ty)* >)?)::*
+                        $([$Arg1BoundsConst:ident])? $($Arg1BoundsIdents:ident $(<$Arg1BoundsIdentsTypeArg1:ty $(, $Arg1BoundsIdentsTypeArgs:ty)* >)?)::*
                     )*
                 )?
             ),*
         >)?: $($ExprIdent:ident)::+ <$ReturnK:ty> = $Body:ty;
         $($Tail:tt)*
     } => {
-        meta!{
-            $Vis struct $Fn $(<
+        meta_with_parsed_toplevel_const!{
+            $Vis ($($ToplevelConst)*) struct $Fn $(<
                 $(
                     $Args $(:
-                        $(~$Arg1Bound1Const)* $($Arg1Bound1Idents $(<$Arg1Bound1IdentsTypeArg1 $(, $Arg1Bound1IdentsTypeArgs)* >)?)::*
+                        $([$Arg1Bound1Const])* $($Arg1Bound1Idents $(<$Arg1Bound1IdentsTypeArg1 $(, $Arg1Bound1IdentsTypeArgs)* >)?)::*
                         $(+
-                            $(~$Arg1BoundsConst)? $($Arg1BoundsIdents $(<$Arg1BoundsIdentsTypeArg1 $(, $Arg1BoundsIdentsTypeArgs)* >)?)::*
+                            $([$Arg1BoundsConst])* $($Arg1BoundsIdents $(<$Arg1BoundsIdentsTypeArg1 $(, $Arg1BoundsIdentsTypeArgs)* >)?)::*
                         )*
                     )*
                 ),*
@@ -110,12 +110,12 @@ macro_rules! meta {
     };
 
     {
-        $Vis:vis struct $Fn:ident $(<
+        $Vis:vis ($($ToplevelConst:ident)?) struct $Fn:ident $(<
             $(
                 $Args:ident $(:
-                    $(~$Arg1Bound1Const:ident)? $($Arg1Bound1Idents:ident $(<$Arg1Bound1IdentsTypeArg1:ty $(, $Arg1Bound1IdentsTypeArgs:ty)* >)?)::*
+                    $([$Arg1Bound1Const:ident])? $($Arg1Bound1Idents:ident $(<$Arg1Bound1IdentsTypeArg1:ty $(, $Arg1Bound1IdentsTypeArgs:ty)* >)?)::*
                     $(+
-                        $(~$Arg1BoundsConst:ident)? $($Arg1BoundsIdents:ident $(<$Arg1BoundsIdentsTypeArg1:ty $(, $Arg1BoundsIdentsTypeArgs:ty)* >)?)::*
+                        $([$Arg1BoundsConst:ident])? $($Arg1BoundsIdents:ident $(<$Arg1BoundsIdentsTypeArg1:ty $(, $Arg1BoundsIdentsTypeArgs:ty)* >)?)::*
                     )*
                 )?
             ),*
@@ -131,9 +131,9 @@ macro_rules! meta {
         $Vis struct $Fn $(<
                 $(
                     $Args $(:
-                        $(~$Arg1Bound1Const)* $($Arg1Bound1Idents $(<$Arg1Bound1IdentsTypeArg1 $(, $Arg1Bound1IdentsTypeArgs)* >)?)::*
+                        $($Arg1Bound1Idents $(<$Arg1Bound1IdentsTypeArg1 $(, $Arg1Bound1IdentsTypeArgs)* >)?)::*
                         $(+
-                            $(~$Arg1BoundsConst)* $($Arg1BoundsIdents $(<$Arg1BoundsIdentsTypeArg1 $(, $Arg1BoundsIdentsTypeArgs)* >)?)::*
+                            $($Arg1BoundsIdents $(<$Arg1BoundsIdentsTypeArg1 $(, $Arg1BoundsIdentsTypeArgs)* >)?)::*
                         )*
                     )*
                 ),*
@@ -143,12 +143,12 @@ macro_rules! meta {
             )*
         }
 
-        impl $(<
+        $($ToplevelConst)* impl $(<
             $(
                 $Args $(:
-                    $(~$Arg1Bound1Const)* $($Arg1Bound1Idents $(<$Arg1Bound1IdentsTypeArg1 $(, $Arg1Bound1IdentsTypeArgs)* >)?)::*
+                    $([$Arg1Bound1Const])* $($Arg1Bound1Idents $(<$Arg1Bound1IdentsTypeArg1 $(, $Arg1Bound1IdentsTypeArgs)* >)?)::*
                     $(+
-                        $(~$Arg1BoundsConst)* $($Arg1BoundsIdents $(<$Arg1BoundsIdentsTypeArg1 $(, $Arg1BoundsIdentsTypeArgs)* >)?)::*
+                        $([$Arg1BoundsConst])* $($Arg1BoundsIdents $(<$Arg1BoundsIdentsTypeArg1 $(, $Arg1BoundsIdentsTypeArgs)* >)?)::*
                     )*
                 )*
             ),*
@@ -160,5 +160,19 @@ macro_rules! meta {
             $($Tail)*
         }
     };
+}
+
+#[macro_export]
+macro_rules! meta {
+    {} => {};
+
+    // Helper rules to parse the optional "const". Then in meta_with_parsed_toplevel_const we can assume that the "const" (if any) is always in parentheses.
+    {$Vis:vis const type $($Tail:tt)*} => {meta_with_parsed_toplevel_const!{$Vis (const) type $($Tail)*} };
+    {$Vis:vis type $($Tail:tt)*} => {meta_with_parsed_toplevel_const!{$Vis () type $($Tail)*} };
+
+    // Helper rules to parse the optional "const". Then in meta_with_parsed_toplevel_const we can assume that the "const" (if any) is always in parentheses.
+    {$Vis:vis const struct $($Tail:tt)*} => {meta_with_parsed_toplevel_const!{$Vis (const) struct $($Tail)*} };
+    {$Vis:vis struct $($Tail:tt)*} => {meta_with_parsed_toplevel_const!{$Vis () struct $($Tail)*} };
+
 }
 pub use meta;

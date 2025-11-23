@@ -26,7 +26,7 @@ mod internal {
     use crate::const_fn::*;
 
     meta!{
-        pub struct PanickingConstFnImpl<E>: const ConstFnTrait<(), ()> {
+        pub const struct PanickingConstFnImpl<E>: ConstFnTrait<(), ()> {
             fn apply(_: ()) -> () {
                 panic!("Error found in check_no_error");
             }

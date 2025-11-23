@@ -40,7 +40,7 @@ mod internal {
     use crate::result::*;
 
     meta!{
-        pub struct ToUSizeErrorImpl: const ConstFnTrait<std::result::Result<usize, &'static str>, ()> {
+        pub const struct ToUSizeErrorImpl: ConstFnTrait<std::result::Result<usize, &'static str>, ()> {
             fn apply(_: ()) -> std::result::Result<usize, &'static str> {
                 panic!("result_to_usize called on an error")
             }
@@ -55,15 +55,15 @@ mod internal {
             type VisitIncrement<N: Expr<USize>> = WrapConstFn<usize, (), IncValueConstFnImpl<<AsUSize<N> as USizeTrait>::Visit<ConstFn<usize, ()>, ToUSizeVisitor>>>;
         }
 
-        pub struct ZeroValueConstFnImpl: const ConstFnTrait<usize, ()> {
+        pub const struct ZeroValueConstFnImpl: ConstFnTrait<usize, ()> {
             fn apply(_: ()) -> usize {
                 return 0;
             }
         }
 
-        pub struct IncValueConstFnImpl<
+        pub const struct IncValueConstFnImpl<
             F: Expr<ConstFn<usize, ()>>
-        >: const ConstFnTrait<usize, ()> {
+        >: ConstFnTrait<usize, ()> {
             fn apply(_: ()) -> usize {
                 return 1 + call_const_fn::<usize, (), F>(());
             }

@@ -29,7 +29,7 @@ mod tests {
     use super::super::*;
 
     meta!{
-        struct Add42Impl: const ConstFnTrait<i32, i32> {
+        const struct Add42Impl: ConstFnTrait<i32, i32> {
             fn apply(n: i32) -> i32 {
                 return n + 42;
             }

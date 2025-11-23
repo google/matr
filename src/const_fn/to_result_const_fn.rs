@@ -17,9 +17,9 @@ use internal::*;
 use crate::result::*;
 
 meta!{
-    pub type ToResultConstFn<
+    pub const type ToResultConstFn<
         Out,
-        Args: ~const Destruct,
+        Args: [const] Destruct,
         E: Expr<Result<ConstFn<Out, Args>>>
     >: Expr<ConstFn<std::result::Result<Out, &'static str>, Args>> =
         ResultOrValue<
@@ -33,7 +33,8 @@ meta!{
 }
 
 mod internal {
-    use std::marker::Destruct;
+    use std::mem;
+use std::marker::Destruct;
     pub use super::super::internal::*;
     use crate::result::*;
 
@@ -42,14 +43,15 @@ mod internal {
             type Apply<X: Expr<ConstFn<Out, Args>>> = Ok<ConstFn<std::result::Result<Out, &'static str>, Args>, WrapConstFn<std::result::Result<Out, &'static str>, Args, ToResultConstFnAdapterImpl<Out, Args, X>>>;
         }
 
-        pub struct ToResultConstFnAdapterImpl<Out, Args, X: Expr<ConstFn<Out, Args>>>: const ConstFnTrait<std::result::Result<Out, &'static str>, Args> {
+        pub const struct ToResultConstFnAdapterImpl<Out, Args, X: Expr<ConstFn<Out, Args>>>: ConstFnTrait<std::result::Result<Out, &'static str>, Args> {
             fn apply(args: Args) -> std::result::Result<Out, &'static str> {
                 return Ok(call_const_fn::<Out, Args, X>(args));
             }
         }
 
-        pub struct ToResultConstFnErrorImpl<Out, Args: ~const Destruct>: const ConstFnTrait<std::result::Result<Out, &'static str>, Args> {
-            fn apply(_: Args) -> std::result::Result<Out, &'static str> {
+        pub const struct ToResultConstFnErrorImpl<Out, Args: [const] Destruct>: ConstFnTrait<std::result::Result<Out, &'static str>, Args> {
+            fn apply(args: Args) -> std::result::Result<Out, &'static str> {
+                mem::forget(args);
                 return Err("error Result in ToResultConstFn")
             }
         }
@@ -64,7 +66,7 @@ mod tests {
     use crate::result::*;
 
     meta!{
-        pub struct ToUnsigned32ConstFn: const ConstFnTrait<u32, i32> {
+        pub struct ToUnsigned32ConstFn: ConstFnTrait<u32, i32> {
             fn apply(n: i32) -> u32 {
                 return n as u32
             }

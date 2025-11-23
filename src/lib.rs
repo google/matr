@@ -15,6 +15,7 @@
 #![allow(incomplete_features)]
 #![feature(specialization)]
 #![feature(const_trait_impl)]
+#![feature(const_destruct)]
 
 pub mod assertions;
 pub mod meta;

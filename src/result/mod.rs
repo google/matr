@@ -43,7 +43,7 @@ impl<K: KindWithDefault> KindWithDefault for Result<K> {
     type Default = Ok<K, K::Default>;
 }
 
-pub trait ResultVisitor<K: Kind, ResultK: Kind> {
+pub const trait ResultVisitor<K: Kind, ResultK: Kind> {
     type VisitOk<V: Expr<K>>: Expr<ResultK>;
     type VisitErr<E>: Expr<ResultK>;
 }
@@ -88,7 +88,7 @@ mod internal {
         }
     }
 
-    pub trait ResultValue<K: Kind> {
+    pub const trait ResultValue<K: Kind> {
         type Impl: ResultTrait<K>;
     }
 
@@ -101,7 +101,7 @@ mod internal {
         }
     }
     
-    pub trait ResultTrait<K: Kind> {
+    pub const trait ResultTrait<K: Kind> {
         type Visit<ResultK: Kind, V: ResultVisitor<K, ResultK>>: Expr<ResultK>;
     }
 
